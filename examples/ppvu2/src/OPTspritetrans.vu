@@ -1,0 +1,142 @@
+; flowMon::Emit() vcl 1.23 produced this code:
+		.vu
+		.align 4
+		.global	Innerloop_CodeStart
+		.global	Innerloop_CodeEnd
+Innerloop_CodeStart:
+__vcl__MMspritetrans_vcl_3:
+; [0,4) size=4 nU=0 nL=4 ic=4 [lin=4 lp=0]
+              nop                                                           iaddiu          VI04,VI00,vuSymbOutputBuffer1   
+              nop                                                           iaddiu          VI03,VI00,vuSymbVIFOffset       
+              nop                                                           xtop            VI02                            
+              nop                                                           iaddiu          VI05,VI00,vuSymbOutputBuffer2   
+doAllSprites:
+; [0,12) size=12 nU=0 nL=12 ic=12 [lin=12 lp=0]
+              nop                                                           iaddiu          VI06,VI00,0x4000                
+              nop                                                           xitop           VI07                            
+              nop                                                           iadd            VI09,VI06,VI06                  
+              nop                                                           iadd            VI06,VI00,VI04                  
+              nop                                                           ior             VI01,VI09,VI07                  
+              nop                                                           lq.yzw          VF05,vuSymbSpriteGifTag(VI00)   
+              nop                                                           iaddiu          VI09,VI06,1                     
+              nop                                                           iadd            VI08,VI00,VI06                  
+              nop                                                           isw.x           VI01,0(VI06)                    
+              nop                                                           sq.yzw          VF05,0(VI06)                    
+              nop                                                           iadd            VI06,VI00,VI02                  
+              nop                                                           fcset           00                              
+; [0,25) size=25 nU=23 nL=14 ic=37 [lin=23 lp=0]
+              mulaw           ACC,VF04,VF00w                                lq.xyz          VF12,(0*vertexSize)+inPos(VI06) 
+              addw.z          VF07,VF00,VF00w                               nop                                             
+              nop                                                           move.z          VF10,VF00                       
+              addw.z          VF08,VF00,VF00w                               mr32.w          VF10,VF00                       
+              maddax.xyw      ACC,VF01,VF12x                                lq              VF11,(0*vertexSize)+inUV1(VI06) 
+              madday.xyw      ACC,VF02,VF12y                                lq.xy           VF10,(0*vertexSize)+inHW(VI06)  
+              maddz           VF12,VF03,VF12z                               nop                                             
+              adda.z          ACC,VF00,VF26                                 nop                                             
+              addz.x          VF26,VF00,VF11z                               lq              VF13,(0*vertexSize)+inRGBA(VI06)
+              addw.y          VF26,VF00,VF11w                               nop                                             
+              sub             VF09,VF12,VF10                                div             Q,VF00w,VF12w                   
+              add             VF06,VF12,VF10                                nop                                             
+              add.xy          VF07,VF00,VF11                                nop                                             
+              add.xy          VF08,VF00,VF26                                sq              VF13,(0*outVertexSize)+outRGBA(VI09)
+              mul.xy          VF11,VF09,VF24                                iaddiu          VI09,VI09,(1*outVertexSize)     
+              maddw.z         VF11,VF24,VF09w                               iaddiu          VI06,VI06,(1*vertexSize)        
+              mul.xy          VF10,VF06,VF24                                sq.xyz          VF07,((0*outVertexSize)+outSTa)-(1*((1*outVertexSize)))(VI09)
+              maddw.z         VF10,VF24,VF06w                               sq.xyz          VF08,((0*outVertexSize)+outSTb)-(1*((1*outVertexSize)))(VI09)
+              mulq.xyz        VF09,VF09,Q                                   nop                                             
+              clipw.xyz       VF11xyz,VF09w                                 nop                                             
+              mulq.xyz        VF11,VF06,Q                                   nop                                             
+              nop                                                           isubiu          VI07,VI07,1                     
+              add.xyz         VF09,VF09,VF30                                nop                                             
+              clipw.xyz       VF10xyz,VF06w                                 iblez           VI07,EXPL_spritetrans_vcl_spriteLoop__EPI1
+              add.xyz         VF05,VF11,VF30                                nop                                             
+; [0,25) size=25 nU=25 nL=18 ic=43 [lin=25 lp=0]
+              mulaw           ACC,VF04,VF00w                                lq.xyz          VF12,(0*vertexSize)+inPos(VI06) 
+              addw.z          VF07,VF00,VF00w                               nop                                             
+              ftoi4.xyz       VF09,VF09                                     move.z          VF10,VF00                       
+              addw.z          VF08,VF00,VF00w                               mr32.w          VF10,VF00                       
+              maddax.xyw      ACC,VF01,VF12x                                lq              VF11,(0*vertexSize)+inUV1(VI06) 
+              madday.xyw      ACC,VF02,VF12y                                lq.xy           VF10,(0*vertexSize)+inHW(VI06)  
+              maddz           VF12,VF03,VF12z                               fcand           VI01,0x0fff                     
+              adda.z          ACC,VF00,VF26                                 iaddiu          VI01,VI01,0x7fff                
+              addz.x          VF26,VF00,VF11z                               lq              VF13,(0*vertexSize)+inRGBA(VI06)
+              addw.y          VF26,VF00,VF11w                               sq.xyz          VF09,((0*outVertexSize)+outPosa)-(1*((1*outVertexSize)))(VI09)
+              sub             VF09,VF12,VF10                                div             Q,VF00w,VF12w                   
+              add             VF06,VF12,VF10                                nop                                             
+              add.xy          VF07,VF00,VF11                                isw.w           VI01,((0*outVertexSize)+outPosb)-(1*((1*outVertexSize)))(VI09)
+              add.xy          VF08,VF00,VF26                                sq              VF13,(0*outVertexSize)+outRGBA(VI09)
+              mul.xy          VF11,VF09,VF24                                iaddiu          VI09,VI09,(1*outVertexSize)     
+              maddw.z         VF11,VF24,VF09w                               iaddiu          VI06,VI06,(1*vertexSize)        
+              mul.xy          VF10,VF06,VF24                                sq.xyz          VF07,((0*outVertexSize)+outSTa)-(1*((1*outVertexSize)))(VI09)
+              maddw.z         VF10,VF24,VF06w                               sq.xyz          VF08,((0*outVertexSize)+outSTb)-(1*((1*outVertexSize)))(VI09)
+              mulq.xyz        VF09,VF09,Q                                   nop                                             
+              clipw.xyz       VF11xyz,VF09w                                 nop                                             
+              mulq.xyz        VF11,VF06,Q                                   nop                                             
+              ftoi4.xyz       VF06,VF05                                     isubiu          VI07,VI07,1                     
+              add.xyz         VF09,VF09,VF30                                nop                                             
+              clipw.xyz       VF10xyz,VF06w                                 iblez           VI07,EXPL_spritetrans_vcl_spriteLoop__EPI0
+              add.xyz         VF05,VF11,VF30                                nop                                             
+EXPL_spritetrans_vcl_spriteLoop__MAIN_LOOP:
+; [0,25) size=25 nU=25 nL=19 ic=44 [lin=25 lp=25]
+              mulaw           ACC,VF04,VF00w                                lq.xyz          VF12,(0*vertexSize)+inPos(VI06) 
+              addw.z          VF07,VF00,VF00w                               nop                                             
+              ftoi4.xyz       VF09,VF09                                     move.z          VF10,VF00                       
+              addw.z          VF08,VF00,VF00w                               mr32.w          VF10,VF00                       
+              maddax.xyw      ACC,VF01,VF12x                                lq              VF11,(0*vertexSize)+inUV1(VI06) 
+              madday.xyw      ACC,VF02,VF12y                                lq.xy           VF10,(0*vertexSize)+inHW(VI06)  
+              maddz           VF12,VF03,VF12z                               fcand           VI01,0x0fff                     
+              adda.z          ACC,VF00,VF26                                 iaddiu          VI01,VI01,0x7fff                
+              addz.x          VF26,VF00,VF11z                               lq              VF13,(0*vertexSize)+inRGBA(VI06)
+              addw.y          VF26,VF00,VF11w                               sq.xyz          VF09,((0*outVertexSize)+outPosa)-(1*((1*outVertexSize)))(VI09)
+              sub             VF09,VF12,VF10                                div             Q,VF00w,VF12w                   
+              add             VF06,VF12,VF10                                sq.xyz          VF06,((0*outVertexSize)+outPosb)-(2*((1*outVertexSize)))(VI09)
+              add.xy          VF07,VF00,VF11                                isw.w           VI01,((0*outVertexSize)+outPosb)-(1*((1*outVertexSize)))(VI09)
+              add.xy          VF08,VF00,VF26                                sq              VF13,(0*outVertexSize)+outRGBA(VI09)
+              mul.xy          VF11,VF09,VF24                                iaddiu          VI09,VI09,(1*outVertexSize)     
+              maddw.z         VF11,VF24,VF09w                               iaddiu          VI06,VI06,(1*vertexSize)        
+              mul.xy          VF10,VF06,VF24                                sq.xyz          VF07,((0*outVertexSize)+outSTa)-(1*((1*outVertexSize)))(VI09)
+              maddw.z         VF10,VF24,VF06w                               sq.xyz          VF08,((0*outVertexSize)+outSTb)-(1*((1*outVertexSize)))(VI09)
+              mulq.xyz        VF09,VF09,Q                                   nop                                             
+              clipw.xyz       VF11xyz,VF09w                                 nop                                             
+              mulq.xyz        VF11,VF06,Q                                   nop                                             
+              ftoi4.xyz       VF06,VF05                                     isubiu          VI07,VI07,1                     
+              add.xyz         VF09,VF09,VF30                                nop                                             
+              clipw.xyz       VF10xyz,VF06w                                 ibgtz           VI07,EXPL_spritetrans_vcl_spriteLoop__MAIN_LOOP
+              add.xyz         VF05,VF11,VF30                                nop                                             
+EXPL_spritetrans_vcl_spriteLoop__EPI0:
+; [0,8) size=8 nU=2 nL=7 ic=9 [lin=7 lp=0]
+              nop                                                           sq.xyz          VF06,((0*outVertexSize)+outPosb)-(2*((1*outVertexSize)))(VI09)
+              ftoi4.xyz       VF09,VF09                                     nop                                             
+              nop                                                           fcand           VI01,0x0fff                     
+              ftoi4.xyz       VF06,VF05                                     iaddiu          VI01,VI01,0x7fff                
+              nop                                                           isw.w           VI01,((0*outVertexSize)+outPosb)-(1*((1*outVertexSize)))(VI09)
+              nop                                                           sq.xyz          VF09,((0*outVertexSize)+outPosa)-(1*((1*outVertexSize)))(VI09)
+              nop                                                           b               EXPL_spritetrans_vcl_spriteLoop__EXIT_POINT
+              nop                                                           sq.xyz          VF06,((0*outVertexSize)+outPosb)-(1*((1*outVertexSize)))(VI09)
+EXPL_spritetrans_vcl_spriteLoop__EPI1:
+; [0,8) size=8 nU=2 nL=5 ic=7 [lin=5 lp=0]
+              nop                                                           nop                                             
+              ftoi4.xyz       VF09,VF09                                     nop                                             
+              nop                                                           fcand           VI01,0x0fff                     
+              ftoi4.xyz       VF06,VF05                                     iaddiu          VI01,VI01,0x7fff                
+              nop                                                           isw.w           VI01,((0*outVertexSize)+outPosb)-(1*((1*outVertexSize)))(VI09)
+              nop                                                           sq.xyz          VF09,((0*outVertexSize)+outPosa)-(1*((1*outVertexSize)))(VI09)
+              nop                                                           nop                                             
+              nop                                                           sq.xyz          VF06,((0*outVertexSize)+outPosb)-(1*((1*outVertexSize)))(VI09)
+EXPL_spritetrans_vcl_spriteLoop__EXIT_POINT:
+; [0,7) size=7 nU=0 nL=7 ic=7 [lin=7 lp=0]
+              nop                                                           iadd            VI06,VI00,VI02                  
+              nop                                                           iadd            VI01,VI00,VI04                  
+              nop                                                           iadd            VI02,VI00,VI03                  
+              nop                                                           iadd            VI03,VI00,VI06                  
+              nop                                                           xgkick          VI08                            
+              nop                                                           iadd            VI04,VI00,VI05                  
+              nop                                                           iadd            VI05,VI00,VI01                  
+              nop[E]                                                        nop                                             
+              nop                                                           nop                                             
+; [0,2) size=2 nU=0 nL=1 ic=1 [lin=3 lp=0]
+              nop                                                           b               doAllSprites                    
+              nop                                                           nop                                             
+		.align 4
+Innerloop_CodeEnd:
+;	iCount=116

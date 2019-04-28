@@ -1,0 +1,11 @@
+.global VCLFullScreen
+.balign 16, 0
+VCLFullScreen:
+DMAret      *
+MPG         0, *
+.vu
+
+.include "fullscreen.vsm"
+
+.endmpg
+.EndDmaData

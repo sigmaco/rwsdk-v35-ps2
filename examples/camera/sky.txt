@@ -1,0 +1,109 @@
+--------------------------------------------------------------------------
+           RenderWare Graphics Example (PlayStation 2): Camera
+--------------------------------------------------------------------------
+
+PURPOSE
+
+The CAMERA example is used to demonstrate how the camera frustum and 
+settings can be altered to change the camera's view.
+
+The example creates two cameras, a main camera and a sub-camera.
+Initially, the main camera can see the sub-camera frustum and an example
+clump. The sub-camera is positioned to view the clump.
+
+By changing the sub-camera settings via the menu or using the pad, the
+effects of the changes can be seen through the main camera. It is possible
+to switch the view so that the example looks through the sub-camera.
+
+--------------------------------------------------------------------------
+GENERAL CONTROLS
+
+LEFT ANALOG stick        - Rotate the clump.
+
+RIGHT ANALOG stick       - Translate the clump (in Y and Z).
+
+LEFT SHOULDER #2 + 
+LEFT ANALOG stick        - Rotate the camera frustum.
+
+LEFT SHOULDER #2 +
+RIGHT ANALOG stick       - Translate the camera frustum (in X and Z).
+
+TRIANGLE + 
+LEFT ANALOG stick        - Change the size of the camera's view-window.
+
+SQUARE + 
+LEFT ANALOG stick        - Change the camera's view-offset.
+
+SELECT button            - Toggle menu/help/plain mode.
+
+START+ SELECT            - Quit the application.
+
+--------------------------------------------------------------------------
+MENU OPTIONS
+
+CAMERA                   - Allows the user to select the camera which the
+                           example looks through.
+    
+PROJECTION               - Allows the user to change the sub camera's
+                           projection type between rwPERSPECTIVE and 
+                           rwPARALLEL.
+
+NEAR CLIP PLANE          - Allows the user to set the near clip-plane of
+                           the sub camera.
+
+FAR CLIP PLANE           - Allows the user to set the far clip-plane of
+                           the sub camera.
+
+RESET                    - Allows the user to return the camera and clump
+                           to their original location, orientation and 
+                           settings.
+
+MINI-VIEW                - Allows the user to turn on and off the sub 
+                           camera mini-view.
+
+FPS                      - Allows the user to display the current frames
+                           per second.
+
+--------------------------------------------------------------------------
+MENU CONTROLS
+
+DPAD UP and DOWN        - Select menu item.
+
+DPAD LEFT and RIGHT     - Modify menu item value or execute associated 
+                          command.
+
+LEFT ANALOG stick       - Modify floating point value (if applicable) 
+                          otherwise do what you would do in general 
+                          controls..
+
+--------------------------------------------------------------------------
+HELP CONTROLS
+
+DPAD UP and DOWN         - Scroll a line at a time (autorepeat available).
+
+LEFT SHOULDER #1 and #2  - Scroll a page at a time.
+
+--------------------------------------------------------------------------
+VIDEO MODE SELECTION
+
+The command-line option '-vms' can be used to enable a simple video 
+selection screen, which appears before the application starts running. 
+Use the UP and DOWN DPAD buttons to highlight the required video
+mode and press START to make the selection. Note there are several pages
+of video modes; use the LEFT SHOULDER buttons to move from page to page.
+
+--------------------------------------------------------------------------
+This demonstration program is copyright Criterion Software Limited 2003. 
+Criterion Software grants you a license to use it only in the form as 
+supplied. You may not disassemble, decompile or reverse engineer this 
+demonstration program.
+
+This demonstration program is provided as is with no warranties of any
+kind. Criterion Software will not, under any circumstances, be liable for
+any lost revenue or other damages arising from the use of this
+demonstration program.
+
+RenderWare is a registered trademark of Canon Inc.
+Other trademarks acknowledged.
+--------------------------------------------------------------------------
+Tue Apr 22 12:04:26 2003 -- build sky ( 64649 0x35000 )

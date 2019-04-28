@@ -1,0 +1,117 @@
+--------------------------------------------------------------------------
+         RenderWare Graphics Example (PlayStation 2): Alpha-sorting
+--------------------------------------------------------------------------
+
+PURPOSE
+
+The ALPHASRT example illustrates how a series of transparent atomics can
+be sorted to ensure they are rendered in the correct order.
+
+The method involves overriding each atomic's render callback in order to 
+defer the rendering of transparent atomics. All atomics with alpha 
+components are then rendered last, in back-to-front order, so as to
+ensure correct rendering of the transparency.
+
+An atomic is determined to be transparent if some degree of transparency
+(alpha values not at their maximum value) is found in any of the 
+following:
+
+  (A) Prelight colors in the atomic's geometry.
+
+  (B) Material colors in the atomic's geometry.
+
+  (C) Pixel (or palette) colors in the material's texture.
+
+On application startup, a list is created which contains all atomics
+that are found to be transparent. This list is then used every frame
+to determine another list that contains the transparent atomics sorted
+with respect to distance from the camera. The 'position' of an atomic
+is taken to mean the location of the atomic's bounding-sphere center. 
+
+For this example a single clump is used which contains both transparent
+atomics (six textured cones and a sphere) and non-transparent atomics
+(three cylinders, all un-textured). The transparent atomics are colored 
+red (R), green (G), blue (B), cyan (C), magenta (M), yellow (Y), and 
+white (W). The opaque atomics are all colored white. Note that each 
+transparent atomic uses only a single material whose color is used for 
+identification purposes.
+
+For the R, G and B atomics, the transparency comes from the texture alpha
+(the material colors are fully opaque). For the C, M and Y atomics the 
+transparency comes from the material alpha (the textures are all fully
+opaque). The W atomic is un-textured and derives its transparency from
+its material color.
+
+The order in which the transparent atomics are rendered, both with and 
+without alpha sorting, is indicated in the top right-hand corner of the
+display.
+
+--------------------------------------------------------------------------
+GENERAL CONTROLS
+
+LEFT ANALOG stick       - Rotate the clump.
+
+RIGHT ANALOG stick      - Translate the camera to and from the clump.
+
+SELECT button           - Toggle menu/help/plain mode.
+
+START + SELECT          - Quit the application.
+
+--------------------------------------------------------------------------
+MENU OPTIONS
+
+ALPHA SORTING           - Toggles the sorting of alpha atomics 
+                          before rendering.
+
+SPIN                    - Toggles the spinning of the clump. 
+                          When enabled, left analog stick input is 
+                          accumulated to generate spin. When disabled 
+                          rotation is based relative to left analog 
+                          stick.
+                          
+FPS                     - Allows the user to read the number of frames 
+                          being rendered per second (updated every second).
+
+--------------------------------------------------------------------------
+MENU CONTROLS
+
+DPAD UP and DOWN        - Select menu item.
+
+DPAD LEFT and RIGHT     - Modify menu item value or execute associated 
+                          command.
+
+LEFT ANALOG stick       - Modify floating point value (if applicable) 
+                          otherwise do what you would do in general 
+                          controls.
+
+--------------------------------------------------------------------------
+HELP CONTROLS
+
+DPAD UP and DOWN        - Scroll a line at a time (autorepeat available).
+
+LEFT SHOULDER #1 and #2 - Scroll a page at a time.
+
+--------------------------------------------------------------------------
+VIDEO MODE SELECTION
+
+The command-line option '-vms' can be used to enable a simple video 
+selection screen, which appears before the application starts running. 
+Use the UP and DOWN DPAD buttons to highlight the required video
+mode and press START to make the selection. Note there are several pages
+of video modes; use the LEFT SHOULDER buttons to move from page to page.
+
+--------------------------------------------------------------------------
+This demonstration program is copyright Criterion Software Limited 2003. 
+Criterion Software grants you a license to use it only in the form as 
+supplied. You may not disassemble, decompile or reverse engineer this 
+demonstration program.
+
+This demonstration program is provided as is with no warranties of any
+kind. Criterion Software will not, under any circumstances, be liable for
+any lost revenue or other damages arising from the use of this
+demonstration program.
+
+RenderWare is a registered trademark of Canon Inc.
+Other trademarks acknowledged.
+--------------------------------------------------------------------------
+Tue Apr 22 12:04:26 2003 -- build sky ( 64649 0x35000 )

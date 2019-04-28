@@ -1,0 +1,66 @@
+					;//==================================================================
+					;//==================================================================
+					;//==															   ==						
+					;//==  	  -PSX2-     MULTIPASS PARALLEL MATRIX PRE-PROCESSOR	   ==
+					;//==															   ==					
+					;//==															   ==					
+					;//== Features : Generate matrix for parallel projection.	       ==					
+					;//==			 Prepare fast floating point conversion.    	   ==					
+					;//==			 Contain fog first clamping information. 		   ==					
+					;//==			 Support 24 bits and 16 bits Zbuffers.			   ==			
+					;//==															   ==					
+					;//== 			 Optimal!!!								-CHECKED-  ==					
+					;//==															   ==					
+					;//==================================================================
+					;//==================================================================
+
+
+	;----------------------------------------------------------------------------
+	SUBw.w VF02, VF02, VF02				LQ.xyzw	VF31, vuSDmat3(VI00)			; Clean w Field		- Load matrix	
+	NOP									LQ.xyz VF05, vuSDcamWcamHzScale(VI00)	;					- GS Scale	
+	NOP									LQ.xyzw	VF28, vuSDmat0(VI00)			;					- Load matrix	
+	NOP									LQ.xyzw	VF29, vuSDmat1(VI00)			;					- Load matrix
+	NOP									LQ.xyzw	VF30, vuSDmat2(VI00)			; 					- Load matrix
+	NOP									ILW.x VI02, vuSDVUSwitch(VI00)			; 				    - Load Render States 		
+	NOP									LOI 0.5									;					- Assemble constant 0.5	
+	SUBi.xy VF31, VF31, I				LQ.xy VF03, vuSDrealOffset(VI00)		; Prescale matrix	- GS offset
+	MUL.xyz VF28, VF28, VF05			IADDIU VI03, VI00, 2					; Prescale matrix	- Clipping Mask				 
+	MUL.xyz VF29, VF29, VF05			IAND VI03, VI02, VI03					; Prescale matrix	- Extract clipping Flag	  	 
+	MUL.xyz VF30, VF30, VF05			LQ.xyz VF02, vuSDoffXoffYzShift(VI00)	; Prescale matrix	- Combine offsets	
+	MUL.xyz VF31, VF31, VF05			IBEQ VI03, VI00, SwitchNoClip  			; Prescale matrix	- Clipping Test 
+	NOP									IADDIU VI05, VI00, 4					; 					- Primitive Mask	
+SwitchClipping:;---------- CLIPPING SWITCH --------------------------------------		 	
+	NOP									IAND VI05, VI02, VI05					; 				    - Extract primitive Flag 
+	NOP									IADDIU VI06, VI00, 8					;					- Clip method Mask	 
+	NOP									IADDIU VI12, VI00, ExpandBuffer1		;					- First XGKICK addres
+	NOP									IBEQ VI05, VI00, SwitchTSCLip  			;					- Primitive test
+	NOP									IAND VI06, VI02, VI06					;				 	- Extract methode Flag
+SwitchTLCLip:;------------ TRI-LIST CLIPPING ------------------------------------			 	
+	NOP									IADDIU VI13, VI00, XExpandBuffer2 		; 					- Clipping Second XGKICK addres 
+	NOP									IADDIU VI14, VI00, XExpandBuffer3 		; 					- Clipping Third XGKICK addres 
+	NOP									IBEQ VI06, VI00, SwithSystemExit  		;					- Methode test
+	NOP									IADDIU VI15, VI00, TLCullRender			;					- Tri-List culling adress	
+	NOP									B SwithSystemExit						;					- End Jump 
+	NOP									IADDIU VI15, VI00, TLClipRender			;					- Tri-List clipping adress
+SwitchTSCLip:;------------ TRI-STRIP CLIPPING -----------------------------------			 	
+	NOP									IADDIU VI13, VI00, XExpandBuffer2 		; 					- Clipping Second XGKICK addres 
+	NOP									IADDIU VI14, VI00, XExpandBuffer3 		; 					- Clipping Third XGKICK addres 
+	NOP									IBEQ VI06, VI00, SwithSystemExit  		;					- Methode test
+	NOP									IADDIU VI15, VI00, TSCullRender			;					- Tri-Strip culling adress			
+	NOP									B SwithSystemExit						;					- End Jump 
+	NOP									IADDIU VI15, VI00, TSClipRender			;					- Tri-Strip clipping adress		 	
+SwitchNoClip:;------------ NO CLIPPING SWITCH -----------------------------------		 	
+	NOP									IADDIU VI12, VI00, ExpandBuffer1		;					- First XGKICK addres
+	NOP									IADDIU VI13, VI00, ExpandBuffer2 		; 				 	- Second XGKICK addres
+	NOP									IADDIU VI14, VI00, ExpandBuffer3 		; 				 	- Third XGKICK addres
+	NOP									IADDIU VI15, VI00, GenericRender		;					- Generic rendering adress		
+SwithSystemExit:;--------- END OF DYNAMIC SWITCH PROCESSING ---------------------
+	ADD.xy VF02, VF02, VF03				ISW.y VI15, vuSDVUSwitch(VI00)			; Combine offsets	- Store Renderinf System adress
+	;----------------------------------------------------------------------------
+
+
+;//================================================================================================================
+;//=======================================					=======================================================
+;//===================						    THE END					                  =========================
+;//=======================================			        =======================================================
+;//============================================================================================= JCL Janvier 2001 =

@@ -1,0 +1,30 @@
+#
+# Skeleton src files for SKY
+#
+
+SKELSRC = $(SKELPS)/skyfs.c
+SKELOBJ =
+
+ifeq ($(RWSPLASH), 1)
+SKELSRC += $(SKELPS)/mpeg/mpegmain.c \
+	$(SKELPS)/mpeg/read.c \
+	$(SKELPS)/mpeg/readbuf.c \
+	$(SKELPS)/mpeg/audiodec.c \
+	$(SKELPS)/mpeg/vibuf.c \
+	$(SKELPS)/mpeg/videodec.c \
+	$(SKELPS)/mpeg/vobuf.c \
+	$(SKELPS)/mpeg/disp.c \
+	$(SKELPS)/mpeg/util.c \
+	$(SKELPS)/mpeg/strfile.c 
+
+SYSLIBS += $(SCELIBDIR)/libmpeg.a \
+	$(SCELIBDIR)/libipu.a \
+	$(SCELIBDIR)/libcdvd.a \
+	$(SCELIBDIR)/libsdr.a \
+        $(SCELIBDIR)/libpkt.a 
+
+$(OBJDIR)/%.$(O): $(SKELPS)/mpeg/%.c
+	$(CC) $(CFLAGS) $(COUT)$@ $^
+
+
+endif

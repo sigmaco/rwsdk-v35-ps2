@@ -1,0 +1,131 @@
+; flowMon::Emit() version 1.3.3 produced this code:
+		.vu
+		.align 4
+__v_D__RenderWare_dev_examples_vclpipes_src_fullscreen_vcl_4:
+; _LNOPT_w=[ normal ] 31 [31 0] 32   [__v_D__RenderWare_dev_examples_vclpipes_src_fullscreen_vcl_4]
+         maxx.w        VF18,VF00,VF00x                              lq.xy         VF22,0(VI00)                        
+         maxx.w        VF19,VF00,VF00x                              loi           0x41800000                          
+         maxi.w        VF01,VF00,I                                  lq.xy         VF10,1(VI00)                        
+         itof0.xy      VF18,VF22                                    NOP                                                      ;	STALL_LATENCY ?1
+         maxx.w        VF20,VF00,VF00x                              NOP                                               
+         maxx.w        VF21,VF00,VF00x                              NOP                                               
+         itof4.xy      VF10,VF10                                    loi           0x3f000000                          
+         addi.xy       VF02,VF18,I                                  NOP                                               
+         addi.x        VF03,VF18,I                                  loi           0x40200000                          
+         addi.y        VF04,VF18,I                                  loi           0x40900000                          
+         addi.xy       VF05,VF18,I                                  NOP                                               
+         addi.x        VF06,VF18,I                                  loi           0x40d00000                          
+         addi.y        VF07,VF18,I                                  loi           0x41080000                          
+         addi.x        VF04,VF18,I                                  NOP                                               
+         addi.y        VF03,VF18,I                                  iaddiu        VI01,VI00,0x00000044                
+         addi.x        VF08,VF18,I                                  loi           0x41280000                          
+         addi.y        VF08,VF18,I                                  loi           0x41480000                          
+         addi.x        VF07,VF18,I                                  iaddiu        VI02,VI00,0x00000087                
+         addi.y        VF06,VF18,I                                  lq            VF22,2(VI00)                        
+         addi.x        VF09,VF18,I                                  loi           0x41680000                          
+         addi.y        VF09,VF18,I                                  loi           0x40000000                          
+         addi.y        VF14,VF10,I                                  lq            VF23,3(VI00)                        
+         addi.y        VF11,VF10,I                                  loi           0x40800000                          
+         addi.y        VF15,VF10,I                                  isubiu        VI03,VI00,0x00000009                
+         addi.y        VF12,VF10,I                                  loi           0x40c00000                          
+         addi.y        VF16,VF10,I                                  isubiu        VI04,VI00,0x00000005                
+         addi.y        VF13,VF10,I                                  loi           0x41000000                          
+         addi.x        VF14,VF10,I                                  move.x        VF11,VF10                           
+         addi.x        VF15,VF10,I                                  ilw.z         VI05,1(VI00)                        
+         addi.x        VF16,VF10,I                                  move.x        VF12,VF10                           
+         addi.xy       VF17,VF10,I                                  move.x        VF13,VF10                           
+PageXLoop:
+; _LNOPT_w=[ normal ] 1 [1 0] 1   [PageXLoop]
+         NOP                                                        ilw.w         VI06,1(VI00)                        
+PageYLoop:
+; _LNOPT_w=[ normal ] 1 [1 0] 1   [PageYLoop]
+         NOP                                                        iaddiu        VI07,VI05,0x00000008                
+BlockXLoop:
+; _LNOPT_w=[ normal ] 22 [26 0] 30   [BlockXLoop]
+         NOP                                                        mfir.x        VF01,VI07                           
+         NOP                                                        iaddiu        VI09,VI06,0x00000004                       ;	STALL_LATENCY ?1
+         NOP                                                        mfir.y        VF01,VI09                           
+         itof0.xy      VF21,VF01                                    lq            VF24,4(VI07)                               ;	STALL_LATENCY ?3
+         NOP                                                        iaddiu        VI08,VI01,0                         
+         mulw.xy       VF25,VF21,VF01w                              sqi           VF22,(VI08++)                              ;	STALL_LATENCY ?2
+         muli.xy       VF24,VF21,I                                  sqi           VF24,(VI08++)                       
+         add.xy        VF20,VF25,VF02                               NOP                                                      ;	STALL_LATENCY ?2
+         add.xy        VF19,VF24,VF10                               NOP                                               
+         add.xy        VF18,VF24,VF14                               NOP                                               
+         add.xy        VF21,VF25,VF04                               sqi           VF23,(VI08++)                       
+         add.xy        VF20,VF24,VF11                               sqi.xy        VF20,(VI08++)                       
+         ftoi4.xy      VF26,VF19                                    NOP                                               
+         ftoi4.xy      VF18,VF18                                    NOP                                               
+         add.xy        VF19,VF25,VF05                               NOP                                               
+         ftoi4.xy      VF20,VF20                                    NOP                                               
+         add.xy        VF26,VF24,VF15                               sqi.xy        VF26,(VI08++)                       
+         add.xy        VF21,VF25,VF07                               sqi.xy        VF21,(VI08++)                       
+         add.xy        VF28,VF24,VF12                               isubiu        VI09,VI09,0x00000001                
+         add.xy        VF18,VF25,VF03                               sqi.xyw       VF18,(VI08++)                       
+         ftoi4.xy      VF19,VF26                                    sqi.xy        VF19,(VI08++)                       
+         add.xy        VF20,VF24,VF16                               sqi.xy        VF20,(VI08++)                       
+EXPL_D__RenderWare_dev_examples_vclpipes_src_fullscreen_vcl_BlockYLoop__MAIN_LOOP:
+; _LPOPT_w=[ dUp ] 27 [27 27] 27   [EXPL_D__RenderWare_dev_examples_vclpipes_src_fullscreen_vcl_BlockYLoop__MAIN_LOOP]
+         ftoi4.xy      VF27,VF28                                    mfir.y        VF01,VI09                           
+         add.xy        VF26,VF25,VF08                               sqi.xy        VF21,(VI08++)                       
+         add.xy        VF21,VF24,VF13                               sqi.xyw       VF19,(VI08++)                       
+         ftoi4.xy      VF20,VF20                                    sqi.xy        VF18,(VI08++)                       
+         itof0.xy      VF18,VF01                                    sqi.xy        VF27,(VI08++)                       
+         add.xy        VF26,VF25,VF06                               sqi.xy        VF26,(VI08++)                       
+         ftoi4.xy      VF19,VF21                                    move.xy       VF21,VF25                           
+         add.xy        VF20,VF24,VF17                               sqi.xyw       VF20,(VI08++)                       
+         mulw.xy       VF25,VF18,VF01w                              NOP                                               
+         muli.xy       VF24,VF18,I                                  sqi.xy        VF26,(VI08++)                       
+         add.xy        VF18,VF21,VF09                               sqi.xy        VF19,(VI08++)                       
+         ftoi4.xy      VF21,VF20                                    NOP                                               
+         add.xy        VF20,VF25,VF02                               NOP                                               
+         add.xy        VF26,VF24,VF10                               NOP                                               
+         add.xy        VF18,VF24,VF14                               sqi.xy        VF18,(VI08++)                       
+         add.xy        VF19,VF25,VF04                               sqi.xyw       VF21,(VI08++)                       
+         add.xy        VF20,VF24,VF11                               sqi.xy        VF20,(VI08++)                       
+         ftoi4.xy      VF21,VF26                                    NOP                                               
+         ftoi4.xy      VF18,VF18                                    NOP                                               
+         add.xy        VF26,VF25,VF05                               NOP                                               
+         ftoi4.xy      VF20,VF20                                    isubiu        VI09,VI09,0x00000001                
+         add.xy        VF27,VF24,VF15                               sqi.xy        VF21,(VI08++)                       
+         add.xy        VF21,VF25,VF07                               sqi.xy        VF19,(VI08++)                       
+         add.xy        VF28,VF24,VF12                               sqi.xyw       VF18,(VI08++)                       
+         add.xy        VF18,VF25,VF03                               sqi.xy        VF26,(VI08++)                       
+         ftoi4.xy      VF19,VF27                                    ibne          VI09,VI06,EXPL_D__RenderWare_dev_examples_vclpipes_src_fullscreen_vcl_BlockYLoop__MAIN_LOOP
+         add.xy        VF20,VF24,VF16                               sqi.xy        VF20,(VI08++)                       
+; _LNOPT_w=[ ] 18 [17 0] 19   [EXPL_D__RenderWare_dev_examples_vclpipes_src_fullscreen_vcl_BlockYLoop__EPI0]
+         add.xy        VF21,VF24,VF13                               sqi.xy        VF21,(VI08++)                       
+         ftoi4.xy      VF26,VF28                                    NOP                                               
+         add.xy        VF01,VF25,VF08                               sqi.xyw       VF19,(VI08++)                       
+         ftoi4.xy      VF20,VF20                                    sqi.xy        VF18,(VI08++)                       
+         ftoi4.xy      VF19,VF21                                    move.xy       VF18,VF25                           
+         add.xy        VF21,VF24,VF17                               sqi.xy        VF26,(VI08++)                       
+         add.xy        VF01,VF25,VF06                               sqi.xy        VF01,(VI08++)                       
+         add.xy        VF20,VF18,VF09                               sqi.xyw       VF20,(VI08++)                              ;	STALL_LATENCY ?1
+         ftoi4.xy      VF21,VF21                                    isubiu        VI07,VI07,0x00000001                
+         NOP                                                        sqi.xy        VF01,(VI08++)                       
+         NOP                                                        sqi.xy        VF19,(VI08++)                       
+         NOP                                                        sqi.xy        VF20,(VI08++)                       
+         NOP                                                        sqi.xyw       VF21,(VI08++)                       
+         NOP                                                        iadd          VI08,VI00,VI01                      
+         NOP                                                        xgkick        VI01                                
+         NOP                                                        iadd          VI01,VI00,VI02                      
+         NOP                                                        ibne          VI07,VI05,BlockXLoop                
+         NOP                                                        iadd          VI02,VI00,VI08                      
+; _LNOPT_w=[ normal ] 4 [4 0] 4   [__v_D__RenderWare_dev_examples_vclpipes_src_fullscreen_vcl_10]
+         NOP                                                        isubiu        VI06,VI06,0x00000004                
+         NOP                                                        NOP                                               
+         NOP                                                        ibne          VI06,VI04,PageYLoop                 
+         NOP                                                        NOP                                               
+; _LNOPT_w=[ normal ] 4 [4 0] 4   [__v_D__RenderWare_dev_examples_vclpipes_src_fullscreen_vcl_11]
+         NOP                                                        isubiu        VI05,VI05,0x00000008                
+         NOP                                                        NOP                                               
+         NOP                                                        ibne          VI05,VI03,PageXLoop                 
+         NOP                                                        NOP                                               
+         NOP[E]                                                     NOP                                               
+         NOP                                                        NOP                                               
+		.align 4
+;	iCount=110
+; register stats:
+;   9 VU User integer registers
+;  28 VU User floating point registers

@@ -1,0 +1,94 @@
+--------------------------------------------------------------------------
+         RenderWare Graphics Example (PlayStation 2): H-anim delta
+--------------------------------------------------------------------------
+
+PURPOSE
+
+The HANIM2 example illustrates how the RpHAnim plugin can be used to 
+perform delta animation. To perform delta animations you load in the
+base and delta clumps, extracting the hierarchies of their skinned atomics,
+and load the base and delta animations. The base animation is a figure
+running on the spot, the delta animation is the same figure but only its
+head is turning. The base animation is attached to the base hierarchy and
+the delta animation is attached to the delta hierarchy.
+
+A third hierarchy (OutHierarchy) is created to store the result of
+adding the base and delta hierarchies together. This third hierarchy is
+then attached to one of the loaded clumps' skinned atomics (it does not
+matter which one). The chosen atomics will be the ones that are rendered.
+
+To update the running animations the amount of time to update the
+animations is added to the base and delta hierarchies. Then the base and
+delta hierarchies are added together storing the result in OutHierarchy.
+The result of adding the two hierarchies is a figure running on the spot
+turning its head at the same time.
+
+This example behaves slightly differently from the behavior described 
+above, the delta animation and one of the clumps are reloaded. This is 
+because the example allows the user to switch to rendering only the base 
+animation, only the delta animation or the result of adding the two 
+together. These differences are highlighted in the source code 
+comments.
+
+
+--------------------------------------------------------------------------
+GENERAL CONTROLS
+
+SELECT button            - Toggle menu/help/plain mode.
+
+START + SELECT           - Quit the application.
+
+--------------------------------------------------------------------------
+MENU OPTIONS
+
+ANIMATION               - Allows the user to view the base and delta 
+                          animations, and the result of adding the
+                          base and delta hierarchies together.
+
+FPS                     - Allows the user to read the number of frames 
+                          per second being rendered (updated every
+                          second).
+
+--------------------------------------------------------------------------
+MENU CONTROLS
+
+DPAD UP and DOWN        - Select menu item.
+
+DPAD LEFT and RIGHT     - Modify menu item value or execute associated 
+                          command.
+
+LEFT ANALOG stick       - Modify floating point value (if applicable) 
+                          otherwise do what you would do in general 
+                          controls.
+
+--------------------------------------------------------------------------
+HELP CONTROLS
+
+DPAD UP and DOWN         - Scroll a line at a time (autorepeat available).
+
+LEFT SHOULDER #1 and #2  - Scroll a page at a time.
+
+--------------------------------------------------------------------------
+VIDEO MODE SELECTION
+
+The command-line option '-vms' can be used to enable a simple video 
+selection screen, which appears before the application starts running. 
+Use the UP and DOWN DPAD buttons to highlight the required video
+mode and press START to make the selection. Note there are several pages
+of video modes; use the LEFT SHOULDER buttons to move from page to page.
+
+--------------------------------------------------------------------------
+This demonstration program is copyright Criterion Software Limited 2003. 
+Criterion Software grants you a license to use it only in the form as 
+supplied. You may not disassemble, decompile or reverse engineer this 
+demonstration program.
+
+This demonstration program is provided as is with no warranties of any
+kind. Criterion Software will not, under any circumstances, be liable for
+any lost revenue or other damages arising from the use of this
+demonstration program.
+
+RenderWare is a registered trademark of Canon Inc.
+Other trademarks acknowledged.
+--------------------------------------------------------------------------
+Tue Apr 22 12:04:26 2003 -- build sky ( 64649 0x35000 )

@@ -1,0 +1,385 @@
+					;//==================================================================
+					;//==================================================================
+					;//==															   ==						
+					;//==   -PSX2- FXNORMALS PARALLEL - TRIANGLE STRIP - CLIPPING	   ==
+					;//==															   ==					
+					;//==															   ==					
+					;//== Features : Transform vertices into camera space and		   ==					
+					;//==			 perform clipping using the frustum info.	  	   ==					
+					;//==			 Clipped triangles are inserted as a new strip	   ==					
+					;//==			 in the previous strip.  						   ==
+					;//==			 Process Normals.								   ==															
+					;//==															   ==					
+					;//==  												    -RUNNING-  ==					
+					;//==															   ==					
+					;//==================================================================
+					;//==================================================================
+					
+	
+;//================================================================================================================
+;//======================================== Pre-processing ========================================================
+;//================================================================================================================
+
+	;----------------------------------------------------------------------------				
+	SUB.zw VF17, VF00, VF00				LQ.xyzw VF26, vuSDClipvec1(VI00)		; Build x100 vector	- Load Clipping vector-1		
+	ADDw.y VF17, VF00, VF00				LQ.xyzw VF03, (0+0*vertexSize)(VI11)	; Build x100 vector - Load position-1
+	ADDw.z VF19, VF00, VF00				LQ.xyzw VF27, vuSDClipvec2(VI00)		; Build x010 vector - Load Clipping vector-2 	
+	SUB.yw VF19, VF00, VF00				LQ.xyzw VF04, (0+1*vertexSize)(VI11)	; Build x010 vector - Load position-2
+	MULAw.xyzw ACC, VF31, VF00			LQ.xyzw VF05, (0+2*vertexSize)(VI11)	; Transform pos-1	- Load position-3
+	MADDAx.xyzw ACC, VF28, VF03			MR32.w VF23, VF26						; Transform pos-1   - Clip plan x
+	MADDAy.xyzw ACC, VF29, VF03		    MR32.x VF24, VF26						; Transform pos-1	- Frustrum x coef	
+	MADDz.xyzw VF03, VF30, VF03		  	LQ.yz	VF24, vuSDClipvec2(VI00)		; Transform pos-1   - Load Frustrum y-z1
+	MULAw.xyzw ACC, VF31, VF00			NOP										; Transform pos-2	
+	MADDAx.xyzw ACC, VF28, VF04			MR32.z VF23, VF23						; Transform pos-2	- Rotate Clip plan x	
+	MADDAy.xyzw ACC, VF29, VF04		    NOP										; Transform pos-2
+	MADDz.xyzw VF04, VF30, VF04		  	IADDIU VI09, VI00, 0					; Transform pos-2	- Set vertex counter to 0
+	MULAw.xyzw ACC, VF31, VF00			MR32.x VF26, VF26						; Transform pos-3	- Frustrum x coef	
+	MADDAx.xyzw ACC, VF28, VF05			MR32.w VF23, VF27						; Transform pos-3	- Clip plan y
+	MADDAy.xyzw ACC, VF29, VF05			MOVE.xyzw VF16, VF03					; Transform pos-3	- Copy pos-1 in interp-1
+	MADDz.xyzw VF05, VF30, VF05			MOVE.xyzw VF18, VF04					; Transform pos-3	- Copy pos-2 in interp-2
+	ADDA.z ACC, VF00, VF26				MR32.x VF27, VF27						; Zmapping offset	- Frustrum y coef
+	MUL.xy VF06, VF03, VF24				IADDIU VI07, VI00, ClippingBuffer		; Zmapping pos-1	- Set Clipping buffer adress
+	MADDw.z VF06, VF24, VF03			IADDIU VI11, VI11, (2*vertexSize)		; Zmapping pos-1	- Set position in the input buffer			
+	MUL.xy VF07, VF04, VF24				IADDIU VI05, VI00, 1					; Zmapping pos-2	- Set Degeneration flag to active
+	MADDw.z VF07, VF24, VF04			SQ.xyzw VF00, 3(VI14)  					; Zmapping pos-2	- Store interpolator 001		
+	MUL.xy VF25, VF05, VF24				SQ.xyzw VF17, 5(VI14) 					; Zmapping pos-3	- Store interpolator 100
+	MADDw.z VF25, VF24, VF05			SQ.xyzw VF19, 1(VI14)  					; Zmapping pos-3	- Store interpolator 010	
+	CLIPw.xyz VF06, VF00				LQ.xyzw VF15, (0+1*vertexSize)(VI11)	; Clip pos-1		- Load new pos-3	
+	CLIPw.xyz VF07, VF00				IADDIU VI02, VI00, 0x00c0				; Clip pos-2		- Store Fmac filter
+	;----------------------------------------------------------------------------
+
+;//================================================================================================================
+;//==================================== CLIPPING DATA EXPANDER ====================================================
+;//================================================================================================================	
+
+TSPExpanderLoop:;---------------------------------------------------------------- 	
+	NOP									SQ.xyzw VF03, 4(VI14)  					; 					- Store interp-1
+	CLIPw.xyz VF25, VF00				SQ.xyzw VF04, 0(VI14)  					; Clip old pos-3	- Store interp-2
+	MULAw.xyzw ACC, VF31, VF00			SQ.xyzw VF05, 2(VI14)  					; Transform pos-3	- Store interp-3
+	MADDAx.xyzw ACC, VF28, VF15		    IADDIU VI08, VI14, 6					; Transform pos-3	- Increment ring memory
+	MADDAy.xyzw ACC, VF29, VF15		  	IADDIU VI03, VI14, 0					; Transform pos-3	- Ring Pointer
+TSPWall1:;=======================================================================
+	;//===============		CLIPPING PLAN : Z= Zmin			=====================
+	;============================================================================
+	MADDz.xyzw VF15, VF30, VF15			FCAND VI01, 0x03ffff					; Transform pos-3	- Test clipping flag 0000 0011 1111 1111 1111 1111
+	NOP									IBEQ VI01, VI00, TSPFullTrig			;					- Trig inside frustum
+	ADDw.y VF06, VF00, VF18				FCOR VI01, 0xfdf7df						; Vert-1 zpos		- Test clipping flag 1111 1101 1111 0111 1101 1111
+	ADDw.x VF06, VF00, VF16				IBNE VI01, VI00, TSPFullClip			; Vert-2 zpos		- Trig outside Zmin clipping plan	
+	NOP									FCAND VI01, 0x020820					;					- Test clipping flag 0000 0010 0000 1000 0010 0000
+	NOP									IBEQ VI01, VI00, TSPWall2				;					- Trig not interssecting zmin clip plan
+	NOP									LQ.xyzw VF17, -1(VI08)  				;					- Load interpolator-1
+	SUBx.y VF20, VF06, VF06				IADDIU VI04, VI08, 0					; Distz1-2			- Set ring pointer to end of ring memory	
+TSPRing1:;-----------------------------------------------------------------------
+	SUBw.xy VF07, VF06, VF27			LQ.xyzw VF08, 2(VI03)  					; Build clip test	- Load interp-2
+	ADDx.xyzw VF22, VF16, VF00			LQ.xyzw VF19, 1(VI03) 					; Transfer interp-1 - Load interpolator-2
+	ADDx.xyzw VF16, VF18, VF00			IADDIU VI03, VI03, 2 					; Swap interp2-1	- Increment ring pointer
+	ADDy.x VF06, VF00, VF06				DIV Q, VF00w, VF20y						; Swap interpolator - Launch 1/D calc
+	ADDw.y VF06, VF00, VF08				FMAND VI01, VI02						; Interpolator y	- Test Fmac register 
+	MULAy.xyz ACC, VF22, VF07			IBEQ VI01, VI02, TSPNext1				; Calc new pos		- Full Clipped segment
+	MSUBx.xyz VF22, VF16, VF07			SQ.xyzw VF22, 0(VI08) 					; Calc new pos		- Store first position
+	MULAy.xyzw ACC, VF17, VF07			SQ.xyzw VF17, 1(VI08) 					; Calc new Interp   - Store first interpolator
+	MSUBx.xyzw VF21, VF19, VF07			IBEQ VI01, VI00, TSPNext1				; Calc new Interp   - Full segment inside frustum
+	MUL.w VF22, VF00, VF27				IADDIU VI08, VI08, 2					; Use Zmin pos		- Increment vertex counter
+	MULq.xyz VF22, VF22, Q				IADDIU VI02, VI00, 0x0040				; Scale new pos		- Bit mask 0000 0000 0100 0000
+	NOP									NOP										;	
+	MULq.xyzw VF21, VF21, Q				NOP										; Scale new Interp 
+	NOP									IBEQ VI01, VI02, TSPSwap1				;					- Test Fmac second position
+	NOP									IADDIU VI02, VI00, 0x00c0				;					- Restore Fmac filter in vi02
+	NOP									ISUBIU VI08, VI08, 2					;					- Decrement vertex counter	
+TSPSwap1:;-----------------------------------------------------------------------	
+	NOP									SQI.xyzw VF22,(VI08++)  				;					- Store interpolated position
+	NOP									SQI.xyzw VF21,(VI08++)  				;					- Store new trig interpolator
+TSPNext1:;-----------------------------------------------------------------------	
+	ADDx.xyzw VF18, VF08, VF00			IBNE VI03, VI04, TSPRing1				; Swap second vert  - Ring End test
+	SUBx.y VF20, VF06, VF06				MOVE.xyzw VF17, VF19					; Distz1-2			- Swap interpolators2-1											
+	;----------------------------------------------------------------------------	
+	NOP									IBEQ VI08, VI04, TSPFullClip 			;					- Test data consistance
+	NOP									LQ.xyzw VF16, -2(VI08)  				;					- Load first vertex for next stage
+TSPWall2:;=======================================================================
+	;//===============		CLIPPING PLAN : Z= Zmax			=====================
+	;============================================================================
+	NOP									FCAND VI01, 0x01f7df					;					- Test clipping flag 0000 0001 1111 0111 1101 1111
+	NOP									IBEQ VI01, VI00, TSPMetaFormer			;					- End clipping test
+	SUBw.y VF09, VF00, VF18				FCOR VI01, 0xfefbef						; Vert-1 zpos		- Test clipping flag 1111 1110 1111 1011 1110 1111
+	SUBw.x VF09, VF00, VF16				IBNE VI01, VI00, TSPFullClip			; Vert-2 zpos		- Trig outside zmax clipping plan	
+	NOP									FCAND VI01, 0x010410					;					- Test Clipping Flag 0000 0001 0000 1000 0001 0000
+	NOP									IBEQ VI01, VI00, TSPWall3				;					- Trig not intersecting this wall
+	NOP									LQ.xyzw VF17, -1(VI08)  				;					- Load interpolator-1
+	SUBx.y VF20, VF09, VF09				IADDIU VI04, VI08, 0					; Distz1-2			- Set ring pointer to end of ring memory			
+TSPRing2:;-----------------------------------------------------------------------
+	ADDw.xy VF07, VF09, VF26			LQ.xyzw VF08, 2(VI03)  					; Build clip test	- Load interp-2
+	ADDx.xyzw VF22, VF16, VF00			LQ.xyzw VF19, 1(VI03) 					; Transfer interp-1 - Load interpolator-2
+	ADDx.xyzw VF16, VF18, VF00			IADDIU VI03, VI03, 2 					; Swap interp2-1	- Increment ring pointer
+	ADDy.x VF09, VF00, VF09				DIV Q, VF00w, VF20y						; Swap interpolator - Launch 1/D calc
+	SUBw.y VF09, VF00, VF08				FMAND VI01, VI02						; Interpolator y	- Test Fmac register 
+	MULAy.xyz ACC, VF22, VF07			IBEQ VI01, VI02, TSPNext2				; Calc new pos		- Full Clipped segment 
+	MSUBx.xyz VF22, VF16, VF07			SQ.xyzw VF22, 0(VI08) 					; Calc new pos		- Store first position
+	MULAy.xyzw ACC, VF17, VF07			SQ.xyzw VF17, 1(VI08) 					; Calc new Interp   - Store first interpolator
+	MSUBx.xyzw VF21, VF19, VF07			IBEQ VI01, VI00, TSPNext2				; Calc new Interp   - Full segment inside frustum
+	MUL.w VF22, VF00, VF26				IADDIU VI08, VI08, 2					; Use Zmax pos		- Increment vertex counter
+	MULq.xyz VF22, VF22, Q				IADDIU VI02, VI00, 0x0040				; Scale new pos		- Bit mask 0000 0000 0100 0000
+	NOP									NOP										;	
+	MULq.xyzw VF21, VF21, Q				NOP										; Scale new Interp
+	NOP									IBEQ VI01, VI02, TSPSwap2				;					- Test Fmac second position
+	NOP									IADDIU VI02, VI00, 0x00c0				;					- Restore Fmac filter in vi02
+	NOP									ISUBIU VI08, VI08, 2					;					- Decrement vertex counter
+TSPSwap2:;-----------------------------------------------------------------------	
+	NOP									SQI.xyzw VF22,(VI08++)  				;					- Store interpolated position
+	NOP									SQI.xyzw VF21,(VI08++)  				;					- Store new trig interpolator
+TSPNext2:;-----------------------------------------------------------------------										
+	ADDx.xyzw VF18, VF08, VF00			IBNE VI03, VI04, TSPRing2				; Swap second vert  - Ring End test
+	SUBx.y VF20, VF09, VF09				MOVE.xyzw VF17, VF19					; Distz1-2			- Swap interpolators2-1										
+	;----------------------------------------------------------------------------	
+	NOP									IBEQ VI08, VI04, TSPFullClip			;					- Test data consistance
+	NOP									LQ.xyzw VF16, -2(VI08)  				;					- Load first vertex for next stage		
+TSPWall3:;=======================================================================
+	;//===============		CLIPPING PLAN : Y = YMIN		=====================
+	;============================================================================
+	NOP									FCAND VI01, 0x00f3cf					;  					- Test clipping flag 0000 0000 1111 0011 1100 1111
+	NOP									IBEQ VI01, VI00, TSPMetaFormer			; 					- End clipping test		
+	ADDy.y VF06, VF00, VF18				FCOR VI01, 0xff7df7						; Vert-1 y			- Test clipping flag 1111 1111 0111 1101 1111 0111
+	ADDy.x VF06, VF00, VF16				IBNE VI01, VI00, TSPFullClip			; Vert-2 y			- Trig outside y=ymin clipping plan	
+	NOP									FCAND VI01, 0x008208					;					- Test clipping flag 0000 0010 0000 1000 0010 0000
+	NOP									IBEQ VI01, VI00, TSPWall4				;					- Trig not intersecting this wall
+	NOP									LQ.xyzw VF17, -1(VI08)  				;					- Load interpolator-1
+	SUBx.y VF20, VF06, VF06				IADDIU VI04, VI08, 0					; Dist y1-y2		- Set ring pointer to end of ring memory	
+TSPRing3:;-----------------------------------------------------------------------
+	ADDw.xy VF07, VF06, VF23			LQ.xyzw VF08, 2(VI03)  					; Build clip test	- Load interp-2
+	ADDx.xyzw VF22, VF16, VF00			LQ.xyzw VF19, 1(VI03) 					; Transfer interp-1 - Load interpolator-2
+	ADDx.xyzw VF16, VF18, VF00			IADDIU VI03, VI03, 2 					; Swap interp2-1	- Increment ring pointer
+	ADDy.x VF06, VF00, VF06				DIV Q, VF00w, VF20y						; Swap interpolator - Launch 1/D calc
+	ADDy.y VF06, VF00, VF08				FMAND VI01, VI02						; Interpolator y	- Test Fmac register	
+	MULAy.xyzw ACC, VF22, VF07			IBEQ VI01, VI02, TSPNext3				; Calc new pos		- Full Clipped segment 	
+	MSUBx.xyzw VF22, VF16, VF07			SQ.xyzw VF22, 0(VI08) 					; Calc new pos		- Store first position
+	MULAy.xyzw ACC, VF17, VF07			SQ.xyzw VF17, 1(VI08) 					; Calc new Interp   - Store first interpolator										
+	MSUBx.xyzw VF21, VF19, VF07			IBEQ VI01, VI00, TSPNext3				; Calc new Interp   - Full segment inside frustum
+	SUBw.y VF22, VF00, VF23				IADDIU VI08, VI08, 2					; Use Ymin pos      - Increment vertex counter
+	MULq.xzw VF22, VF22, Q				IADDIU VI02, VI00, 0x0040				; Scale new pos		- Bit mask 0000 0000 0100 0000
+	NOP									NOP										;	
+	MULq.xyzw VF21, VF21, Q				NOP										; Scale new Interp
+	NOP									IBEQ VI01, VI02, TSPSwap3				;					- Test Fmac second position
+	NOP									IADDIU VI02, VI00, 0x00c0				;					- Restore Fmac filter in vi02
+	NOP									ISUBIU VI08, VI08, 2					;					- Decrement vertex counter
+TSPSwap3:;-----------------------------------------------------------------------	
+	NOP									SQI.xyzw VF22,(VI08++)  				;					- Store interpolated position
+	NOP									SQI.xyzw VF21,(VI08++)  				;					- Store new trig interpolator
+TSPNext3:;-----------------------------------------------------------------------									
+	ADDx.xyzw VF18, VF08, VF00			IBNE VI03, VI04, TSPRing3				; Swap second vert  - Ring End test
+	SUBx.y VF20, VF06, VF06				MOVE.xyzw VF17, VF19					; Dist1-2			- Swap interpolators2-1											
+	;----------------------------------------------------------------------------	
+	NOP									IBEQ VI08, VI04, TSPFullClip			;					- Test data consistance
+	NOP									LQ.xyzw VF16, -2(VI08)  				;					- Load first vertex for next stage		
+TSPWall4:;=======================================================================
+	;//===============		 CLIPPING PLAN : Y = YMAX		=====================
+	;============================================================================
+	NOP									FCAND VI01, 0x0071c7					; 					- Test clipping flag 0000 0000 0111 0001 1100 0111
+	NOP									IBEQ VI01, VI00, TSPMetaFormer			; 					- End clipping test
+	SUBy.y VF06, VF00, VF18				FCOR VI01, 0xffbefb						; Vert-1 -y			- Test clipping flag 1111 1111 1011 1110 1111 1011
+	SUBy.x VF06, VF00, VF16				IBNE VI01, VI00, TSPFullClip			; Vert-2 -y			- Trig outside y=ymax clipping plan
+	NOP									FCAND VI01, 0x004104					;					- Test clipping flag 0000 0000 0100 0001 0000 0100
+	NOP									IBEQ VI01, VI00, TSPWall5				;					- Trig not intersecting this wall
+	NOP									LQ.xyzw VF17, -1(VI08)  				;					- Load interpolator-1
+	SUBx.y VF20, VF06, VF06				IADDIU VI04, VI08, 0					; Dist y2-y1		- Set ring pointer to end of ring memory	
+TSPRing4:;-----------------------------------------------------------------------
+	ADDw.xy VF07, VF06, VF23			LQ.xyzw VF08, 2(VI03)  					; Build clip test	- Load interp-2
+	ADDx.xyzw VF22, VF16, VF00			LQ.xyzw VF19, 1(VI03) 					; Transfer interp-1 - Load interpolator-2
+	ADDx.xyzw VF16, VF18, VF00			IADDIU VI03, VI03, 2 					; Swap interp2-1	- Increment ring pointer
+	ADDy.x VF06, VF00, VF06				DIV Q, VF00w, VF20y						; Swap interpolator - Launch 1/D calc
+	SUBy.y VF06, VF00, VF08				FMAND VI01, VI02						; Interpolator y	- Test Fmac register
+	MULAy.xyzw ACC, VF22, VF07			IBEQ VI01, VI02, TSPNext4				; Calc new pos		- Full Clipped segment 
+	MSUBx.xyzw VF22, VF16, VF07			SQ.xyzw VF22, 0(VI08) 					; Calc new pos		- Store first position
+	MULAy.xyzw ACC, VF17, VF07			SQ.xyzw VF17, 1(VI08) 					; Calc new Interp   - Store first interpolator
+	MSUBx.xyzw VF21, VF19, VF07			IBEQ VI01, VI00, TSPNext4				; Calc new Interp   - Full segment inside frustum
+	ADDw.y VF22, VF00, VF23				IADDIU VI08, VI08, 2					; Use Ymax pos      - Increment vertex counter
+	MULq.xzw VF22, VF22, Q				IADDIU VI02, VI00, 0x0040				; Scale new pos		- Bit mask 0000 0000 0100 0000
+	NOP									NOP										;	
+	MULq.xyzw VF21, VF21, Q				NOP										; Scale new Interp
+	NOP									IBEQ VI01, VI02, TSPSwap4				;					- Test Fmac second position
+	NOP									IADDIU VI02, VI00, 0x00c0				;					- Restore Fmac filter in vi02
+	NOP									ISUBIU VI08, VI08, 2					;					- Decrement vertex counter
+TSPSwap4:;-----------------------------------------------------------------------		
+	NOP									SQI.xyzw VF22,(VI08++)  				;					- Store interpolated position
+	NOP									SQI.xyzw VF21,(VI08++)  				;					- Store new trig interpolator
+TSPNext4:;-----------------------------------------------------------------------									
+	ADDx.xyzw VF18, VF08, VF00			IBNE VI03, VI04, TSPRing4				; Swap second vert  - Ring End test
+	SUBx.y VF20, VF06, VF06				MOVE.xyzw VF17, VF19					; Dist1-2			- Swap interpolators2-1											
+	;----------------------------------------------------------------------------	
+	NOP									IBEQ VI08, VI04, TSPFullClip 			;					- Test data consistance
+	NOP									LQ.xyzw VF16, -2(VI08)  				;					- Load first vertex for next stage
+TSPWall5:;=======================================================================
+	;//===============		CLIPPING PLAN : X = XMIN		=====================
+	;============================================================================
+	NOP									FCAND VI01, 0x0030c3					;					- Test clipping flag 0000 0000 0011 0000 1100 0011
+	NOP									IBEQ VI01, VI00, TSPMetaFormer			;					- End clipping test
+	ADDx.y VF06, VF00, VF18				FCOR VI01, 0xffdf7d						; Vert-1 x			- Test clipping flag 1111 1111 1101 1111 0111 1101
+	ADDx.x VF06, VF00, VF16				IBNE VI01, VI00, TSPFullClip			; Vert-2 x			- Trig outside x=xmax clipping plan
+	NOP									FCAND VI01, 0x002082					;					- Test clipping flag 0000 0000 0010 0000 1000 0010
+	NOP									IBEQ VI01, VI00, TSPWall6				;					- Trig not intersecting this wall
+	NOP									LQ.xyzw VF17, -1(VI08) 					;					- Load interpolator-1
+	SUBx.y VF20, VF06, VF06				IADDIU VI04, VI08, 0					; Dist x1-x2		- Set ring pointer to end of ring memory	
+TSPRing5:;-----------------------------------------------------------------------
+	ADDz.xy VF07, VF06, VF23			LQ.xyzw VF08, 2(VI03)  					; Build clip test	- Load interp-2
+	ADDx.xyzw VF22, VF16, VF00			LQ.xyzw VF19, 1(VI03) 					; Transfer interp-1 - Load interpolator-2
+	ADDx.xyzw VF16, VF18, VF00			IADDIU VI03, VI03, 2 					; Swap interp2-1	- Increment ring pointer
+	ADDy.x VF06, VF00, VF06				DIV Q, VF00w, VF20y						; Swap interpolator - Launch 1/D calc
+	ADDx.y VF06, VF00, VF08				FMAND VI01, VI02						; Interpolator y	- Test Fmac register
+	MULAy.xyzw ACC, VF22, VF07			IBEQ VI01, VI02, TSPNext5				; Calc new pos		- Full Clipped segment 
+	MSUBx.xyzw VF22, VF16, VF07			SQ.xyzw VF22, 0(VI08) 					; Calc new pos		- Store first position
+	MULAy.xyzw ACC, VF17, VF07			SQ.xyzw VF17, 1(VI08) 					; Calc new Interp   - Store first interpolator
+	MSUBx.xyzw VF21, VF19, VF07			IBEQ VI01, VI00, TSPNext5				; Calc new Interp   - Full segment inside frustum
+	SUBz.x VF22, VF00, VF23				IADDIU VI08, VI08, 2					; Use Xmin pos      - Increment vertex counter
+	MULq.yzw VF22, VF22, Q				IADDIU VI02, VI00, 0x0040				; Scale new pos		- Bit mask 0000 0000 0100 0000
+	NOP									NOP										;	
+	MULq.xyzw VF21, VF21, Q				NOP										; Scale new Interp
+	NOP									IBEQ VI01, VI02, TSPSwap5				;					- Test Fmac second position
+	NOP									IADDIU VI02, VI00, 0x00c0				;					- Restore Fmac filter in vi02
+	NOP									ISUBIU VI08, VI08, 2					;					- Decrement vertex counter
+TSPSwap5:;-----------------------------------------------------------------------	
+	NOP									SQI.xyzw VF22,(VI08++)  				;					- Store interpolated position
+	NOP									SQI.xyzw VF21,(VI08++)  				;					- Store new trig interpolator
+TSPNext5:;-----------------------------------------------------------------------									
+	ADDx.xyzw VF18, VF08, VF00			IBNE VI03, VI04, TSPRing5				; Swap second vert  - Ring End test
+	SUBx.y VF20, VF06, VF06				MOVE.xyzw VF17, VF19					; Dist1-2			- Swap interpolators2-1											
+	;----------------------------------------------------------------------------	
+	NOP									IBEQ VI08, VI04, TSPFullClip 			;					- Test data consistance
+	NOP									LQ.xyzw VF16, -2(VI08)  				;					- Load first vertex for next stage		
+TSPWall6:;=======================================================================
+	;//===============		CLIPPING PLAN : X = Z			=====================
+	;============================================================================
+	NOP									FCAND VI01, 0x001041					;					- Test clipping flag 0000 0000 0001 0000 0100 0001
+	NOP									IBEQ VI01, VI00, TSPMetaFormer			;					- End clipping test	
+	SUBx.y VF06, VF00, VF18				FCOR VI01, 0xffefbe						; Vert-1 -x			- Test clipping flag 1111 1111 1110 1110 1011 1110
+	SUBx.x VF06, VF00, VF16				IBNE VI01, VI00, TSPFullClip			; Vert-2 -x			- Trig outside x=xmax clipping plan
+	NOP									FCAND VI01, 0x001041					;					- Test clipping flag 0000 0000 0001 0001 0100 0001
+	NOP									IBEQ VI01, VI00, TSPMetaFormer			;					- Trig not intersecting this wall
+	NOP									LQ.xyzw VF17, -1(VI08)  				;					- Load interpolator-1			
+	SUBx.y VF20, VF06, VF06				IADDIU VI04, VI08, 0		 			; Dist y+z1-2		- Set ring pointer to end of ring memory	
+TSPRing6:;-----------------------------------------------------------------------
+	ADDz.xy VF07, VF06, VF23			LQ.xyzw VF08, 2(VI03)  					; Build clip test	- Load interp-2
+	ADDx.xyzw VF22, VF16, VF00			LQ.xyzw VF19, 1(VI03) 					; Transfer interp-1 - Load interpolator-2
+	ADDx.xyzw VF16, VF18, VF00			IADDIU VI03, VI03, 2 					; Swap interp2-1	- Increment ring pointer
+	ADDy.x VF06, VF00, VF06				DIV Q, VF00w, VF20y						; Swap interpolator - Launch 1/D calc
+	SUBx.y VF06, VF00, VF08				FMAND VI01, VI02						; Interpolator y	- Test Fmac register
+	MULAy.xyzw ACC, VF22, VF07			IBEQ VI01, VI02, TSPNext6				; Calc new pos		- Full Clipped segment 
+	MSUBx.xyzw VF22, VF16, VF07			SQ.xyzw VF22, 0(VI08) 					; Calc new pos		- Store first position
+	MULAy.xyzw ACC, VF17, VF07			SQ.xyzw VF17, 1(VI08) 					; Calc new Interp   - Store first interpolator
+	MSUBx.xyzw VF21, VF19, VF07			IBEQ VI01, VI00, TSPNext6				; Calc new Interp   - Full segment inside frustum
+	ADDz.x VF22, VF00, VF23				IADDIU VI08, VI08, 2					; Use Xmax pos      - Increment vertex counter
+	MULq.yzw VF22, VF22, Q				IADDIU VI02, VI00, 0x0040				; Scale new pos		- Bit mask 0000 0000 0100 0000
+	NOP									NOP										;
+	MULq.xyzw VF21, VF21, Q				NOP										; Scale new Interp
+	NOP									IBEQ VI01, VI02, TSPSwap6				;					- Test Fmac second position
+	NOP									IADDIU VI02, VI00, 0x00c0				;					- Restore Fmac filter in vi02
+	NOP									ISUBIU VI08, VI08, 2					;					- Decrement vertex counter
+TSPSwap6:;-----------------------------------------------------------------------	
+	NOP									SQI.xyzw VF22,(VI08++)  				;					- Store interpolated position
+	NOP									SQI.xyzw VF21,(VI08++)  				;					- Store new trig interpolator
+TSPNext6:;-----------------------------------------------------------------------											
+	ADDx.xyzw VF18, VF08, VF00			IBNE VI03, VI04, TSPRing6				; Swap second vert  - Ring End test
+	SUBx.y VF20, VF06, VF06				MOVE.xyzw VF17, VF19					; Dist1-2			- Swap interpolators2-1			
+TSPMetaFormer:;==================================================================
+	;//===============     INSERT A NEW DNA STRUCTURE      ======================
+	;============================================================================
+	NOP									IBEQ VI08, VI04, TSPFullClip			;					- Test data consistency
+	NOP									LQ.xyzw VF18, (0-1*vertexSize)(VI07)	;  					- Load first vertex	
+	NOP									IBNE VI05, VI00, TSPIgnition			;					- Degeneration test	
+	NOP									IADDIU VI07, VI07, vertexSize 			;					- Increment clipping buffer	
+	NOP									IADDIU VI09, VI09, 1					;					- Increment number of vertices
+	NOP									SQ.xyzw VF18, (0-1*vertexSize)(VI07)	;  					- Store degenerated vertex
+	NOP									IADDIU VI07, VI07, vertexSize 			;					- Increment clipping buffer
+TSPIgnition:;--------------------------------------------------------------------
+	NOP									LQI.xyzw VF20, (VI04++)  				;					- Load new vertex
+	NOP									LQI.xyzw VF22, (VI04++)	  				;					- Load new interpolator
+	NOP									LQ.xyzw VF06, (1-2*vertexSize)(VI11)	; 					- Load uv-1
+	NOP									LQ.xyzw VF07, (1-1*vertexSize)(VI11)	;					- Load uv-2
+	NOP									LQ.xyzw VF08, (1-0*vertexSize)(VI11)	;					- Load uv-3
+	NOP									LQ.xyzw VF09, (2-2*vertexSize)(VI11)	; 					- Load rgba-1
+	MULAy.xyzw ACC, VF06, VF22			LQ.xyzw VF10, (2-1*vertexSize)(VI11)	; Interp uv			- Load rgba-2
+	MADDAz.xyzw ACC, VF07, VF22			LQ.xyzw VF11, (2-0*vertexSize)(VI11)	; Interp uv			- Load rgba-3
+	MADDw.xyzw VF16, VF08, VF22			LQ.xyzw VF12, (3-2*vertexSize)(VI11)	; Interp uv			- Load normal-1
+	MULAy.xyzw ACC, VF09, VF22			LQ.xyzw VF13, (3-1*vertexSize)(VI11)	; Interp rgba		- Load normal-2
+	MADDAz.xyzw ACC, VF10, VF22			LQ.xyzw VF14, (3-0*vertexSize)(VI11)	; Interp rgba		- Load normal-3
+	MADDw.xyzw VF17, VF11, VF22			LQD.xyzw VF21, (--VI08)   				; Interp rgba		- Load new vertex
+	MULAy.xyzw ACC, VF12, VF22			LQD.xyzw VF03, (--VI08)   				; Inperp normal		- Load new interpolator
+	MADDAz.xyzw ACC, VF13, VF22			ISUB VI01, VI08, VI04					; Interp normal		- Number of remaining data
+	MADDw.xyzw VF18, VF14, VF22			SQ.xyzw VF20, (0-1*vertexSize)(VI07)	; Interp normal		- Store Degenerated vertex
+TSPMetaFormerLoop:;--------------------------------------------------------------						
+	MULAy.xyzw ACC, VF06, VF21			SQI.xyzw VF20, (VI07++)					; Inperp uv			- Store position
+	MADDAz.xyzw ACC, VF07, VF21			LQI.xyzw VF20, (VI04++)  				; Interp uv			- Load new vertex
+	MADDw.xyzw VF16, VF08, VF21			SQI.xyzw VF16, (VI07++)					; Interp uv			- Store uv
+	MULAy.xyzw ACC, VF09, VF21			SQI.xyzw VF17, (VI07++)					; Interp rgba		- Store rgba
+	MADDAz.xyzw ACC, VF10, VF21			LQI.xyzw VF22, (VI04++)	  				; Interp rgba		- Load new interpolator
+	MADDw.xyzw VF17, VF11, VF21			SQI.xyzw VF18, (VI07++)					; Interp rgba		- Store normal
+	MULAy.xyzw ACC, VF12, VF21			IBLTZ VI01, TSPMetaFormerEnd			; Interp normal		- End test
+	MADDAz.xyzw ACC, VF13, VF21			IADDIU VI09, VI09, 1					; Interp normal		- Increment number of vertices
+	MADDw.xyzw VF18, VF14, VF21			ISUB VI01, VI08, VI04					; Interp normal		- Number of remaining data
+	MULAy.xyzw ACC, VF06, VF22			SQI.xyzw VF03, (VI07++)					; Interp uv			- Store position
+	MADDAz.xyzw ACC, VF07, VF22			LQD.xyzw VF21, (--VI08)   				; Interp uv			- Load new interpolator
+	MADDw.xyzw VF16, VF08, VF22			SQI.xyzw VF16, (VI07++)					; Interp uv			- Store uv
+	MULAy.xyzw ACC, VF09, VF22			SQI.xyzw VF17, (VI07++)					; Interp rgba		- Store rgba
+	MADDAz.xyzw ACC, VF10, VF22			LQD.xyzw VF03, (--VI08)   				; Interp rgba		- Load new vertex
+	MADDw.xyzw VF17, VF11, VF22			SQI.xyzw VF18, (VI07++)					; Interp rgba		- Store normal	 			
+	MULAy.xyzw ACC, VF12, VF22			IADDIU VI09, VI09, 1					; Interp normal		- Increment number of vertices
+	MADDAz.xyzw ACC, VF13, VF22			IBGEZ VI01, TSPMetaFormerLoop			; Interp normal		- End test
+	MADDw.xyzw VF18, VF14, VF22			ISUB VI01, VI08, VI04					; Interp normal		- Number of remaining data
+TSPMetaFormerEnd:;---------------------------------------------------------------
+	NOP									LQ.xyzw VF03, (0-1*vertexSize)(VI07)	;					- Load Last vertex position
+	NOP									IADDIU VI07, VI07, vertexSize 			;					- Increment clipping buffer adress
+	NOP									IADDIU VI09, VI09, 2					;					- Increment number of vertices
+	NOP									B TSPFullClip							;					- Jump to clipping flag
+	NOP									SQ.xyzw VF03, (0-1*vertexSize)(VI07)	;					- Store degenerated vertex
+TSPFullTrig:;====================================================================
+	;//===============   	  START A DNA STRUCTURE	       ======================
+	;============================================================================
+	NOP									IBEQ VI05, VI00, TSPByPass				;					- Degeration test
+	NOP									IADDIU VI09, VI09, 1					;					- Increment number of vertices
+	NOP									IADDIU VI07, VI07, vertexSize			;					- Increment clipping buffer adress		
+	NOP									SQ.xyzw VF03, (0-1*vertexSize)(VI07)	;					- Store degenerated vertex
+	NOP									LQ.xyzw VF06, (1-2*vertexSize)(VI11)	;					- Load uvs
+	NOP									LQ.xyzw VF07, (2-2*vertexSize)(VI11)	;					- Load rgbas
+	NOP									LQ.xyzw VF08, (3-2*vertexSize)(VI11)	;					- Load normal	
+	NOP									SQI.xyzw VF03, (VI07++)					;					- Store position	
+	NOP									SQI.xyzw VF06, (VI07++)					;					- Store uvs		
+	NOP									SQI.xyzw VF07, (VI07++)					;					- Store rgbas
+	NOP									SQI.xyzw VF08, (VI07++)					;					- Store normal
+	NOP									LQ.xyzw VF06, (1-1*vertexSize)(VI11)	;					- Load uvs
+	NOP									LQ.xyzw VF07, (2-1*vertexSize)(VI11)	;					- Load rgbas
+	NOP									LQ.xyzw VF08, (3-1*vertexSize)(VI11)	;					- Load normal	
+	NOP									SQI.xyzw VF04, (VI07++)					;					- Store position
+	NOP									SQI.xyzw VF06, (VI07++)					;					- Store uvs		
+	NOP									SQI.xyzw VF07, (VI07++)					;					- Store rgbas
+	NOP									SQI.xyzw VF08, (VI07++)					;					- Store normal
+	NOP									IADDIU VI09, VI09, 3					;					- Increment number of vertices
+	NOP									IADDIU VI05, VI00, 0					;					- Reset Clipping flag	
+TSPByPass:;======================================================================
+	;//===============   	 FILL THE DNA STRUCTURE        ======================
+	;============================================================================
+	NOP									LQ.xyzw VF06, (1-0*vertexSize)(VI11)	;					- Load uvs
+	NOP									LQ.xyzw VF07, (2-0*vertexSize)(VI11)	;					- Load rgbas
+	NOP									LQ.xyzw VF08, (3-0*vertexSize)(VI11)	;					- Load normal
+	NOP									SQI.xyzw VF05, (VI07++)					;					- Store position
+	NOP									SQI.xyzw VF06, (VI07++)					;					- Store uv							
+	NOP									SQI.xyzw VF07, (VI07++)					;					- Store rgbas
+	NOP									B TSPRedLine							;					- Bypass Clipping
+	ADDx.xyzw VF03, VF04, VF00			SQI.xyzw VF08, (VI07++)					; Shift pos2-1		- Store normal
+TSPFullClip:;====================================================================
+	;//===============   	 FLAG OF DNA MODIFICATION       =====================
+	;============================================================================
+	ADDx.xyzw VF03, VF04, VF00			IADDIU VI05, VI00, 1					; Zmapping pos-3	- Degeneration flag
+TSPRedLine:;=====================================================================
+	;//===============   	 LOOP OVER INPUT BUFFER       =======================
+	;============================================================================
+	MULAw.z ACC, VF24, VF15				ISUBIU VI01, VI07, TSClipRedLine		; XYZmapping pos-3	- Test Clipping buffer limit
+	ADDx.xyzw VF04, VF05, VF00			IADDIU VI11, VI11, (1*vertexSize)		; Shift pos3-2		- Increment input buffe adress
+	MUL.xy VF25, VF15, VF24				IBGEZ VI01, TSPOverLoad 				; XYZmapping pos-3	- Test clipping buffer filling
+	MADDw.z VF25, VF26, VF00			MOVE.xyzw VF16, VF03					; Zmapping pos-3	- Shift interp1
+	ADDx.xyzw VF05, VF15, VF00			IBNE VI11, VI10, TSPExpanderLoop		; Shift pos3-3		- End test
+	ADDx.xyzw VF18, VF04, VF00			LQ.xyzw VF15, (0+1*vertexSize)(VI11)	; Shift interp2		- Load new vertex position	
+TSPOverLoad:;//==================================================================	
+			
+			
+;//================================================================================================================
+;//=======================================					=======================================================
+;//===================						    THE END					                  =========================
+;//=======================================			        =======================================================
+;//============================================================================================= JCL Janvier 2001 =

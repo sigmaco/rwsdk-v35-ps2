@@ -1,0 +1,97 @@
+--------------------------------------------------------------------------
+             RenderWare Graphics Example (PlayStation 2): Mipmap
+--------------------------------------------------------------------------
+
+
+PURPOSE
+
+The MIPMAP example shows a buckyball that can be moved toward or away 
+from the camera.
+
+It  demonstrates the use of mipmaps in RenderWare. A clump is loaded
+that uses two textures, one that uses auto-generated mipmaps, and one
+that uses mipmaps generated from user-supplied mip level images.
+For the latter type of texture, each mipmap level image is numbered to 
+indicate the level currently displayed (level 0 being the top level).
+
+The text at the bottom right of the window shows the total number of
+mipmaps in operation. This number will vary between platforms, the 
+maximum being determined by the resolution of the top-level mipmap. 
+A sufficient number of mipmap images are supplied to give mipmap 
+resolutions down to 1x1.
+
+The example also gives a good illustration of the various texture
+blending modes:
+  rwFILTERNEAREST
+  rwFILTERLINEAR
+  rwFILTERMIPNEAREST
+  rwFILTERMIPLINEAR
+  rwFILTERLINEARMIPNEAREST
+  rwFILTERLINEARMIPLINEAR
+      including some text at the bottom right of the window.
+
+
+--------------------------------------------------------------------------
+GENERAL CONTROLS
+
+LEFT ANALOG stick        - Rotate clump.
+
+RIGHT ANALOG stick       - Translate the clump to and from the camera.
+
+SELECT button            - Toggle menu/help/plain mode.
+
+START + SELECT           - Quit the application.
+
+--------------------------------------------------------------------------
+MENU OPTIONS
+
+FILTER MODE           - Allows the user to select the type of filtering
+                        (mipmap and non-mipmap) to be applied to all
+                        textures on the clump.
+
+FPS                   - Allows the user to read the number of frames 
+                        per second being rendered (updated every second).
+
+--------------------------------------------------------------------------
+MENU CONTROLS
+
+DPAD UP and DOWN        - Select menu item.
+
+DPAD LEFT and RIGHT     - Modify menu item value or execute associated 
+                          command.
+
+LEFT ANALOG stick       - Modify floating point value (if applicable) 
+                          otherwise do what you would do in general 
+                          controls.
+
+--------------------------------------------------------------------------
+HELP CONTROLS
+
+DPAD UP and DOWN         - Scroll a line at a time (autorepeat available).
+
+LEFT SHOULDER #1 and #2  - Scroll a page at a time.
+
+--------------------------------------------------------------------------
+VIDEO MODE SELECTION
+
+The command-line option '-vms' can be used to enable a simple video 
+selection screen, which appears before the application starts running. 
+Use the UP and DOWN DPAD buttons to highlight the required video
+mode and press START to make the selection. Note there are several pages
+of video modes; use the LEFT SHOULDER buttons to move from page to page.
+
+--------------------------------------------------------------------------
+This demonstration program is copyright Criterion Software Limited 2003. 
+Criterion Software grants you a license to use it only in the form as 
+supplied. You may not disassemble, decompile or reverse engineer this 
+demonstration program.
+
+This demonstration program is provided as is with no warranties of any
+kind. Criterion Software will not, under any circumstances, be liable for
+any lost revenue or other damages arising from the use of this
+demonstration program.
+
+RenderWare is a registered trademark of Canon Inc.
+Other trademarks acknowledged.
+--------------------------------------------------------------------------
+Tue Apr 22 12:04:26 2003 -- build sky ( 64649 0x35000 )

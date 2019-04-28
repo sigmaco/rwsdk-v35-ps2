@@ -1,0 +1,268 @@
+###########################################################################
+#
+# File :     makecom/skygcc
+#
+# Abstract : sky gcc specific compile time options. 
+#
+#            See
+#            o GCC homepage
+#               http://www.gnu.org/software/gcc
+#            o GCC compilations flags
+#               http://www.gnu.org/software/gcc/onlinedocs/gcc_2.html
+#
+#            This file is included from a generic top level makefile when
+#            using the Linux hosted Sony tool chain. It may also be used
+#            with PC builds of the Sony tools.
+#
+###########################################################################
+#
+# This file is a product of Criterion Software Ltd.
+#
+# This file is provided as is with no warranties of any kind and is
+# provided without any obligation on Criterion Software Ltd. or Canon Inc. 
+# to assist in its use or modification.
+#
+# Criterion Software Ltd. will not, under any circumstances, be liable for 
+# any lost revenue or other damages arising from the use of this file.
+#
+# Copyright (c) 1999 Criterion Software Ltd.
+# All Rights Reserved.
+#
+# RenderWare is a trademark of Canon Inc.
+#
+###########################################################################
+
+# Indicate that compiler options have been included
+MAKECOM=1
+
+CC        = ee-gcc
+
+#
+# Sony tool chain 2.96 requires a slightly different config to the
+# older ones. The following lets us sellect.
+#
+CC_VER := $(shell $(CC) -dumpversion)
+CC_VER1 := $(findstring 2.96, $(CC_VER))
+CC_VER2 := $(findstring 3.0., $(CC_VER))
+
+ifeq ($(SMALLCODE), 1)
+C_OPT = -Os
+else
+C_OPT = -O3
+endif
+
+
+ifeq ($(COPTIMIZE), 1)
+CFLAGS += $(C_OPT) -DNDEBUG  -Wuninitialized
+else
+CFLAGS += -O0
+#----------------
+# # gcc requires the generation of a dependency tree, and hence at least -O1,
+# # to detect any use of uninitialized variables
+# so build optimised then. Code generation options win.
+endif
+
+ifeq ($(CDEBUG), 1)
+CFLAGS += -g
+endif
+
+ifeq ($(PG), 1)
+CFLAGS += -pg -DPG
+endif
+
+CFLAGS += -DRW_USE_SPF
+
+ifeq ($(SCE_11),1)
+CFLAGS += -DSCE_11
+endif
+
+ifdef IOPPATH
+CFLAGS += -DIOPPATH=$(IOPPATH)
+endif
+
+ifdef PS2_DRIVE
+CFLAGS += -DPS2_DRIVE=$(PS2_DRIVE)
+endif
+
+# These seem to be platform specific, not compiler specific
+
+ifeq ($(NOASM), 1)
+CFLAGS += -DNOASM 
+endif
+
+ifeq ("$(COMPILER)", "")
+COMPILER=cc
+endif
+
+ifeq ("$(LINKER)", "")
+# It should be this, but we have a rather strange idea of LINKER
+LINKER=link.exe
+endif
+
+######
+# included burst from sony Makefiles
+######
+
+ifeq ("$(PS2_DRIVE)", "")
+SCE = /usr/local/sce/ee
+else
+SCE = $(PS2_DRIVE):/usr/local/sce/ee
+endif
+
+SCELIBDIR      = $(SCE)/lib
+SCEINCDIR      = $(SCE)/include
+
+ifeq ("$(SKYLCF)", "RWCMD")
+LCFILE      = $(RWGDIR)/shared/makecom/sky/rwapp.cmd
+else  #  ("$(RWLCF)", "")
+LCFILE      = $(SCELIBDIR)/app.cmd 
+endif #  ("$(RWLCF)", "")
+
+SYSLIBS     = $(SCELIBDIR)/libgraph.a \
+              $(SCELIBDIR)/libdma.a
+
+ifndef SCE_11
+SYSLIBS += $(SCELIBDIR)/libpad.a
+endif	
+
+ifeq ($(RWDEBUG), 1)
+ifeq ($(RWMEMDEBUG), 1)
+SYSLIBS += -L$(RWLIBDIR) -lrtdbmalloc
+endif # ($(RWMEMDEBUG), 1)
+endif # ($(RWDEBUG), 1)
+						
+CWARNINGS = \
+    -Wall \
+    -W \
+    -Wcast-qual \
+    -Wchar-subscripts \
+    -Wcomment \
+    -Wformat \
+    -Wid-clash-32 \
+    -Wimplicit \
+    -Wimplicit-function-declaration \
+    -Wimplicit-int \
+    -Winline \
+    -Wlong-long \
+    -Wmain \
+    -Wmissing-noreturn \
+    -Wmultichar \
+    -Wnested-externs \
+    -Wparentheses \
+    -Wpointer-arith \
+    -Wreturn-type \
+    -Wsign-compare \
+    -Wswitch \
+    -Wtrigraphs \
+    -Wunknown-pragmas \
+    -Wunused \
+    -Wwrite-strings 
+
+#    -ansi
+#    -pedantic
+#    -Waggregate-return
+#    -Wbad-function-cast
+#    -Wcast-align
+#    -Wconversion
+#    -Werror
+#    -Wlarger-than-len 
+#    -Wmissing-declarations /* sce include files fire these warnings*/
+#    -Wmissing-prototypes   /* sce include files fire these warnings*/
+#    -Wredundant-decls
+#    -Wshadow 
+#    -Wstrict-prototypes    /* sce include files fire these warnings */
+#    -Wtraditional
+#    -Wundef
+#    -Wuninitialized
+
+CPP       = $(CC)
+COUT      = -o
+LOUT      = -e
+SOUT      = -S -o $@
+CPPOPT    = -E -P
+CFLAGS   += $(CWARNINGS) -fno-common -c
+CFLAGS   += -Wa,-I$(DEVDIR)/$(RWTARGET)
+CFLAGS   += -Wa,-al=$*.lst
+CFLAGS   += -DSKY 
+LD        = ee-gcc
+LFLAGS   = -T $(LCFILE) -g -Wl,-Map,$(TARGET).map -L$(SCELIBDIR) -lm
+
+ifeq ("$(CC_VER1)", "2.96")
+LFLAGS += -mno-crt0
+else
+ifeq ("$(CC_VER2)", "3.0.")
+LFLAGS += -mno-crt0
+else
+LFLAGS += -nostartfiles
+endif
+endif
+
+LOUT = -o
+
+AS        = ee-gcc
+AOUT      = -o
+ASFLAGS   = -c -xassembler-with-cpp
+ASFLAGS  += -Wa,-al=$*.lsa
+
+DVPASM        = ee-dvp-as
+DVPASFLAGS    = -I$(SRCDIR) -I$(DEVDIR)/$(RWTARGET)
+DVPAOUT       = -o
+
+RUN = pc-ps2d -d miko 
+
+ifeq ($(CDEBUG), 1)
+ASFLAGS     += --gstabs
+DVPASMFLAGS += --gstabs
+endif
+
+# We do want assembler
+
+CFLAGS += -I/usr/local/sce/common/include -I/usr/local/sce/ee/include
+CFLAGS += -fno-exceptions
+
+
+# Add crtO.o to list of object files
+
+OBJ += crt0.o
+
+VPATH += $(SCELIBDIR)
+
+# Define some compiler/platform specific parameters for the naming of object
+# and library files
+
+O = o
+L = a
+LP = lib
+EXE = .elf
+
+# Directory creation
+ifndef MD
+MD = mkdir -p
+endif
+
+# The following rule is required, as it is not a default
+
+#.SUFFIXES: .c .$(O) .asm .dsm
+
+$(OBJDIR)/%.$(O) : %.dsm
+	$(DVPASM) $(DVPASFLAGS) -alhs $(DVPAOUT)$@ $^ > $(OBJDIR)/$*.lsd
+
+CPPFLAGS += $(CFLAGS)
+
+CPPFLAGS +=					\
+	-Wctor-dtor-privacy			\
+	-Wno-non-template-friend		\
+	-Wno-pmf-conversions			\
+	-Wnon-virtual-dtor			\
+	-Woverloaded-virtual			\
+	-Wreorder				\
+	-Wsign-promo				\
+	-Wsynth
+
+# -Weffc++		
+# -Wold-style-cast
+
+# Support for multipass linking with LIB groups
+
+RWLIBGROUPSTART = -Wl,--start-group
+RWLIBGROUPEND = -Wl,--end-group

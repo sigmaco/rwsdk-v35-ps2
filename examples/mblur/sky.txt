@@ -1,0 +1,89 @@
+--------------------------------------------------------------------------
+             RenderWare Graphics Example (PlayStation 2): Motion-blur
+--------------------------------------------------------------------------
+
+PURPOSE
+
+The MBLUR example illustrates how simple motion blur can be performed on 
+PlayStation 2. The example works by blitting the front buffer over the 
+back buffer after rendering has been performed.
+
+This example relies on an effect of sub-rastering the camera raster. On
+PS2 this operation returns the front (displayed) buffer. By using the
+result of the previous rendering in this way we can achieve this full
+screen motion blur.
+
+The menu allows the setting of the alpha value used in the blit. A value
+of 0 means to take no contribution from the front buffer (i.e. to perform
+no motion blur). A setting of 255 means to take 100% of the previous
+frame and superimpose it over the current frame. This has the result of
+freezing the display until the alpha setting is changed. This is not
+a bug.
+
+By rendering the previous frame over the current frame, and then
+rendering the menu we prevent the menu from being motion blurred, which
+gives an unusual appearance.
+
+The motion blur rendering code sets renderstate. Be aware of this.
+
+--------------------------------------------------------------------------
+GENERAL CONTROLS
+
+SELECT button            - Toggle menu/help/plain mode.
+
+START + SELECT           - Quit the application.
+
+--------------------------------------------------------------------------
+MENU OPTIONS
+
+ALPHA                    - Determines how much alpha blending is applied.
+
+SPEED                    - Controls the speed of the moving ssballs.
+
+FPS                      - Allows the user to read the number of frames 
+                           per second being rendered (updated every
+                           second).
+
+--------------------------------------------------------------------------
+MENU CONTROLS
+
+DPAD UP and DOWN         - Select menu item.
+
+DPAD LEFT and RIGHT      - Modify menu item value or execute associated 
+                           command.
+
+LEFT ANALOG stick        - Modify floating point value (if applicable) 
+                           otherwise do what you would do in general 
+                           controls.
+
+--------------------------------------------------------------------------
+HELP CONTROLS
+
+DPAD UP and DOWN         - Scroll a line at a time (autorepeat available).
+
+LEFT SHOULDER #1 and #2  - Scroll a page at a time.
+
+--------------------------------------------------------------------------
+VIDEO MODE SELECTION
+
+The command-line option '-vms' can be used to enable a simple video 
+selection screen, which appears before the application starts running. 
+Use the UP and DOWN DPAD buttons to highlight the required video
+mode and press START to make the selection. Note there are several pages
+of video modes; use the LEFT SHOULDER buttons to move from page to page.
+
+--------------------------------------------------------------------------
+This demonstration program is copyright Criterion Software Limited 2003. 
+Criterion Software grants you a license to use it only in the form as 
+supplied. You may not disassemble, decompile or reverse engineer this 
+demonstration program.
+
+This demonstration program is provided as is with no warranties of any
+kind. Criterion Software will not, under any circumstances, be liable for
+any lost revenue or other damages arising from the use of this
+demonstration program.
+
+RenderWare is a registered trademark of Canon Inc.
+Other trademarks acknowledged.
+--------------------------------------------------------------------------
+Tue Apr 22 12:04:26 2003 -- build sky ( 64649 0x35000 )

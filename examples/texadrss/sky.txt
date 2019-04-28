@@ -1,0 +1,87 @@
+--------------------------------------------------------------------------
+          RenderWare Graphics Example (PlayStation 2): Texadrss
+--------------------------------------------------------------------------
+
+PURPOSE
+
+The TEXADRSS example demonstrates the use of different texture addressing
+modes in RenderWare. A clump is loaded that uses three textures. The user
+can then alter the texture addressing mode for the entire clump.
+
+It is possible to alter both the U and V addressing modes simultaneously
+or separately.
+
+It should be noted that different hardware supports different modes. Any
+modes which are not supported are removed from the list of available
+modes.
+
+--------------------------------------------------------------------------
+GENERAL CONTROLS
+
+LEFT ANALOG stick        - Rotate clump.
+
+RIGHT ANALOG stick       - Translate the clump to and from the camera.
+
+SELECT button            - Toggle menu/help/plain mode.
+
+START + SELECT           - Quit the application.
+
+--------------------------------------------------------------------------
+MENU OPTIONS
+
+UV MODE                  - Allows the user to select the type of texture
+                           addressing to be applied in both U and V.
+
+U MODE                   - Allows the user to select the type of texture
+                           addressing to be applied in U only.
+
+V MODE                   - Allows the user to select the type of texture
+                           addressing to be applied in V only.
+
+FPS                      - Allows the user to read the number of frames
+                           per second being rendered (updated every
+                           second).
+
+--------------------------------------------------------------------------
+MENU CONTROLS
+
+DPAD UP and DOWN        - Select menu item.
+
+DPAD LEFT and RIGHT     - Modify menu item value or execute associated 
+                          command.
+
+LEFT ANALOG stick       - Modify floating point value (if applicable) 
+                          otherwise do what you would do in general 
+                          controls.
+
+--------------------------------------------------------------------------
+HELP CONTROLS
+
+DPAD UP and DOWN         - Scroll a line at a time (autorepeat available).
+
+LEFT SHOULDER #1 and #2  - Scroll a page at a time.
+
+--------------------------------------------------------------------------
+VIDEO MODE SELECTION
+
+The command-line option '-vms' can be used to enable a simple video 
+selection screen, which appears before the application starts running. 
+Use the UP and DOWN DPAD buttons to highlight the required video
+mode and press START to make the selection. Note there are several pages
+of video modes; use the LEFT SHOULDER buttons to move from page to page.
+
+--------------------------------------------------------------------------
+This demonstration program is copyright Criterion Software Limited 2003. 
+Criterion Software grants you a license to use it only in the form as 
+supplied. You may not disassemble, decompile or reverse engineer this 
+demonstration program.
+
+This demonstration program is provided as is with no warranties of any
+kind. Criterion Software will not, under any circumstances, be liable for
+any lost revenue or other damages arising from the use of this
+demonstration program.
+
+RenderWare is a registered trademark of Canon Inc.
+Other trademarks acknowledged.
+--------------------------------------------------------------------------
+Tue Apr 22 12:04:26 2003 -- build sky ( 64649 0x35000 )

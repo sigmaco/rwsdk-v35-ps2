@@ -1,0 +1,34 @@
+;**********************************************************************************************************************
+; Matrix set up code. Only do this once per strip, not once per batch.
+;
+; GOTCHAS: MAKE SURE THAT YOU DO NOT OVERWRITE THE FOLLOWING REGISTERS IN THE REST OF YOUR CODE:
+;   VF01 - VF04 : This is the main matrix!
+;**********************************************************************************************************************
+
+    SUB.z   VF01, VF01, VF01        MR32.z  VF04, VF00                          ; Zero matrix.z             VF04=1.0
+    SUB.z   VF02, VF02, VF02        NOP                                         ; Zero matrix.z             
+    SUB.z   VF03, VF03, VF03        NOP                                         ; Zero matrix.z             
+    NOP                             LOI     0.5                                 ;                           Assemble constant 0.5
+
+    MULi.w  VF08, VF00, I           LQ.xyw  VF01, vuSDmat0(VI00)                ; Constant 0.5              Load matrix
+    NOP                             LQ.xyw  VF02, vuSDmat1(VI00)                ;                           Load matrix
+    NOP                             LQ.xyw  VF03, vuSDmat2(VI00)                ;                           Load matrix
+    NOP                             LQ.xyw  VF04, vuSDmat3(VI00)                ;                           Load matrix
+
+    MUL.w   VF05, VF08, VF01        LQ.xyz  VF30, vuSDoffXoffYzShift(VI00)      ; Adjust matrix             Viewport offset
+    MUL.w   VF06, VF08, VF02        LQ.xy   VF31, vuSDrealOffset(VI00)          ; Adjust matrix             GS offset
+    MUL.w   VF07, VF08, VF03        LQ.xyzw VF28, vuSDcolScale(VI00)            ; Adjust matrix             Load color scale
+    MUL.w   VF08, VF08, VF04        LQ.xyz  VF29, vuSDcamWcamHzScale(VI00)      ; Adjust matrix             Viewport scale
+
+    SUBw.xy VF01, VF01, VF05        NOP				                            ; Adjust matrix             
+    SUBw.xy VF02, VF02, VF06        NOP                                         ; Adjust matrix             
+
+    SUBw.xy VF03, VF03, VF07        LQ.xyzw VF26, vuSDClipvec1(VI00)            ; Adjust matrix             Load Clipping vector-1
+    SUBw.xy VF04, VF04, VF08        LQ.yz	VF24, vuSDClipvec2(VI00)            ; Adjust matrix             Load Clipping vector-1
+    ADD.xy  VF30, VF30, VF31        NOP				                            ; Combine GS&VP offset      zScale for fast fp->i
+
+    NOP					            MR32.x VF26, VF26                           ;                           Rotate clipping vector 1
+    MUL.xy  VF01, VF01, VF29        MR32.x VF24, VF26                           ; Prescale the matrix       Rotate clipping vector 2
+    MUL.xy  VF02, VF02, VF29        NOP                                         ; Prescale the matrix       
+    MUL.xy  VF03, VF03, VF29        NOP                                         ; Prescale the matrix       
+	MUL.xyz VF04, VF04, VF29        NOP                                         ; Prescale the matrix       

@@ -1,0 +1,260 @@
+###########################################################################
+#
+# File :     sky303/makecom
+#
+# Abstract : sky gcc 3.0.3 (SN) specific compile time options. 
+#
+# See
+# o ee-gcc303 binaries
+#   http://www.snsys.com/betafiles/ps2/ProDG/ps2-ee-3_0_3-v1_16b.zip
+# o GCC homepage
+#   http://www.gnu.org/software/gcc/gcc-3.0
+#   http://gcc.gnu.org/onlinedocs/gcc-3.0.3/gcc.html
+#   http://gcc.gnu.org/onlinedocs/gcc-3.0.3/gcc_3.html#SEC13
+#   http://gcc.gnu.org/onlinedocs/gcc-3.0.3/gcc_3.html#SEC34
+#
+###########################################################################
+#
+# This file is a product of Criterion Software Ltd.
+#
+# This file is provided as is with no warranties of any kind and is
+# provided without any obligation on Criterion Software Ltd. or Canon Inc. 
+# to assist in its use or modification.
+#
+# Criterion Software Ltd. will not, under any circumstances, be liable for 
+# any lost revenue or other damages arising from the use of this file.
+#
+# Copyright (c) 1999 Criterion Software Ltd.
+# All Rights Reserved.
+#
+# RenderWare is a trademark of Canon Inc.
+#
+###########################################################################
+
+# Indicate that compiler options have been included
+MAKECOM=1
+
+ifeq ($(SMALLCODE), 1)
+C_OPT = -Os
+else
+C_OPT = -O3                                     \
+	-falign-functions                       \
+	-fcaller-saves                          \
+	-fcse-follow-jumps                      \
+	-fcse-skip-blocks                       \
+	-fdefer-pop                             \
+	-fdelayed-branch                        \
+	-fdelete-null-pointer-checks            \
+	-fexpensive-optimizations               \
+	-ffast-math                             \
+	-fforce-addr                            \
+	-fforce-mem                             \
+	-ffunction-cse                          \
+	-fgcse                                  \
+	-fguess-branch-probability              \
+	-finline                                \
+	-finline-functions                      \
+	-finline-limit=1200                     \
+	-fmove-all-movables                     \
+	-fomit-frame-pointer                    \
+	-foptimize-register-move                \
+	-foptimize-sibling-calls                \
+	-fpeephole                              \
+	-fpeephole2                             \
+	-freduce-all-givs                       \
+	-frename-registers                      \
+	-frerun-cse-after-loop                  \
+	-frerun-loop-opt                        \
+	-fschedule-insns                        \
+	-fschedule-insns2                       \
+	-fstrength-reduce                       \
+	-fstrict-aliasing                       \
+	-fthread-jumps                          \
+	-funroll-loops				\
+	-msingle-float
+
+endif
+
+
+ifeq ($(COPTIMIZE), 1)
+CFLAGS += $(C_OPT) -DNDEBUG  -Wuninitialized
+else
+CFLAGS += -O0
+endif
+
+ifeq ($(CDEBUG), 1)
+CFLAGS += -g
+endif
+
+ifeq ($(PG), 1)
+CFLAGS += -pg -DPG
+endif
+
+CFLAGS += -DRW_USE_SPF
+
+ifeq ($(SCE_11),1)
+CFLAGS += -DSCE_11
+endif
+
+ifdef IOPPATH
+CFLAGS += -DIOPPATH=$(IOPPATH)
+endif
+
+ifdef PS2_DRIVE
+CFLAGS += -DPS2_DRIVE=$(PS2_DRIVE)
+endif
+
+# These seem to be platform specific, not compiler specific
+
+ifeq ($(NOASM), 1)
+CFLAGS += -DNOASM 
+endif
+
+ifeq ("$(COMPILER)", "")
+COMPILER=cc
+endif
+
+ifeq ("$(LINKER)", "")
+# It should be this, but we have a rather strange idea of LINKER
+LINKER=link.exe
+endif
+
+######
+# included burst from sony Makefiles
+######
+
+ifeq ("$(PS2_DRIVE)", "")
+SCE = /usr/local/sce/ee
+else
+SCE = $(PS2_DRIVE):/usr/local/sce/ee
+endif
+
+SCELIBDIR      = $(SCE)/lib
+SCEINCDIR      = $(SCE)/include
+
+ifeq ("$(SKYLCF)", "RWCMD")
+LCFILE      = $(RWGDIR)/shared/makecom/sky/rwapp.cmd
+else  #  ("$(RWLCF)", "")
+LCFILE      = $(SCELIBDIR)/app.cmd 
+endif #  ("$(RWLCF)", "")
+
+SYSLIBS     = $(SCELIBDIR)/libgraph.a \
+              $(SCELIBDIR)/libdma.a
+
+ifndef SCE_11
+SYSLIBS += $(SCELIBDIR)/libpad.a
+endif	
+
+ifeq ($(RWDEBUG), 1)
+ifeq ($(RWMEMDEBUG), 1)
+SYSLIBS += -L$(RWLIBDIR) -lrtdbmalloc
+endif # ($(RWMEMDEBUG), 1)
+endif # ($(RWDEBUG), 1)
+						
+CWARNINGS =                                     \
+	-Wbad-function-cast			\
+	-W                                      \
+	-Waggregate-return                      \
+	-Wall                                   \
+	-Wcast-qual                             \
+	-Wchar-subscripts                       \
+	-Wcomment                               \
+	-Wdisabled-optimization			\
+	-Werror-implicit-function-declaration   \
+	-Wformat                                \
+	-Wformat-security                       \
+	-Wimplicit                              \
+	-Winline                                \
+	-Wlong-long                             \
+	-Wmain                                  \
+	-Wmissing-braces                        \
+	-Wmissing-declarations                  \
+	-Wmissing-format-attribute              \
+	-Wmissing-noreturn                      \
+	-Wmissing-prototypes                    \
+	-Wmultichar                             \
+	-Wnested-externs                        \
+	-Wpacked                                \
+	-Wparentheses                           \
+	-Wpointer-arith                         \
+	-Wredundant-decls                       \
+	-Wreturn-type                           \
+	-Wsequence-point                        \
+	-Wsign-compare                          \
+	-Wstrict-prototypes                     \
+	-Wswitch                                \
+	-Wtrigraphs                             \
+	-Wundef                                 \
+	-Wunknown-pragmas                       \
+	-Wunreachable-code                      \
+	-Wunused                                \
+	-Wwrite-strings                         \
+
+CC        = ee-gcc3
+CPP       = $(CC)
+COUT      = -o
+LOUT      = -e
+SOUT      = -S -o $@
+CPPOPT    = -E -P
+CFLAGS   += $(CWARNINGS) -fno-common -c
+CFLAGS   += -Wa,-I$(DEVDIR)/$(RWTARGET)
+CFLAGS   += -Wa,-al=$*.lst
+CFLAGS   += -DSKY 
+
+LD       = ee-gcc3
+LFLAGS   = -T $(LCFILE) -g -Wl,-Map,$(TARGET).map -nostartfiles -L$(SCELIBDIR) -lm
+LOUT = -o
+
+AS        = ee-gcc3
+AOUT      = -o
+ASFLAGS   = -c -xassembler-with-cpp
+ASFLAGS  += -Wa,-al=$*.lsa
+
+DVPASM        = ee-dvp-as
+DVPASFLAGS    = -I$(SRCDIR) -I$(DEVDIR)/$(RWTARGET)
+DVPAOUT       = -o
+
+RUN = pc-ps2d -d miko 
+
+ifeq ($(CDEBUG), 1)
+ASFLAGS     += --gstabs
+DVPASMFLAGS += --gstabs
+endif
+
+# We do want assembler
+
+CFLAGS += -I/usr/local/sce/common/include -I/usr/local/sce/ee/include
+CFLAGS += -fno-exceptions
+# CFLAGS += -fno-rtti 
+
+# Add crtO.o to list of object files
+
+OBJ += crt0.o
+
+VPATH += $(SCELIBDIR)
+
+# Define some compiler/platform specific parameters for the naming of object
+# and library files
+
+O = o
+L = a
+LP = lib
+EXE = .elf
+
+# Directory creation
+ifndef MD
+MD = mkdir -p
+endif
+
+# The following rule is required, as it is not a default
+
+#.SUFFIXES: .c .$(O) .asm .dsm
+
+$(OBJDIR)/%.$(O) : %.dsm
+	$(DVPASM) $(DVPASFLAGS) -alhs $(DVPAOUT)$@ $^ > $(OBJDIR)/$*.lsd
+CPPFLAGS += $(CFLAGS)
+
+# Support for multipass linking with LIB groups
+
+RWLIBGROUPSTART = -Wl,--start-group
+RWLIBGROUPEND = -Wl,--end-group

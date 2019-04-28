@@ -1,0 +1,62 @@
+--------------------------------------------------------------------------
+            RenderWare Graphics Example (PlayStation 2): DMorph
+--------------------------------------------------------------------------
+
+PURPOSE
+
+The DMORPH example illustrates the DMorph plugin.
+
+The example uses two different geometry objects to illustrate the two ways
+in which delta morph targets can be used – a human face which is animated,
+and a curved surface which can be manipulated – both have a base geometry
+and two morph targets.
+
+--------------------------------------------------------------------------
+GENERAL CONTROLS
+
+LEFT ANALOG stick         Surface controls
+Left                    - Reduce the contribution of DMorph Target 0.
+Right                   - Increase the contribution of DMorph Target 0.
+Up                      - Increase the contribution of DMorph Target 1.
+Down                    - Reduce the contribution of DMorph Target 1.
+
+RIGHT ANALOG stick        Face controls
+Left                    - Reduce the loop-cycle time of DMorph Target 0.
+Right                   - Increase the loop-cycle time of DMorph Target 0.
+Up                      - Increase the loop-cycle time of DMorph Target 1.
+Down                    - Reduce the loop-cycle time of DMorph Target 1.
+
+SELECT button           - Toggle help.
+
+START + SELECT          - Quit the application.
+
+
+--------------------------------------------------------------------------
+MENU OPTIONS
+
+FPS                  - Allows the user to read the number of frames per
+                       second being rendered (updated every second).
+
+--------------------------------------------------------------------------
+HELP CONTROLS
+
+DPAD UP and DOWN        - Scroll a line at a time (autorepeat available).
+
+LEFT SHOULDER #1 and #2 - Scroll a page at a time.
+
+
+--------------------------------------------------------------------------
+This demonstration program is copyright Criterion Software Limited 2003.
+Criterion Software grants you a license to use it only in the form as
+supplied. You may not disassemble, decompile or reverse engineer this
+demonstration program.
+
+This demonstration program is provided as is with no warranties of any
+kind. Criterion Software will not, under any circumstances, be liable for
+any lost revenue or other damages arising from the use of this
+demonstration program.
+
+RenderWare is a registered trademark of Canon Inc.
+Other trademarks acknowledged.
+--------------------------------------------------------------------------
+Tue Apr 22 12:04:26 2003 -- build sky ( 64649 0x35000 )

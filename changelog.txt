@@ -1,0 +1,3344 @@
+22/04/03 GCN (BZ#4577) Environment map scaling
+  The environment matrix is orthonormalized to prevent texture wrapping if the
+  matrix has scaling in it.
+
+22/04/03 3ds max and Maya Exporters
+  Added Japanese specific behaviour and text to the exception handler.
+
+17/04/03 RpPrtStd (BZ#4623)
+  Fixed property table's refcount not incremented correctly after reading.
+
+17/04/03 RtTOC (BZ#4652) 
+  RtTOC stream read functions were doing endian conversion twice which
+  would've resulted in incorrect TOC data on big endian machines.
+
+17/04/03 RtTOC (BZ#4648) 
+  RtTOC stream writing could previously have crashed in the case of a
+  failure to write data into the given stream. The function will now
+  correctly return a NULL result
+
+16/04/03 OpenGL toon (BZ#4688)
+  Toon pipelines did not contain the correct plugin Id.
+
+15/04/03 Exporters
+  Fixed problem that could lead to "Unable to set object frame to:" messages
+  and aborted exports when exporting Static World assets with the 3ds max
+  or Maya scene start time set to > 0.
+
+15/04/03 PS2 RpPDS (BZ#4463)
+  rwPDS_G3_Toon_MatPipeID pipeline now sets GS_ZBUF_2 register
+
+15/04/03 (BZ#4501) Maya Particle Emitter interface bug (3.5)
+  Fixed a bug where the minimum emission gap's default was 1.0. It now defaults
+  to a minimum of 0.0.
+
+14/04/03 PS2 Examples
+  Updated vcproj example projects to build properly.
+
+13/04/03 RF3 Export
+  Fixed bug introduced on 03/04/03. When exporting animated hierarchy assets
+  with animation children the animated hierarchy asset is no longer incorrectly
+  disabled.
+
+11/04/03 Maya Exporter- Fixed a bug in auto create code.
+  There was uninitialized variable that could lead to auto create code
+  not behaving properly. Fixed now.
+
+11/04/03 Rt2d (BZ4591)
+  Fixed reading/writing to beyond the end of the string.
+
+11/04/03 Xbox (BZ#4631) pixel shader constants don't always get uploaded, fixed.
+
+11/04/03 RpPrtStd
+  Fixed compilation warning from gcc2953 release.
+
+10/04/03 (BZ#4596) rpmatfx: second matrix doens't get applied, fixed.
+
+10/04/03 Exporters
+  Fixed a bug that could lead to Lightmap, Normal Map and Toon RenderWare
+  material settings not being correctly read from RF3 files.
+
+10/04/03 (build) html source for APIrefs is now preserved so that it can be 
+  copied to FMSS. This includes platforms and exporter APIs
+
+10/04/03 (build) Xbox compiler has changed with the new XDK, so the libs etc are
+  built with RWCOMPILER=xbox. Only the nullxbox libs are built with RWCOMPILER=net
+
+10/04/03 Build tool (BZ#4590)
+  The cwsky compiler was incorrectly reporting error contexts since there
+  was no compiler context resource set up, and the build tool was using the
+  default search term 'error' which occurred as part of the compiler options.
+
+  Solution was to add a specific cwsky compiler context resource.
+  Further information has been added to the documentation regarding this
+  problem and solution.
+
+09/04/03 PS2 (BZ#4560)
+  Fixed a bug in the material effects pipelines where filling the dma
+  unreference array would close the dma buffer before the packet had
+  been completely written.
+
+09/04/03 (build) cygwin1.dll updated to match dev version, to avoid 
+  compatibility problems when building active and dev branches on the 
+  same PCs.
+
+08/04/03 Xbox build machine upgraded to use the April 2003 SDK (#5455).
+
+08/04/03 RpPrtStd & RpPrtAdv
+  Fixed emitter copy. Destination properties no longer needs to be in the same
+  offset location as in the src.
+  Fixed texture step copy. Some pointers were not reset to the dest emitter and 
+  instead were set to the src emitter.
+  Fixed texture's ref count not updated during copy.
+
+07/04/03 PS2 (BZ#4524)
+  Fixed colour clamping in the G3x_ADLClone pipeline
+
+03/04/03 .anm exporting from Rf3 files
+  Added support for exporting indivdual .anm assets from Rf3 by adding the parent 
+  asset as disabled to the Rf3 file.
+
+03/04/03 Disabling of assets in Rf3 files
+  Added a param to the Rf3 format for disabling and enabling of individual
+  assets within an Rf3 file.
+
+03/04/03 Exporter UV transform (BZ#4516)
+  A bug has been fixed that could lead to inconsistent UV values when using
+  multiple textures with differing addressing modes on a single mesh.
+
+03/04/03 Softras Im2D fogging (BZ#4531)
+  Now supports Im2D fogging.
+
+03/04/03 OpenGL Im2D fogging (BZ#4531)
+  Now fully supports Im2D fogging and not just when z-writes or z-tests were enabled.
+
+03/04/03 D3D8 (BZ#4214) RwImageSetFromRaster is not supported on compressed rasters.
+  Added a check to fail instead of generating unpredictable results.
+
+03/04/03 rt2danim (BZ#4517) Fixed typo in header
+
+02/04/03 Xbox (BZ#4532) Lightmap plugin
+  Fixed a bug when a base texture has alpha channel.
+
+02/04/03 Maya Exporter
+  Fixed bug that meant lightmapping flags would not always be exported correctly
+  from RenderWareShader materials in Maya scenes.
+
+02/04/03 Exporters
+  Fixed bug that could cause an exception in 3ds max or Maya when exporting a
+  RenderWare Shader material shared across multiple objects to an RF3 file.
+
+02/04/03 RpPrtStd (BZ #4376)
+  Fixed reading Rw3.4 files in Rw3.5.
+
+02/04/03 RpPrtStd
+  Fixed velocity corruption introduced from BZ #4361.
+
+31/03/03 Xbox (BZ#4511) Skin Toon plugin now supports lees than 4 weights per vertex.
+
+31/03/03 RpPrtAdv
+  Fixed memory trampling when reading in old particle files. Some properties
+  were not correctly adjusted to the new size.
+
+28/03/03 RF3 Export
+  A bug that meant asset names could sometimes be changed when exported to
+  RF3 files has been fixed. The fix involves changes to the RF3 format and
+  the RwMI layer so the RF3 and RwComm version numbers have been incremented.
+
+28/03/03 RpPrtStd & RpPrtAdv (BZ #4441)
+  Fixed caching of property tables during property offset query. The
+  property table pointers are reset to NULL if the property table
+  are destroyed.
+  Fixed memory leak in RpPrtAdv. Ref count was not decremented.
+
+28/03/03 rptoon makefile (null builds only)
+  Previously forced usage of multithreaded .dll for null builds. This
+  is unnecessary for non-dll builds and causes warnings and possible
+  c-runtime library conflicts. It's no longer necessary for .dll
+  builds and so has been removed.
+
+28/03/03 2dviewer
+  Up-transitions of button pushes weren't being relayed for button
+  push enabled builds. (Enable with WITH_BUTTONS in the main.c)
+
+28/03/03 rt2d font loading
+  Added stealth functions to all allow access to global font dictionary
+  _rt2dFontDictionaryAddFont and _rt2dFontDictionaryRemoveFont
+
+27/03/03 RpPrtStd (BZ #4361)
+  Fixed incorrect bounding sphere calculation.
+
+26/03/03 PS2 Visualizer / Instancer workaround for occaisional PS2 lockup
+  while remote instancing
+
+26/03/03 PS2 Visualizer updated to use 2.7.0 /usr
+
+26/03/03 PS2 IOP rebooting reinstated
+  Visualizer once more can be used on dev tools with non-matching flash
+
+25/03/03 GCN Compressed vertex positions and world sectors.
+  When using compressed vertex formats for positions in worlds the world
+  sectors positions will now be treated as though they are relative to the
+  infimum vertex of the world sectors tight bounding box. This allows large
+  worlds to use compressed vertex positions with out running out of range.
+
+25/03/03 PS2 (BZ#4437) - user set alpha blending being overwritten by 
+  instancing.
+  RpPTankAtomicSkyRenderStateSet now unset rpPTANKIFLAGALPHABLENDING in the 
+  instance flags.
+
+24/03/03 (build) modifying api-refs to exclude normmap, for any platform
+  except xbox.
+
+24/03/03 rt2d basic font dictionary functionality
+  Added _rt2dFontDictionaryAddFont and _rt2dFontDictionaryRemoveFont
+  stealth functions.
+
+24/03/03 (BZ#4104) Maestro lighting problems.
+  Changed lithing callbacks to not attach non ambient lights if the 
+  atomic does not have normals.
+
+24/03/03 PS2 build Machine
+  Now builds against SCE 2.7.0 libs
+
+24/03/03 PS2 (BZ#4423) Team pipelines.
+  Fixed all gloss environment map pipelines (GEM) to correctly setup the 
+  palette for the environment map pass.
+
+21/03/03 Rt2d font reading
+  Increased the size of the read buffer to 2560 characters from 256 to
+  support easier reading of Unicode fonts.
+
+21/03/03 D3D8 (BZ#4396) 24 bit DDS images not supported, fixed.
+
+21/03/03 Visualizer Fixed bug loading large palettized textures on PS2
+
+21/03/03 (build) changing makefile.sky to include .i pds files.
+
+20/03/03 RpPrtAdv & RpPrtStd
+  Fixed problem with multiple properties in prtadv. It is now possible to
+  have several property tables which have the same set of properties but
+  different number of frames in the multi frame props. 
+  Added new API
+    RpPrtStdPropTabGetByProperties
+    RpPrtStdEClassGetByPropTab
+    RpPrtStdPClassGetByPropTab
+
+20/03/03 Exporter Licensing Problems
+  Fixed an issue where it was possible to find an incorrect version of the
+  licensing dll on the path prior to the one installed by RenderWare. This
+  could cause the exporters to fail to request a valid license. We now
+  explicitly load the installed dll instead of relying upon the path being
+  setup.
+
+20/03/03 RtBMP 32 bit support
+  Added support for loading 32 bit RGB color BMPs, it's unclear
+  whether these are valid in the BMP format without extended Bitmap headers
+  specifying bit masks. However support was implemented by fixing
+  a hard coded 3 byte per pixel scanline malloc which also has the benefit
+  of reducing memory overhead for 4 and 8 bit Bitmap reading.
+
+19/03/03 Rt2d & RpPDS
+  Fixed incorrect typecast.
+
+18/03/03 Rt2d
+  Fixed font handling for unicode > 7FFF on PS2.
+
+18/03/03  added some code to traverse animations within maya particle emitter objects
+
+18/03/03 GCN ptank
+  Fixed SN build errors.
+
+18/03/03 GCN (BZ#4336)
+  Single weight toon shaded geometry is now supported.
+
+18/03/03 Removed &apos; delimiter conversion when saving rf3 files.
+
+18/03/03 Max Exporter - When converting old batch nodes, if we detect a physique
+modifier in the hierarchy, we turn on the optimize hierarchy option, for back
+compatibility with the old Max exporter behaviour: In 3.4, the Max exporter removed
+all physique dummy nodes by default. Note that the optimize hierarchy option will
+try to remove more nodes, than just the dummy ones.
+
+18/03/03 Xbox (BZ#4351) PTank requires a frame, fixed.
+
+18/03/03 Maestro
+  Fixed a problem whereby undisplayed sprite animations could run in the
+  background, possibly influencing the sequencing of foreground animations
+
+18/03/03 (build) fix for packaging task empty set problem
+
+17/03/03 OpenGL NVIDIA Vertex Array Range 2 initialization (BZ#4356)
+  The GL_VERTEX_ARRAY_RANGE_WITHOUT_FLUSH_NV client state token should be
+  enabled/disabled within the GL_VERTEX_ARRAY_RANGE_NV state rather than
+  exclusively to it.
+
+17/03/03 Visualizer - fixed 'No RpHAnim Matrices' set bug (BZ#4199)
+
+14/03/03 PS2 Fixed RpADC streaming code to not stream out ADC bits if the
+  geometry or world sector is instanced. Correctly align streams to RwUInt32
+  alignment.
+
+14/03/03 RpPrtStd
+  Check for num of particles > 0 before creating a new batch.
+
+14/03/03
+  Removed the API function RtWorldImportGetNumMaterials from rtimport.
+
+14/03/03
+  Renamed 'LONG_PTR' type in win_util.cpp to 'long' to fix the Game Cube build.
+
+14/03/03 Rt2d
+  Fixed unifont handling for Unicode > 7FFF
+
+13/03/03 RpWorldCreate 0-size mallocs removed (BZ#4245)
+
+13/03/03 Xbox (BZ#4234)
+  Controller 1 ignored if there was another controller in port 3 or 4, fixed.
+
+13/03/03 OpenGL RwRasterClearRect BZ#4320
+  Fixed an issue that would repeat the cleared rectangle across the raster in some
+  cases.
+
+13/03/03 png loading bugfix (BZ#4309)
+  pngs specifying a greater palette size than the bit depth allowed were crashing
+  the png read function. Fixed.
+
+13/03/03 D3D8 (BZ#4242) Added support for non-pow2 textures if not using mipmapping.
+
+12/03/03 PS2 Fixed bug in using environment map coefficient whilst rendering in the
+  environment mapping (Gem) ambient and 4 directional lighting (A4D) pipelines.
+
+12/03/03 3ds max Exporter - Max script functions.
+  A new interface with three functions is added. They are:
+	RenderWare_Exporter.AssetMgr.CreateAsset();
+	RenderWare_Exporter.AssetMgr.AutoCreateAssets();
+	RenderWare_Exporter.AssetMgr.SetCustomizedAssets(bool bCustomized);
+  The first function works with selection and returns new asset object. If nothing
+  is selected Static World asset is created. You can query object properties with:
+	objAsset=RenderWare_Exporter.AssetMgr.CreateAsset()
+	showProperties objAsset
+  The second function will analyse the entire scene and create the assets.
+  The third function will set the Customized flag. If set to true, users are
+  responsible for managing asset, where if set to false, assets will be recreated
+  automatically on each export.
+
+12/03/03 OpenGL RwOpenGLVASetPosition(ATI) (BZ#4310)
+  RwOpenGLVASetPosition and RwOpenGLVASetPositionATI did not update the
+  client state cache when called, causing redundant calls to glEnableClientState.
+
+11/03/03 RtWing - Fix bug in RtWingFaceForAllFaces.
+
+11/03/02 Exporters - Fixed a bug in the filter top level keys action.
+
+11/03/02 Exporters - Fixed polygon corruption bug, when exporting multiple
+  objects, that contain an empty mesh.
+
+10/03/02 Exporters - Fixed version string in Export Manager resource file.
+
+10/03/02 Exporters - In the Dff exporter, before inserting an extra root frame, 
+  don't just check the skin export option, but check if the hierarchy is
+  actually skinned.
+
+10/03/02 GCC unused attribute
+  Correctly placed __RWUNUSED__ in various header files.
+
+07/03/03 OpenGL display list prelight + material color modulation (BZ#4273)
+  Modulated color values were incorrect for display list instancing.
+
+07/03/03 Rt2d
+  Bug fix. Fixed incorrect setting of UNICODE flag during reading.
+
+05/03/03 Xbox MatFX added runtime checks to remove problems when a material
+  uses envmap or bumpenvmap without providing an envmap texture.
+
+04/03/03 XBox (BZ#4244)
+  The driver now sets automatically the required renderstates for antialiasing.
+
+04/03/03 PS2 Multipass rendering. Fixed bug with NULL texture causing subsequent
+  textured meshes to be incorrectly rendered. (BZ#3147)
+
+04/03/03 OpenGL NVIDIA vertex array range & remapped vertex data (BZ#4222)
+  Atomics that have numIndices < numVertices can now be remapped at instance
+  to reduce the number of vertices in vertex arrays. Display lists do not
+  support remapping.
+
+  NVIDIA vertex array range (VAR) memory manager updated to dynamically adjust
+  the VAR pool size if heavy use of dynamic vertex arrays is detected.
+
+28/02/03 GCN (BZ#4233)
+  In a rare case the Async rendering code could wake a thread before it was slept
+  causeing the ASync rendering code to lockup.
+
+27/02/03 RtLtMap
+  Fixed segv from reloading a lightmap world and regenerating the lightmaps.
+
+25/02/03 22:00:00 RW3.5 Release point.
+
+24/02/03 XBox visualizer
+  Corrected controller drift problem (BZ#4137)
+
+24/02/03 PS2 DebugStation Visualizer
+  Now spins down DVD after loading Visualizer
+
+20/02/03 RpPatchMesh streaming. (BZ#2994)
+  RpPatchMesh stream write now wraps the patch mesh in a rwID_PATCHMESH chunk.
+  Hence when streaming in an RpPatchMesh with RpPatchMeshStreamRead the 
+  rwID_PATCHMESH must be found first. If old functionality is required use
+  the stealth function _rpPatchMeshStreamReadNoChunk.
+
+20/02/03 RpPTank
+  All platforms: fixed 2d and matrix particle rotation to correctly calculate
+  particle orientation with respect to up vector being 0 degrees.
+  GCN: fixed constant centre offset to machine the offset space of the generic
+  platform.
+
+19/02/03 PS2 PS2All
+  Modified RpMeshPS2AllSyncTextureUpload to always enable or disable alpha
+  test. Hence also modified RpMeshPS2AllTextureStateUpload to always set
+  the GS_TEST_1 register.
+
+19/02/03 GCN
+  Changed dlFwrite to return the number of items written.
+
+19/02/03 Exporters - Removed bounding box influence on the exported world.
+  The RtImportWorld now calcualtes its own bounding box, according to the
+  given geometry, and igonres the bounding box of the exported scene. In 3.4,
+  exporting a sub set of the world, would result in a big bounding box binding
+  the entire scene. In 3.5, only the sub set's box is calculated.
+
+19/02/03 RenderWare mesh building
+  Changed the way in which triangle data is sorted for mesh building. This
+  previously involved some sorting based on pointer address meaning that
+  matching vertex and triangle input data didn't guarantee the same output.
+  This has now been resolved.
+
+19/02/03 Xbox build machine using February 2003 XDK with Integrated Hotfixes (#5344.2).
+
+18/02/03 GCN
+  Fixed asserts in RpGeometryDestroy due to reference count being decremented
+  to early.
+
+18/02/03 GCN Patch2
+  Build machine upgraded to use GCN_SDK_5-Sept-2002_Patch2.
+
+15/02/03 Rt2d / Maestro - Fixed color tints problem (BZ#3356)
+  rt2d's color hierarchical scale/offset has been fixed
+  Color tint offsets are now correctly exported by 2dconvrt.
+
+14/02/03 Exporter - RwCommMesh::GetTriangleUserData function is removed.
+  Instead you should use GetPrimitiveUserData() and RwExpPrimToTriMap()
+  functions.
+
+14/02/03 Memory clean up on stream read failures (BZ#3985 + BZ#3991)
+  Fixed some memory leaks when RpClumpStreamRead fails during the streaming
+  of a clump.
+
+13/02/03 OpenGL Ptank metrics (BZ#3951)
+  NumProcTriangles were showing an incorrect value.
+
+12/02/03 GCN New API functions.
+  RxGameCubePreInstanceSetOptimize
+  RxGameCubePreInstanceGetOptimize
+  RwGameCubeSetFrameLatency
+  RwGameCubeSetMinRetraceCount
+
+12/02/03 3ds max Exporter - Scale Keys now extracted from PRS controllers
+  The RwMaxPRSControlCreator::TraverseControllers function now builds
+  animations from the scale sub controller. If you have used large numbers
+  of scale only keys this could lead to redundant keyframes being exported so
+  we recommend removing unnecessary scale keys.
+
+12/02/03 PowerPipe BZ#3371
+  Fixed bug in calculating node index in RxPipelineFindNodeByName
+
+12/02/03 Maya Material Alpha. 
+  Previously (3.4) The Alpha value for a Maya material
+  was taken from the Alpha gain value of any diffuse colour texture map. 
+  This is not how the material alpha works in the Maya viewport. Have changed
+  Maya materials to always take the alpha value of the base material colour. 
+  The Exporter will display a warning message if any diffuse texture with non 
+  standard (1.0) Alpha Gain is detected. 
+    
+11/02/03 3ds max Exporter - RwMaterial and Render To Texture (RTT)
+  All the images rendered from the RTT for object with RwMaterial, were black.
+  This is now fixed for all render elements except complete and specular maps.
+  Currently diffuse map renders only unshaded and normal map doesn't include
+  the RwMaterial bump map perturbations.
+
+11/02/03 Xbox build machine upgraded to use .Net compiler and February 2003 SDK (#5344).
+
+11/02/03 RtLtMap (BZ#3955)
+  RtLtMap now depends on RpRandom. All calls to rand have been replaced with
+  calls to RpRandom.
+
+11/02/03 Instance
+  Skin-splitting is now done in the custom instancers. This assumes reasonable
+  defaults for each platform, but source is provided so you may modify these
+  if desired.
+
+11/02/03 RpLtMap & RtLtMap
+  Redone lightmap supersampling slightly. Supersampling is now selected during
+  illumination with RtLtMapIlluminate, rather than during creation stage with
+  RtLtMapLightMapsCreation.
+  Also removed the tmp image per texture to just one tmp image. This image is
+  reused for each lightmap to reduce memory usage.
+
+11/02/03 RpPTank BZ#3845
+  Fixed a bug which was breaking alpha rendering in PTank release builds.
+
+11/02/03 3ds max Exporter - Custom Attributes
+  There was a bug with vertex and face custom attributes exported as our user
+  data. Fixed now.
+
+10/02/03 Softras installer now requires that the same build version of 
+  RW 3.5 PC exists on the same machine, installed as the same user.
+
+10/02/03 OpenGL MatFX multipass environment map & fog BZ#3926
+  If fogging was enabled, multipass environment mapping applied fog in
+  both passes.
+
+10/02/03 Softras MCP project files updated (demos, examples, viewers)
+  Now requires CodeWarrior 8.3 for Windows.
+
+10/02/03 OpenGL MatFX environment mapping optimization
+  Further to the changelog entry on 10/10/02, a further requirement to use the
+  multitexturing optimization for environment mapping is that fogging is
+  disabled.
+
+08/02/03 Examples - GCond
+  Added GCond Example.
+
+07/02/03 GCN
+  All CodeWarrior MCP files have been repaired and upgraded to CodeWarrior(R)
+  for GAMECUBE, Release 2.0
+
+07/02/03 RtWorldImportParams
+  Changed the functionality of RtWorldImportParametersInit. The parameters
+  are now owned by the caller and therefore should be static.
+
+07/02/03 RWSView example added
+  Illustrates how to load assets from an .rws file into a RenderWare Graphics
+  application. The .rws file supplied contains a world, a platform independent
+  texture dictionary, two clumps and two animations.
+
+07/02/03 TOC
+  RtTOCCreate no longer recurses into complex chunks.
+
+06/02/03 Imshadow example modifications (fixes BZ#3814)
+  Changes have been made to the way the imshadow shadow render function decides
+  if fading should be enabled. It is now explicitly passed as a parameter rather
+  than being implied by a fade distance.
+
+06/02/03 RpLtMap & RtLtMap
+  Introduced supersampling to lighmap generations. Sampling can now be done
+  at a higher resolution before downsampling to a lower resolution for display.
+  The functions, RtLtMapLightMapCreate has been changed to include an extra
+  parameter to specify the supersampling value.
+  Changed the functionality of the lightmap clearing functions. This previously
+  would clear the lightmap display texture and create the lightmap sample
+  image. This has been changed to just clearing the lightmap display texture.
+  The lightmap sample image is created seperately.
+
+05/02/03 Partition Visualisation
+added CreateAssetPartitionObject() API function to the RwExpMgrExportManager
+class and CreatePartitionObject( ), RemovePartitionObject( ) API functions to 
+RwCommAsset class. All the control of the partition visualization objects in the 
+modelling package.
+
+05/02/03 Preinstancing tool
+  Can now filter default connections by platform
+
+05/02/03 PS2 Camera textures
+  Subrastering of camera textures now works.
+
+04/02/03 RwPlCore
+  Added rwLIBRARYWARNVERSION. This marks the version and below that will produce
+  warning messages when old binary data are read in. The file is still read in
+  but will produce messages to recommend the file be re-exported.
+
+04/02/03 Exporters - Bug fix for exporting toon data.
+  There was a bug when exporting bsp toon scene. User specified crease edges were
+  not remapped right. Fixed now.
+
+04/02/03 3ds max Exporter - Utility renamed and interface change.
+  Our utility in 3ds max is renamed from RenderWare_Batch_Exporter to
+  RenderWare_Exporter, so a typical call to it would be like:
+  RenderWare_Exporter.Interface.Advanced_Settings()
+  Currently exposed functions through this interface are:
+  Export, View, Advanced_Settings, Plugin_Information, Help_Reference_Guide,
+  Help_Tutorials, Help_Programmer and Tools_BatchExport.
+
+04/02/03 GCN (BZ#3784) lib prefix
+  lib prefix removed from SN built libs and makefiles.
+
+03/02/03 Exporters
+  Changed UV limiting to allow floating point values.
+
+03/02/03 Win (D3D8 and OpenGL) MCP project files updated (demos, examples, viewers)
+  Now requires CodeWarrior 8.3 for Windows.
+
+03/02/03 Tutorial 6 added
+  A new tutorial expanding the use of RWS files and TOCs.
+
+31/01/03 GCN pathclibsetjmp
+  It is no longer required to patch rtpng.a using pathclibsetjmp when linking
+  CodeWarrior built libs with SN.
+
+31/01/03 (BZ#3649) PITexDicts and texture plugin data
+  Platform independent texture dictionaries did not stream texture plugin extension
+  data.
+  The internal format of PItexdicts has been changed to accomodate plugin data. A
+  legacy code path for stream reading existing PItexdicts is provided.
+  Note that plugins that have extension data in the PItexdicts must now be attached
+  before stream reading the PItexdicts.
+
+30/01/03 (BZ#2951) importing sectors in PVSEdit from xml and kd files is different.
+removed kd support from PVSEdit since it is not compatible with pvs data.
+
+30/01/03 (BZ#3749) PVSEdit edit->undo option does nothing
+Removed the edit menu.
+
+30/01/03 (BZ#2836) PVSEdit doesn't refresh the view immediately
+Viewport refresh bug fixed in PVSEdit.
+
+30/01/03 (BZ#3329) Toon Editor does not support RWS files
+Toon editor now supports Animated Hierarcy assets and textures from within RWS files.
+
+30/01/03 PS2 New metric
+  ExtraPassNumTriangles added to measure the number of extra triangles processed
+  by multi-pass rendering. Toon, matfx and lightmap pipelines all support this
+  new metric.
+
+30/01/03 RpLtMap and RtLtMap
+  Changed the way darkmaps are generated. The darkmap conversion is no longer
+  an automatic operation and no longer limited to PlayStation 2 only. Darkmap
+  conversion can now be done on a host, PC, for use on a PlayStation 2 without
+  requiring a NULLSKY build.
+  The lightmap example can now generate and view a lightmap result, convert to
+  a darkmap and saved as PI tex dict for used on a PlayStation 2. The output
+  texture dictionary now contains both the base textures and the lightmap
+  textures.
+
+30/01/03 GCN
+  The following code is no longer needed when linking CodeWarrior built
+  RenderWare Graphics libraries with SN.
+
+  #if (defined(__SN__))
+  RwInt32 __float_nan[]   =   {0x7FFFFFFF};
+  RwInt32 __float_huge[]  =   {0x7f800000};
+  #endif /* (defined(__SN__)) */
+
+30/01/03 Exporters - Function renaming
+  Fallowing functions are renamed from: AddShapeVerticesToRtImportWorld,
+  AddShapeFacesToRtImportWorld, to: AddShapeVerticesToRtWorldImport,
+  AddShapeFacesToRtWorldImport.
+
+29/01/03 preinstancer (BZ#2111)
+  instance now always renames output with platform-specific extension.
+  instance now has an option to search for and include textures/anims prior
+  to instancing, making it possible to view the instanced file with textures
+  and animations on the platform-specific visualizers
+
+29/01/03 Exporter and (BZ#2189)
+  Changed the way vertex welding works - it now truly welds polygons, not
+  just snap them to a grid. In addition, there are two extra control params
+  to say what exactly permits welding.
+
+29/01/03 PS2 MatFX (BZ#3351) Texture uploads.
+  In some rare cases the second pass texture was ejecting the first even
+  though the texture cache was large enough for both textures.
+
+28/01/03 Exporters - Changes to the RwCommObjCreator
+  RwCommObjCreator::Attach() now takes one more parameter, which is
+  RwCommCreationData. All derived class will have to be updated.
+
+28/01/03 GCN (BZ#3085)
+  NBT generation now works with pre-instanced data.
+
+28/01/03 GCN RwGameCubeSetAlphaCompare
+  RwGameCubeSetAlphaCompare API function added for setting alpha compare
+  parameters.
+
+28/01/03 GCN GXSetZCompLoc
+  Now has an internal function _rwDlRenderStateSetZCompLoc for setting
+  GXSetZCompLoc. All calls to GXSetZCompLoc should be changed to use
+  _rwDlRenderStateSetZCompLoc in order to keep cache coherency.
+
+28/01/03 GCN GXSetAlphaCompare
+  GXSetAlphaCompare in no longer called by any rendering pipelines.
+
+  alphaComp, alphaCompRef0 & alphaCompRef01 have been removed from
+  _rwDlStateCache.
+
+28/01/03 (BZ#2111) Instance tool:
+  - Instance always renames output extensions to match target platform.
+    Previously this was done for .rws files, now all RW files are renamed.
+
+28/01/03 OpenGL: Removal of exposed #defines in rwcore.h
+  - COLOUR_SCALAR removed as it was unused
+  - rwOGLNEARSCREENZ and rwOGLGLFARSCREENZ moved to internal use only.
+
+28/01/03 GCN Upgraded build machine to use,
+  CodeWarrior(R) for GAMECUBE, Release 2.0
+
+28/01/03 GCN Upgraded build machine to use,
+  GCN_SDK_5-Sept-2002_Patch1.
+
+27/01/03 (BZ#3706) OpenGL texdicts and non-mipmapped textures
+  Non-mipmapped textures in an OpenGL texdict were read in as mipmapped.
+
+27/01/03 PS2 MatFX Changes to second and third pass renderstates.
+  New API functions RpMatFXSkyRenderStateSet/Get have been added to allow the
+  ALPHA, FOGCOL and TEST register values to be set for environment map, dual
+  pass and dual pass uv transform effects. These effects now use the use the
+  global z write and z test render states and the clamp and filtering settings
+  from the texture.
+
+27/01/03 Removed item: 07/01/03 Win32 skeleton menu FPS limiter
+
+23/01/03 MatFX UVANIM effects renamed to UVTRANSFORM
+  rpMATFXEFFECTUVANIM is now rpMATFXEFFECTUVTRANSFORM
+  rpMATFXEFFECTDUALUVANIM is now rpMATFXEFFECTDUALUVTRANSFORM
+  RpMatFXMaterialSet/GetUVAnimTransforms are now
+	RpMatFXMaterialSet/GetUVTransformMatrices
+
+23/01/03 Baseball demo (BZ#3647)
+  Crowds changed so that only one crowd (daytime or nighttime) is instanced
+  during the lifetime of the demo.
+
+22/01/03 OpenGL environment mapping frame (BZ#3625)
+  The envmap was incorrectly positioned.
+
+22/01/03 GCN The environment variable CWFOLDER is no longer used to specify
+  the CodeWarrior directory. The registry is now used to find the correct path.
+  IF GCNCWFOLDER is defined then this path will be used instead.
+
+22/01/03 GCN The environment variable DOLPHINSDK is no needed to build
+  RenderWare graphics for GameCube. All makefiles now use the DOLPHIN_ROOT
+  environment variable that is set when installing the DolphinSDK. If
+  DOLPHINSDK is defined then this path will be used instead of the one
+  specified by DOLPHIN_ROOT.
+
+21/01/03 RwTextureSetMipmapping API Reference
+  Updated the API reference to include information about loading textures from
+  inside stream read functions.  The behaviour of this API remains unchanged.
+
+21/01/03 GCN BZ#3619 Im2d & pixel accuracy
+  Im2d was not correctly calculating the projection matrix leading to triangles
+  not hitting the correct pixels.
+
+21/01/03 GCN BZ#3623 Im2D & Scissor rect
+  2D Immedaite mode no longer sets the scissor rectangle. It now relies on
+  RwCameraBeginUpdate setting it to the rasters rectangle. This allows the user
+  to change the scissor rectangle between 2D renders.
+
+21/01/03 PS2 - skeleton - CW
+  Added call to CW C++ support code whenever the skeleton is compiled as c++
+  and/or when using a product that would need it.
+
+16/01/03 GCN BZ#3403
+  Tokens above 0xE000 are now ignored to prevent conflict with the PERF library.
+
+16/01/03 GCN BZ#3287
+  When seeking to the end of a file from the start dlFseek would try to
+  read 0 bytes from the end of the file causing DVDRead to fail.
+
+16/01/03 NULL target DLL generation
+  When building the NULL RenderWare Graphics SDK with RWDLL=1, the compiler is
+  now set up to build with the /MD[d] flag (multithreaded DLL).
+
+16/01/03 GCN RwGameCubeMinRetraceCountSet
+  RwGameCubeMinRetraceCountSet has been added.
+
+15/01/03 PS2 rwDMA_flipData
+  rwDMA_flipData type now has slots for a pair of extra display environments
+  used in the same way as the 4 dma pointers
+
+15/01/03 RwCameraForAllClumpsNotInFrustum removed from API
+  This somewhat obsolete function has been removed since it has great
+  potential for confusion in that it relies on RwCameraForAllClumpsInFrustum
+  being called first. Also, its behaviour is simple to reproduce using
+  RwCameraForAllClumpsInFrustum to mark clumps in the frustum, and then
+  using RpWorldForAllClumps to iterate through all clumps, and acting on those
+  that have not been marked.
+
+15/01/03 RpWorldGetOrigin removed from API
+  This functionality is no longer required since all worlds generated by
+  RenderWare since RenderWare 3.10 have a fixed origin of 0,0,0.
+
+15/01/03 RtLtMap
+  Added new functions to select and replace the luminance calculation function
+  during texture processing on the PS2.
+  The set of new functions and callbacks are
+    RtLtMapSkyLumCalcMaxCallBack
+    RtLtMapSkyLumCalcSigmaCallBack
+    RtLtMapSkySetLumCalcCallBack
+    RtLtMapSkyGetLumCalcCallBack
+
+14/01/03 RenderWare Graphics Build Tool - Exporters
+  Support to build the exporters have been removed since their build process
+  now works through DSPs rather than makefiles.
+
+14/01/03 BZ#3379 - 2D toolkit.
+2dString and Scene streaming are now endianess proof.
+
+13/01/03 RtImport geometry conditioning.
+  Moved to separate toolkits: rtgeomcond and rtwing.
+  This affected RtImport, RtGCond, RtWing, RtBary, exporters, world example,
+  sector editor and pvs editor. Directly affected are RtImport's conditioning
+  parameters and the way Geometry Conditioning is handled.
+
+10/01/03 GCN RxGameCubeResEntryHeader & RxGameCubeInstanceData
+
+  RxGameCubeResEntryHeader & RxGameCubeInstanceData have been removed and
+  replaced with RxGameCubeVertexBuffer & RxGameCubeDisplayList.
+  RxGameCubeVertexAttr has been added.
+
+10/01/03 GCN Instance & Pre-instance
+
+  Pre-instancing now takes advantage of an index per attribute and variable
+  length attribute arrays.
+
+  Pre-instancing removes degenerate triangles from tristrips.
+
+  The above pre-instancing optimisations work with static and skinned geometry
+  only. Geometry with NBTs will currently not be optimized.
+
+  IMPORTANT: The native Pre-instance format has been broken and all pre-instanced
+  assets will need to be regenerated.
+
+10/01/03 GCN NBT Generation
+  NBT generation now works with compressed vertex formats.
+
+10/01/03 BZ#3382 - BZ#3384 - PTank PS2.
+  Default alpha testing mode is now the same as the for the rest of RenderWare
+  Added platform specfic functions RpPTankAtomicSkyRenderStateSet
+  and RpPTankAtomicSkyRenderStateGet, to access and modify the alpha and the
+  test register.
+
+10/01/03 GCN NBT Generation
+  Pre-instanced vertex data can now optionally by heavily optimized to remove
+  duplicate vertex attributes and degenerate triangles from tri strips.
+
+10/01/03 GCN NBT Generation
+  NBT generation now works with compressed vertex formats.
+
+08/01/03 PS2 Skin - BZ#3441
+  Pre-instance format updated to store the number of vertices using different
+  number of weights. This information is needed by the custom lighting G3x
+  skinning pipelines. Any assets rendered with a G3x skinning pipeline will
+  need to be reinstanced to correctly render.
+
+08/01/03 BZ#3438 - Max Exporter - potential crash when DFF_HANIMSUBHIERARCHYANIM
+  was used conjuction with DFF_FILTERTOPLEVELBIPEDKEYS.
+
+07/01/03 Compressed KeyFrame scheme added for RpHAnim
+  RtCmpkey toolkit added to implement a compressed keyframe representing
+  matrix animation. This compression scheme works through packing floating
+  point values into 16 bit integers and decompressing at runtime. The animation
+  data is thus reduced to 60% of the original size.
+
+07/01/03 RtAnim Changes
+  Modifications have been made to the RtAnim and RpHAnim plugins allowing for 
+  different sized animation vs interpolated keyframes and custom data attached
+  to animations.
+  This includes the addition of a second keyframe size and so maxKeyframeSize
+  variables have been renamed to reflect whether they refer to animation or
+  interpolated keyframes.
+  Small changes will be necessary in custom keyframe schemes which are
+  documented in the RtAnim api ref.
+
+07/01/03 BZ#3777 - RwEngineGetVersion returns RwUInt32 for consistency with
+  RwStreamFindChunk
+
+07/01/03 RwTextureRead can now do a user defined search for textures before
+  attempting to read them from disk. See RwTextureSetFindCallBack, and
+  RwTextureGetFindCallBack. The default callback reproduces the previous
+  behaviour which is to search the current texture dictionary if one is
+  defined or otherwise search all texture dictionaries in the system.
+
+07/01/03 Win32 skeleton menu FPS limiter
+  A common option has been added to all Win32 applications that open the
+  skeleton menu system during initialization. This option enables/disables
+  the FPS limiter. The default limit is 60 FPS, but this can be changed
+  by the application. By default the limiter is DISABLED.
+  (OBSOLETE, see 27/01/03 entry)
+
+07/01/03 Cloning atomics with MatFX - BZ#3430
+  When cloning cloning an atomic with matfx applied the matfx copy callback
+  would also setup the matfx pipes after they had been setup by the atomic clone
+  function. This could overwrite things like skin or patch pipes with generic
+  matfx pipes when it shouldn't.
+
+06/01/03 The NULL Xbox header now defines NULLXBOX_DRVMODEL_H.
+  Previously, the only way of the detecting a NULL Xbox build was checking if
+  WIN_OSTYPES_H was defined.
+
+06/01/03 OpenGL Win32 skeleton - BZ#3399
+  Alt+Tab task switching was not handled by RenderWare Graphics
+  examples.
+
+03/01/03 GCN - BZ#3350
+  RwIm2d Immediate mode now applies the sub raster offset.
+
+16/12/02 GCN BZ# 2842
+  All pipelines now disable the color channels as well as setting the number
+  of channels output to the TEV.
+
+16/12/02 GCN BZ# 3084
+  All pipelines now disable unneeded color channels.
+
+16/12/02 GCN BZ# 3083
+  Alpha lighting was being enabled with color lighting but never used. All alpha
+  lighting is now disabled.
+
+16/12/02 Xbox build machine upgraded to use the December 2002 SDK (#5233).
+  IMPORTANT NOTE: This is the last XDK to support Visual Studio 6.
+
+13/12/02 PS2
+  If a camera texture raster is created mipmaped and automipmaped, the
+  mip stack will be auto generated on RwCameraEndUpdate()
+
+13/12/02 PS2 RpPDS - Added G3x Uva and Dup Uva pipelines.
+  Both skinned and static, supporting ADL, A4D and APL lighting.
+
+13/12/02 BZ#3322 - RtLtmap - Lightmap rasters now carry the
+  rwRASTERGAMMACORRECTED.
+  Note that this flag will be lost in the event of the lightmaps being saved
+  in separate files.
+
+12/12/02 PS2
+  For SN builds, now use to 2.95.3 as this is default in ProDG 3.0
+  Note that their default /usr/local/sce/ee/gcc/ee/include/machine/setjmp.h
+  is broken. SN users should recover this from the Sony 2.96 distribution.
+
+12/12/02 RwFrame streaming modifications BZ#2912
+  Added support for frame lists to be built from branches of hierarchies.
+  This fixes a bug where memory trampling could occur if an RpClumps frame
+  had siblings.
+
+11/12/02 GCN PTank
+  Code modifications to reduce setup cost and state leakage.
+
+11/12/02 GCN Toon
+  Code modifications to reduce setup cost and state leakage.
+
+11/12/02 BZ#2945 - Added RpPTankAtomicSkySwapFrames functions for frame
+swapping mangement. Changed RpPTankSkyGetPreviousBuffer to
+RpPTankAtomicSkyGetPreviousBuffer.
+
+10/12/02 BZ#3272 - OpenGL Team
+  Static shadows were not rendering.
+
+10/12/02 BZ#2424 - Lithmap plugin.
+  When loading a lightmap with a format different than the lightmap platform
+  default, the plugin won't perform any conversion and just message the user
+  with the proposed format.
+
+09/12/02 Examples, Demos
+  Adding .net project files for examples and demos for pc & xbox.
+
+06/12/02 BZ#3120 - 2dconvert : 2dconvert could clear the text style record when
+  converting some odd text string object.
+
+06/12/02 GCN BZ#3236 Removed hard code renderMode from skeleton so examples
+  will work in PAL or NTSC by default.
+
+06/12/02 GCN BZ#3247 Compressed vertex support for normals in RpWorlds was
+  broken if using, rpS8 or rpS16 formats.
+
+06/12/02 PrtStd Example
+   New example, prtstd2, added to show how custom properties are added to
+   RpPrtStd for animating particles.
+
+05/12/02 BZ#2247 - Maetro : when streaming in an rt2d string object, if the
+  font is not found, this will be ignored by the maestro wich will keep on
+  rendering. Streaming out that kind of object is not supported.
+
+05/12/02 OpenGL vertex arrays and world lighting
+  RenderWare Graphics OpenGL vertex array functions have been moved from
+  the world into the core library. These have been promoted to API status:
+
+   RwOpenGLVASetPosition, RwOpenGLVASetPositionATI, RwOpenGLVADisablePosition
+   RwOpenGLVASetNormal, RwOpenGLVASetNormalATI, RwOpenGLVADisableNormal
+   RwOpenGLVASetColor, RwOpenGLVASetColorATI, RwOpenGLVADisableColor
+   RwOpenGLVASetTexCoord, RwOpenGLVASetTexCoordATI, RwOpenGLVADisableTexCoord
+   RwOpenGLVASetMultiTexCoord, RwOpenGLVASetMultiTexCoordATI
+
+  Also OpenGL world lighting functions have been promoted to API:
+
+   RpOpenGLWorldEnableLighting, RpOpenGLWorldDisableLighting
+   RpOpenGLWorldIsLightingEnabled
+
+   RpOpenGLWorldSetMaterialProperties, RpOpenGLWorldDisableColorMaterial
+
+   RpOpenGLWorldEnableNormalize, RpOpenGLWorldDisableNormalize
+
+  The stealth variable _rwOpenGLOpaqueBlack has been removed. This can easily
+  be replaced in render callbacks with glColor4f( 0.0f, 0.0f, 0.0f, 1.0f );
+
+05/12/02 BZ#3112 RpPrtStd : texture refcount was not properly updated when
+  destroying a streamed prtstd atomic.
+
+04/12/02 BZ#3189 RpSline
+  Changed logic test in RpSplineFindPosition from || to &&
+
+04/12/02 OpenGL texturing
+  Added the API function
+	RwOpenGLSetTexture
+  to bind an RwTexture to OpenGL. This is useful for all-in-one node render
+  callbacks.
+
+  Also promoted _rwOpenGLSetActiveTextureUnit and _rwOpenGLGetActiveTextureUnit
+  to API status, so they are now RwOpenGLSetActiveTextureUnit and
+  RwOpenGLGetActiveTextureUnit.
+
+03/12/02 Maya Exporters
+  Check in for fix for multiple sets(shaderingGroups) using same shader bug.
+
+03/12/02 BZ#1558 Visualizer Xbox big patches. The LOD value is clamped at
+  runtime to generate less than 65535 vertices per atomic, due to a hardware
+  limitation on the maximun number of vertices per DrawIndexedPrimitive call.
+
+03/12/02 BZ#3062 - OpenGL & PI texture dictionaries: rwRASTERFORMATAUTOMIPMAP
+  OpenGL texture dictionaries did not save the rwRASTERFORMATAUTOMIPMAP flag.
+  This could cause problems upon reading some texture dictionaries. The format
+  of OpenGL texture dictionaries has now changed to accomodate this. PC OpenGL
+  and Macintosh OpenGL texture dictionaries are now different. Existing
+  OpenGL texture dictionaries can still be read.
+  PI texture dictionaries also do not store this flag, but now ensure that it
+  is not used when creating PS rasters while reading a PI texture dictionary.
+  Binary version number incremented to 34004.
+
+03/12/02 BZ#3172 - RtLtmap. Lightmap can now be anysize. Creatubg a Lightmap
+  bigger than 512x512 will throw an assert when created as they can slow down
+  performances.
+
+03/12/02 BZ#2689 - PS2All. Added assert to RpMeshPS2AllSyncTextureUpload
+  and multi pass pipelines if texture upload fails.
+
+03/12/02 BZ#2621 - RpMeshSetTriStripMethod missing see also added.
+
+03/12/02 BZ#3043 - Material stream rights callback added.
+
+03/12/02 BZ#2930 - RwMatrixOptimize now uses identity tolerance.
+
+03/12/02 BZ#2756 - PS2All default material pipeline assert moved to prevent
+  bogus asserts.
+
+03/12/02 BZ#3111 - LtMapObjectLightMapRead now check if there is a current
+  texture dictionnary before using it.
+  Added FULLSCENELIGHTING define, which, when defined, allow a generation
+  lightmap for a complete scene rather thanjust what's lie in the camera
+  frustrum.
+
+03/12/02 BZ#2846 - PS2 Allow blit from an indexed to a non-indexed texture,
+  16- to 32-bit and 32- to 16-bit texture.
+
+03/12/02 BZ#3081 - Potential Floating point/Endianess bug fix in bageomet.c
+
+02/12/02 BZ#2984 Xbox & D3D8 - MatFX bumpmapping and compressed textures:
+  only supported if the bumpmap texture is NULL and the base texture has
+  the bumpmap encoded into the alpha channel.
+
+02/12/02 BZ#2719 - PS2 PPVU example : a 16 bit constant was used in place of a
+  15 bit one, preventing compilation when using SN compiler suite.
+
+02/12/02 BZ#3142 DX8 Clearing the Stencil does not work, fixed.
+
+02/12/02 BZ#2940 : ClmpView and disabling hanim animation
+  When HAnim is disabled, but the current clump is Hanimated,
+  RpHAnimUpdateHierarchyMatrices is now allways called, allowing clump
+  manipulation.
+
+02/12/02 BZ#2700 PS2 skel main loop
+  Dropped poll to 5ms as I believe that throttling is still required.
+
+02/12/02 BZ#3093 XBox RwXboxDDSTextureRead can crash without assert, fixed.
+
+28/11/02 PS2 Visualizer
+  Update for 2.6.0 Libs.
+
+27/11/02 PS2 Build
+  PS2 build machine now builds against sce libs 2.6.0.
+
+26/11/02 BZ#2981 Xbox - Exposed the function RwXboxLightsEnable that
+  must be used inside the lighting callbacks.
+
+22/11/02 RpPrtStd & RpPrtAdv
+  Renamed structures and functions in RpPrtAdv to reduce its length
+  fixed some strange naming.
+  Fixed particle texture coords step property. Pointers are not
+  allowed in particles since this would break single batch on the PS2.
+  Introducing version stamping in emitter streaming to fix file compatibility
+  problems after the introduction of 2D rotation.
+
+20/11/02 BZ#2841 - rpLTMAPDEFAULTSLIVERAREATHRESHOLD and
+  rpLTMAPDEFAULTVERTEXWELDTHRESHOLD where outside the
+  RWPUBLIC / RWPUBLICEND boundaries.
+
+18/11/02 BZ#2831 - rpLIGHTMAXCONEANGLE changed to be in radians.
+
+13/11/02 PS2 RtSlctPipe. Support for UV Animation pipelines and selecting
+  pipelines without a known lighting setup added.
+
+13/11/02 Docschangelog added to build.
+
+13/11/02 BZ#2817 - OpenGL extension enumeration
+  The RenderWare Graphics extension enumeration may have crashed under
+  particular circumstances on some video cards.
+
+13/11/02 Xbox - RwXboxDeviceConfig structure changed to provide full control
+  over the device creation parameters.
+  Provided the function RwXboxDeviceConfigGetDefaultValues for initializing
+  the device config structure with the default values used by RenderWare
+  Graphics.
+
+12/11/02 BZ#2747 - RtLtMapDefaultVisCallBack use a user modifiable value when
+  validating it's collision test.
+  Added RtLtMapSetVisCallBackCollisionScalar
+  Added RtLtMapGetVisCallBackCollisionScalar
+
+12/11/02 RwVideoMode setup
+  RwVideoMode extended to support refresh rate and raster format.
+  RwVideoModeFlag extended to support platform specific video modes, added:
+    PS2  : rwVIDEOMODE_PS2_FSAASHRINKBLIT
+           rwVIDEOMODE_PS2_FSAAREADCIRCUIT
+    XBox : rwVIDEOMODE_XBOX_WIDESCREEN
+           rwVIDEOMODE_XBOX_PROGRESSIVE
+           rwVIDEOMODE_XBOX_FIELD
+           rwVIDEOMODE_XBOX_10X11PIXELASPECT
+
+12/11/02 BZ#2723 - PS2 Examples
+  Fix ps2 example mcps to have correct debug settings.
+
+06/11/02 BZ#2607
+  RwEngineInit, memFuncs have been made const.
+  RwEngineOpen can not be made const because of internal code design.
+
+06/11/02 BZ#2596
+  RwMatrixRotateOneMinusCosineSine was unnecessarily over setting the
+  matrix flags too many times.
+
+06/11/02 GCN BZ#2401
+  Default mesh rendering in the Team matFX pipeline was not being set up
+  correctly.
+
+06/11/02 GCN BZ#2333
+  The GXFifoObj pointer stored inside RenderWare Graphics was being set to NULL
+  when RwEngineClose was being called. This has now been fixed.
+
+06/11/02 BZ#2570. RpPrtStd and RpPrtAdv.
+  Added RpPrtStdEmitterPrt2DRotate and RpPrtStdParticle2DRotate for 2D rotation
+  support in particles.
+  Removed RpPrtStdEmitterPrtAnimFrame and RpPrtStdParticleAnimFrame from RpPrtStd.
+  This is done in RpPrtAdv.
+
+06/11/02 Xbox build machine upgraded to use the November 2002 SDK (#5120).
+
+05/11/02 (build) seperated api-refs from pdf docs, changed top level
+  and platform specific makefiles for handling autogenerated pdfs
+
+05/11/02 BZ#2667 : RtPITexD not handling texture addressing properly.
+  If U and V texture addressing were different, RtPITexD recorded these
+  incorrectly. The fix records each texture addressing mode separately.
+  Now, if invalid addressing modes are detected when reading a PI texture
+  dictionary RtPITexD handles these by the following:
+  1) if both addressing modes are invalid, both are set to rwTEXTUREADDRESSWRAP.
+  2) if one is invalid, it is set equal to the other, valid, addressing mode.
+
+05/11/02 BZ#2606 : missing RpHAnimHierarchyGetCurrentAnim
+  Added RtAnimInterpolatorGetCurrentAnim
+  Added RpHAnimHierarchyGetCurrentAnim
+
+04/11/02 GCN BZ#2207
+  RwGameCubeCameraTextureFlush was incorrectly calculating the src rectangle
+  for the box filter copy.
+
+01/11/02 PS2 - Added Atomic xyzw cluster instancing for ADC pipelines.
+
+01/11/02 BZ#2608 RpSpline
+  Changed logic test in RpSplineFindMatrix from || to &&
+
+31/10/02 PS2 - Added generic and World Sector xyzw cluster for ADC pipelines.
+
+30/10/02 (build) Added automated PDF generation files and config to
+  build process, includes an .wsf script and xml doc list.
+
+25/10/02 Maya Exporter - Added place holder for MotionPath Animation. Added
+  warnings when using MotionPath and not using Dynamic Keyframe Generation.
+
+25/10/02 Maya Exporter - Fixed an Attribute Editor bug when the AE is embedded
+  in the Maya main window.
+
+25/10/02 Exporters - Added guard against animated visibility crashing the
+  exporter. A warning is now displayed for affected nodes.
+
+24/10/02 Exporters - Added check against duplicate Tag ID's in a heirarchy.
+
+23/10/02 Maya Exporter - Fixed an infinite loop caused by cross-referenced
+  constraint nodes.
+
+21/10/02 Rt2d - Added font read callback functions to allow overriding of
+  font sources - see Rt2dFontSetReadCallBack, Rt2dFontCallBackRead and
+  Rt2dFontGetReadCallBack.
+
+21/10/02 AppWizard hierarchy bug fix (bug #2344)
+  Fixed bug in CRenderWare::_AttachHierarchy() that would return NULL if
+  an atomic did not contain a skin, which would incorrectly terminate the
+  calling iterator.
+
+21/10/02 MatFX - NEW UV Animation effects.
+  Two new effects have been added:
+	rpMATFXEFFECTUVANIM
+	rpMATFXEFFECTDUALUVANIM
+  These are equivalent to a standard single or dual pass but with
+  texture coordinate transformations applied. The transforms can be set for
+  either effect using RpMatFXMaterialSetUVAnimTransforms and they allow
+  scaling, translation, rotation, and shearing of textures. The matfx1
+  example has been updated to demonstrate the new effects. Using these
+  effects is much more efficient than modifying the texture coordinates
+  directly and then re-instancing.
+
+17/10/02 Toon, major internal code modification and restructuring.
+
+17/10/02 Maya Exporter - Integrated maya 4.5 into the build process
+
+16/02/02 bz#2246 Xbox - Fixed a bug on RwXbVertexBufferLockDiscard due to D3D
+  internal references checks.
+
+16/10/02 OpenGL display list/vertex array support updates.
+  * Now supports the GL_ATI_vertex_array_object extension (VAO) for server-side
+    vertex arrays. This is a companion to NVIDIA's GL_NV_vertex_array_range
+    extension (VAR).
+  * Display lists are now only instanced when neither VAO nor VAR are available
+    since these extensions provide better performance in vertex arrays.
+  * VAO is not used in skinning nor particles for performance issues. This will
+    change when direct mapping to video memory becomes available for VAOs.
+  * _rwOpenGLVertexHeapSetSize(), used to set the VAR heap, can now be called
+    before RwEngineInit() if required.
+
+15/10/02 3ds max Exporter - Fixed a bug in RwMaterial when the platform extension
+  was turned on but the effect file was not specified.
+
+14/10/02 bz#2295 DMorph example - Fixed a bug with second and third lights in main.c
+
+14/10/02 Maya Exporter - Fixed a bug when joint and orientConstraint nodes were
+  feeding off each other.
+
+11/10/02 OpenGL miscellaneous updates:
+  * Stealth material functions consolidated: _rwOpenGLEnableColorMaterial changed
+    to _rwOpenGLSetColorMaterial and merged functionality with glColorMaterial.
+    Also added _rwOpenGLLightsSetMaterialProperties to simplify render callbacks
+    when lighting is enabled.
+  * Render callback code for no-lighting simplified.
+  * Normal normalization state caching added to world lighting module.
+  * Fast paths to renderstate set/gets for all internal plugins added.
+
+11/10/02 GCN Made RpGameCubeWorldGetVtxFmt & RpGameCubeGeometryGetVtxFmt
+  Macros in release builds.
+
+11/10/02 GCN Defined RWALIGN to align.
+
+11/10/02 GCN Added extern "C" around _RwGameCubeTextureExtOffset.
+
+11/10/02 RwV3dTransformPoints & RwV3dTransformVectors are now over loadable in
+  the driver without the over head of an additional function call.
+
+11/10/02 GCN Texture extensions in gcn & nullgcn builds are now the same size.
+
+11/10/02 (Bug #2227) OpenGL MatFX dual pass bug.
+  If the rpGEOMETRYTEXTURED2 flag is not set, and a dual texture exists, the
+  first set of texture coordinates should be reused for the dual texture.
+  OpenGL previously always assumed that a second texture coordinate set existed
+  and used that.
+
+10/10/02 OpenGL MatFX environment map optimization.
+  Added a special case to environment mapping when the shinyness parameter is
+  set to 1.0f (or 255). If the GL_ARB_multitexture and GL_ARB_texture_env_combine
+  extensions are available, multitexturing can be used here. Otherwise dual
+  pass is used. Multitexturing cannot be used generally since there is no
+  multiply-add texture combiner.
+
+10/10/02 OpenGL custom instancing function removed for all-in-one nodes.
+  This feature was not used and is not necessary. API functions
+  RxOpenGLAllInOneSetInstanceFn and RxOpenGLAllInOneGetInstanceFn removed.
+
+10/10/02 (Bug #2190) Fatal nullxbox driver bug, fixed to allocate memory for textures
+  as a multiple of 4 bytes.
+
+10/10/02 OpenGL multitexturing and vertex arrays
+  Moved the glClientActiveTextureARB call from the multitexture
+  vertex array setup to _rwOpenGLSetActiveTextureUnit. Ensures applications using
+  custom vertex array setup functions will still work correctly.
+
+08/10/02 (PR#3901) Blinking lights fixed by updating the destination matrix flags:
+  * If the source matrix is identity, destination flags are set to identity.
+  * If the source matrix is orthonormal, destination flags are set to orthonormal.
+  * In any other case the destinations flags are set to zero.
+
+08/10/02 Maya Exporter - Exporting multiple dff or bsp nodes at once to different
+  directories was broken. All assets were being placed in the same directory. This
+  is now fixed.
+
+08/10/02 Xbox build machine upgraded to use the October 2002 SDK (#5028).
+
+04/10/02 3ds max Exporter - Spline export used to fail if there were other
+  batch nodes before it. Fixed now.
+
+03/10/02 Maya Exporter - Fixed the naming problem with files on the network.
+
+03/10/02 API Reference - can now click on folder name to open folder
+  Previously you need to select a function name or page to display the
+  html page.
+
+03/10/02 (PR#3894) Fixed matrix particles on sky2.
+  Frame swapping and querying previous frame buffer did not check for fastpipe
+  and thus returning null pointers.
+  Also fixeding missing clone callbacks for sky2.
+
+03/10/02 3ds max Exporter - Fixed Auto Create Nodes not to set hanim option
+  if there is only morphing or dmorphing
+
+02/10/02 (PR#3893) D3D8 RwEngineGetVideoModeInfo bug, fixed.
+
+01/10/02 API Reference built with 1.2.18-20020927 Doxygen version which fixes
+  cross references.
+
+01/10/02 PS2 palette placement
+  Fix for palette being placed incorrectly for 256x32 mipmaped textures PR#3891
+
+01/10/02 (PR#3888) Xbox Texture dictionary loading crash. Added support for the old
+  binary format.
+
+01/10/02 (PR#3887) Xbox VSHADER example, fixed.
+
+30/09/02 3ds max Exporter - We didn't support target animation for target lights
+  and cameras. Fixed now.
+
+30/09/02 RenderWare Graphics Build Tool
+  If resources are modified at shutdown, there is now a "cancel" option to return
+  to the application.
+
+27/09/02 (PR#3854) RpPrtStd & RpPrtAdv. PrtStd atomics could not be cloned because
+  of empty copy functions. Added clone callbacks for all emitter properties, Particles
+  and PTank are not copied. Only the emitters.
+  Added new API, RpPrtStdEmitterClone.
+
+26/09/02 (PR#3878) Doxygen version reverted back to 1.2.17.
+
+26/09/02 (PR#3884) Xbox RpTeam static shadows, fixed.
+
+25/09/02 Maya Exporter - Fixed texture transformation matrix
+
+25/09/02 Rt2d - Added Unicode support. UNICODE build is no longer necessary.
+  Updated docs on how Unicode is supported and enabled.
+
+24/09/02 Exporters - Fixed Ligtmap bug with objects without textures.
+
+20/09/02 3ds max Exporter - We were not enabling the matfx on the world
+  sectors when rwmaterials had only xbox or gamecube extencions. Fixed now.
+
+20/09/02 3ds max Exporter - RwCommImage::ConvertToTrueColor() bug
+  There was a bug in this function resulting more in corrupted data.
+  This function was used only when opacity map was burned into the
+  diffuse map which was palletized, so we converted it into the true
+  color map. It is fixed now.
+
+20/09/02 (rw-bug #3842) - Rt2d/Maestro - Fixed problem with color offsets
+and tints
+
+20/09/02 3ds max Exporter - Self-Illumination was ignored
+  It is fixed now.
+
+19/09/02 (Bug No: 1940) Maya and 3ds max particle exporting - The parent scaling
+  for the particle emitters is now burned into the emitter size on export. 3ds max
+  and Maya are both more WYSIWYG than before; however scenes before this fix, that
+  used parent scaling, might need adjusting.
+
+18/09/02 3ds max Exporter - "Export User Property Values (RpUserData)"
+  was reset to false for the old scenes in the new exporter. This is fixed
+  now, so if you load the old scene option will be set correctly. If you
+  resaved the in the meantime since the 3.4 release on 30/08/02 and used
+  the option, it will be reset to false, so you'll have to manually set it
+  on again. By default this option is off.
+
+17/09/02 3ds max Exporter - "Export User Property Values (RpUserData)"
+  option was ignored by the exporter and we always used to export strings
+  from the object properties as the user data. Fixed now.
+
+17/09/02 (PR#3851) Xbox team plugin doesn't support re-start, fixed.
+
+17/09/02 OpenGL ambient lighting was modulated with itself.
+  Global ambient is still accumulated and modulated with material ambient
+  but now GL_LIGHT_MODEL_AMBIENT is set to opaque white.
+
+16/09/02 PS2 Display/DrawBufferRaster
+  As part of the preparations for fully custom video modes, the internal
+  implementation of RpSkyGetDisplayBufferRaster() & RpSkyGetDrawBufferRaster()
+  have changed. RpSkyGetDisplayBufferRaster now works correctly in FSAA0
+  modes.
+
+16/09/02 Xbox now built against September 2002 XDK QFE patched to 4928.2.
+
+13/09/02 Exporters - There is a change of behaviour in 3ds max 5 for Assign
+  Vertex Colors utility. With default options it will assign prelight color
+  per face per vertex and the same vertex when approached from the different
+  faces will have different prelight color. This will result in exporter
+  duplicating vertices. The real solution is to turn on the "Mix vertex
+  colors" option in the utility. We now do the rounding in the exporter
+  of the color values to an 0-255 int before remapper which helps, but still
+  is not perfect, so we'll display a warning if too many vertices are
+  duplicated. Any way the option should be used. We'll also output info on
+  the number of vertices duplicated due to normals and uvs differences.
+
+13/09/02 Prtstd example max particle count and softras ptank creation (PR#3838)
+  The default maximum particle count in the Prtstd example has been reduced
+  from 30,000 to 10,000 since this can cause problems with RpGeometryCreate
+  exceeding the maximum number of vertices.
+  Softras RpPTank exhibited this problem and will now report an error if the
+  maximum particle count is exceeded.
+
+13/09/02 PS2 dma manager
+  Added frame rate control (ability to lock to 30, etc) and yield callback to
+  allow "wasted" cpu time to be returned to the application, and dma buffer
+  usage to be monitored. Added extra FLUSH in Gate to allow for possible
+  sync failure.
+
+11/09/02 GCN Upgraded to Dolphin1.0 SDK Sept 2002.
+
+11/09/02 (PR #3827 & PR #3830)
+  Fixed Rt2dDeviceSetMetric not working correctly.
+  Fixed Rt2dDeviceGetMetric. Was accidently removed from a previous check in.
+
+11/09/02 (PR#3829) Win skeleton windowed mode, updating RsGlobal.maximumWidth
+  and RsGlobal.maximumHeight after creating the window.
+
+10/09/02 (PR#3825) GCN Added weight ordering code to skin plugin to prevent
+  compressed weights terminating skinning too early.
+
+10/09/02 PS2 texture cache
+  The function RpSkyTextureCacheSetState() has been removed.
+
+09/09/02 Xbox build machine upgraded to use the September 2002 SDK (#4928).
+
+09/09/02 (PR#3815) Softras HH API header now included as part of a binary SDK.
+
+03/09/02 (PR#3798) PDS now works with rwENGINEINITNOFREELISTS.
+
+02/09/02 PTank - SKY : Instancing code for fast pipe could
+  miss a buffer instance when using multi-buffering displaying flicking in
+  visualizer (CL 54798).
+
+02/09/02 ======================================================[80 Characters]==
+  Branched to RW34Active.
+
+30/08/02 (PR#3441) RtLineSphereIntersectionTest now takes an extra argument
+  to return the distance parameter, rather than this being the return
+  value. The return value is now an RwBool, and indicates whether an
+  intersection was found. This removes the previous ambiguity of
+  a return value of -1.
+
+29/08/02 PrtStd - sky : added support for multi buffering particles
+         PrtStd - sky : maximum batch is now automatically updated when too
+         big.
+
+29/08/02 3ds max 5 viewport rendering
+  3ds max 5 multi texture viewport rendering has been disabled due to
+  problems with D3D support changes in 3ds max 5. Single texture viewing
+  is still available.
+
+28/08/02 Xbox now built against August 2002 XDK QFE patched to 4831.5
+
+28/08/02 OpenGL MatFX bumpmapping bug fix (PR#3770) - texture coordinates
+  in a vertex array were given a bad stride.
+
+27/08/02 Binary version number incremented to 34003.
+  Streamed worlds now store the world bounding box rather than it
+  being regenerated on load.
+
+27/08/02 Removed RpLight types from baequ.*
+  baequ was defining global ints containing RpLight types for use in
+  assembler. These are currently unused and have been removed to fix a
+  dependency on rpworld when building rwcore or plcore.
+
+23/08/02 GCN Doubled FIFO to prevent submitting thread from being put to
+  sleep.
+
+22/08/02 (PR#3687) (PR#3754) (change list 54215)
+  matrix array pointers where not set to null when not used, in function
+  RpHAnimHierarchyCreate
+  release/compatibility macro to call function((param)) rather than
+  function(param)
+
+22/08/02 (PR#3613) RtQuatTransformVectors now functions correctly
+  when input and output arrays are coincident.
+
+22/08/02 (PR#3753) Removed unneeded flag setting from RwMatrixTransform.
+
+21/08/02 RpPrtAdv, FxPack : user guide checked in
+
+21/08/02 RtAnim: new API function:
+  RtAnimAnimationGetNumNodes returns the number of animation nodes
+  compatible with an RtAnimAnimation.
+
+21/08/02 (PR#3736) DMorph:
+  - A tolerance is now used when deciding which vertices are deltas
+  since during modelling, small errors can often be introduced between base
+  and target vertices that are intended to be identical. In such cases,
+  this fix will reduce data size, and increase animation update efficiency.
+
+20/08/02 Skeleton - RsSelectDevice
+  Made a minor modification to the order of events in the skeleton startup.
+  As a result RsSelectDevice is now called in a state where the applications
+  plugins have not been attached. This is part of the fix for PR#3739
+
+20/08/02 Maestro/Rt2d/Rt2dAnim :  Multiple changes
+    Rt2dAnimOpen must be called before using rt2danim functionality, including
+    playing Maestro animations.
+    Rt2dAnimClose must be called on shutdown.
+    API functions Rt2dShapeGetNewPath and Rt2dShapeGetNewBrush have been
+    removed. Rt2dPathCreate() and Rt2dBrushCreate() should be used instead.
+    Maestro animations and static 2d streamed objects must be reexported.
+
+16/08/02 (PR#3732) GCN Fixed crash bug when calling RwEngineStop.
+
+16/08/02 RpSkin : Change list 53582.
+  Updated docs and Userguide to include skin split.
+  Added new API RpSkinIsSplit.
+
+15/08/02 RpPTank - rpPDS - SKY2 - Cloning Pipelines : Changelist 53529
+  cStack was not correcly accessed in RpPDS_G3x_ADLCloneRender
+  changed FAVORITEORGANISATIONMODE to FLAGARRAY
+  Added platform specific (SKY2) flags : rpPTANKSKYFLAGUSECLONEPIPELINE
+  Added cloning utility functions :
+  RpPTankAtomicSkyCloneSetReferenceAtomic
+  RpPTankAtomicSkyCloneGetReferenceAtomic
+  RpPTankAtomicSkyCloneSetAmbientLight
+  RpPTankAtomicSkyCloneGetAmbientLight
+  RpPTankAtomicSkyCloneSetDirectionalLight
+  RpPTankAtomicSkyCloneGetDirectionalLight
+
+15/08/02 RpPrtStd : Changelist 53513.
+  Added ref counting to RpPrtStd.
+  Added API, RpAtomicIsParticleEmitter.
+
+15/08/02 (PR#3380) GCN Display list generation now asserts if the number of
+  indices is greater or equal to 0xFFFF.
+
+15/08/02 (PR#3712) GCN RwGameCubeGetXFBs optimisation bug fixed.
+
+14/08/02 RtAnimInterpolatorAddAnimTime (and SubAnimTime) optimizations
+  Previously the interpolator cached the current pairs of key frames to be
+  interpolated, but it now just caches pointers to the keyframes within the
+  animation. This was found to be more efficient on all platforms, especially
+  for high density keyframe data. The rtANIMGETINERPFRAME1 and
+  rtANIMGETINTERPFRAME2 macros are now no longer available as the cached
+  arrays no longer exist. Instead, a distinction is now made between
+  the keyframes in the animation which have an RtAnimKeyFrameHeader and
+  the interpolated frames in the interpolator which have an
+  RtAnimInterpFrameHeader. This header contains pointers to the current
+  keyframe pair.
+
+14/08/02 PS2 build machine
+  Now builds against sce 2.5.5
+
+13/08/02 (PR#3696) Xbox Bump Mapping effect changed to get similar results to
+  the other platforms. Changelist #53285.
+
+13/08/02 RpSkin
+  Changed an assert to allow the setting of NULL hierarchies on a skin. (PR#3439)
+
+13/08/02 Build: RtPNG on NULLxxx targets, Changelist #53268.
+  NULLSKY, NULLGCN and NULLXBOX builds now produce an extra CodeWarrior specific
+  PNG toolkit library.
+
+13/08/02 Rt2d : Change list 53215.
+  Fixed METRIC2 bitmap fonts always using 32bit textures, even if the source
+  image wasn't.
+
+13/08/02 (PR#3660) GCN Added an assert in to the native texture dictionary
+  reading code to assert on non GCN texture dictionaries.
+
+12/08/02 RtBoneSplit & RtSkinSplit : Changelist 52570.
+  Renamed RtBoneSplit to RtSkinSplit. Some functions in RpSkin were also renamed from
+  bone split to skin split.
+
+12/08/02 MatFX : Changelist #53136
+  (PR#3707) Fix to change on 23/07/02 (PR#3565) that caused matfx bumpmapped objects
+    to fail to load in the clumpviewer due to the way it handles RwErrors.
+  (PR#3698) If multiple materials share the same bumped version of a texture
+    this was generated for every material and added multiple times to the
+    texture dictionary. They are now generated once and picked up from the
+    texture dictionary for subsequent materials.
+
+12/08/02 RpPrtStd : Changelist 52977
+  Renamed RpPrtStdGetDontStreamAll to RpPrtStdGlobalDataGetStreamEmbedded.
+  Also renamed the set function.
+
+08/08/02 rwMATRIXTYPEORTHOGONAL spelling correction
+  Corrected the spelling of rwMATRIXTYPEORTHOGONAL from rwMATRIXTYPEORTHOGANAL
+
+08/08/02 (PR#2856) GCN RwGameCubeCameraTextureFlush now takes a second
+  parameter to enable the box filter on the EFB copy.
+
+08/08/02 RpPrtStd and RpPrtAdv plugin attach naming standards: Changelist #52804.
+  Changed RpParticleAdvancePluginAttach to RpPrtAdvPluginAttach.
+  Changed RpParticleStandardPluginAttach to RpPrtStdPluginAttach.
+
+08/08/02 (PR#3553) GCN Fixed infinite loop bug in dlFputs.
+
+08/08/02 (PR#3662) GCN If the maximum number of used global lights exceeds the
+  8 HW limit then all remaining global lights are ignored.
+
+08/02/02 RpDMorphAtomicInitalize corrected to RpDMorphAtomicInitialize. Changelist #52853
+
+08/08/02 Obselete RpStereo plugin removed
+
+08/08/02 (build) Defaults for examples COPTIMIZE : Changelist #52839
+  Modified where the defaults for COPTIMIZE are setup to ensure that all
+  platforms will build optimized examples by default in release builds.
+
+08/08/02 RpPrtStd. Change list #52783.
+  Removed redundant callbacks. The particle stream callbacks are no longer used.
+  Re-enabled particle batch create callback.
+
+07/08/02 PR#3689 D3D8 team plugin vertexbuffers not released with TnL cards.
+  Fixed, changelist #52774.
+
+06/08/02 GCN - Single Weight skinning on HW.
+
+  RpSkin & RpTeam have been updated to use HW support for single weight
+  skinning. The number of active bones used by a skin must be less than or
+  equal to 10 unless, RtBoneSplitAtomicSplitGeometry has been used.
+
+  IMPORTANT:
+  The pre-instance binary format has been broken for skinned geometry's.
+  All pre-instanced skinned geometry's will have to be regenerated.
+
+06/08/02 Changelist #52640 sectoredit/pvsedit
+  Removed sectoredit from build process and added pvsedit
+
+05/08/02 RpSkin, RpBoneSplit. New toolkit added to split meshes such that each
+         mesh only use a fixed number of bone matrices. During rendering only
+         those bones are loaded into the HW platform, not the entire hierarchy.
+         Binary file version number bumped due to a change in the RpSkin
+         file format.
+
+05/08/02 Xbox build machine upgraded to use the August 2002 SDK (build number 4831).
+
+05/08/02 (PR#3660) Reading non-native texture dictionaries. Added an assert
+  to the D3D8 and Xbox versions that fails if the texture dictionary is from
+  another platform: Changelist 52494.
+
+02/08/02 OpenGL All-In-One pipelines introduced : Changelist(s) #52407/8.
+
+01/08/02 RpAnisot : Changelist #52309
+  Fixed problem with size function returning non-zero for no data written
+
+01/08/02 PDS, PS2Manager and generic PowerPipe
+  Integrated support for the new PDS (Pipeline Delivery System) on PS2. This
+  system allows the selection of custom rendering pipelines on the PS2, see
+  the PDS documentation for further details on the pipelines supplied. Because
+  the system now contains all the default rendering pipelines as well as the
+  new custom pipelines it is necessary for all PS2 applications to use PDS and
+  register the pipes they require at startup, see the PS2 skeleton code for simple
+  details.
+  As part of this integration the PS2Manager pipeline system has been removed to
+  a new toolkit called RtAltpipe. PS2Manager has been superceded by PS2All, however
+  any applications written to use PS2Manager may continue to do so by attaching
+  the new toolkit.
+  The generic c code implementation of the default PowerPipe nodes and pipelines
+  has also been removed to a separate toolkit, rtgncpip, by attaching this toolkit
+  an application can continue use of the original generic c pipes if required.
+  Note the softras driver still requires the use of the generic c nodes and hence
+  has a link dependancy on this new toolkit.
+
+31/07/02 RtWorldImport : Changelist #52266
+  Fixed world bounding box rare bug. Fixed tight bboxes for empty sectors,
+  volume is now nil.
+
+31/07/02 Removed RpHAnimHierarchyHAnimKeyFrameAddAnimTime : Changelists #52199
+                                                                        #52224
+  The function RpHAnimHierarchyHAnimKeyFrameAddAnimTime has been removed.
+  Use RpHAnimHierarchyAddAnimTime instead. A legacy macro has been provided.
+
+30/07/02 LtMap toolkit (PR#3659) RtLtMapLightMapsCreate now check if a world
+  got 2 tex coords set only if it encounter a world sector with flag
+  rtLTMAPOBJECTLIGHTMAP set. enabling the use of emtpy world to generate
+  lightmaps on non world object only (change list #52104).
+
+26/07/02 MatFX (gcn): New single pass bumpmap and bump-env pipelines
+  - The standard bump map method is now almost exactly the same as PS2 and is
+    implemented completely on hardware. This is likely to be the cheapest and
+    simplest option for bump mapping on GameCube. Previously bump uv offsets
+    were calculated in a generic way on the CPU.
+  - The method now supports compressed vertex formats, pre-instancing,
+    morphing, skinning, and the UseFrameBufferAlpha option (even when the
+    frame buffer does not contain an alpha channel since this is mocked up
+    on the TEV).
+  - Standard env mapping now also supports UseFrameBufferAlpha option, but
+    the frame buffer must actually contain alpha in this case.
+  - This is NOT related to the MatFX GameCube multitexturing extension which
+    offers more advanced effects.
+
+26/07/02 RwFreeList/rwENGINEINITNOFREELISTS : Changelist #51914
+RwFreeList implementation was ignoring the rwENGINEINITNOFREELISTS
+flag for RwEngineInit() and reserving space for internal freelist objects
+anyway. Now fixed.
+
+26/07/02 NULL target RenderWare Graphics DLL name change : Changelist #51910
+  DLL-related files generated by the RWDLL=1 make option now use a different
+  naming convention:
+	* rwg.dll
+	* rwg.lib	(import library)
+
+25/07/02 RtWorldImport : Changelist #50725
+  The Hints data structure and its get and set functions have changed to
+  make room for a new hint type, there are now 'partition' hints and 'shield'
+  hints. If access is made to the structures elements directly, these need
+  updating.
+  The new functions are RtWorldImportHintsSetGroup and
+  RtWorldImportHintsGetGroup, but the old functions are still supported for
+  backwards compatibility.
+  Also, a new schemes has been add that work soley with hints.
+
+24/07/02 PLCore only builds : Changelist #51720
+  Added support for PLCore only builds which includes a smaller size for
+  the globals, resulting in a smaller memory overhead when only using PLCore.
+
+23/07/02 PR#3565 MatFX streaming has now been made endian safe
+  This was causing problems when pre-instancing on GameCube.
+
+23/07/02 Default PlayStation2 video mode for examples
+  The default video mode for the examples on PlayStation2 has been changed
+  to a high res anti-aliased mode.
+
+22/07/02 rwRENDERSTATEALPHAPRIMITIVEBUFFER and rwRENDERSTATEFOGTABE removed.
+  These render states have been completely removed from the API since
+  their functionality is no longer supported on any platform.
+
+17/07/02 RtIntel removed
+  Support for the RtIntel toolkit has been removed from RenderWare. Where
+  a platform can support the SIMD operations offered by RtIntel the driver
+  can implement these optimisations if required.
+
+17/07/02 OpenGL & Softras (PR#3634) PTank vertex alpha flag when FALSE
+  but particle color alpha != 255 and using a texture with alpha now
+  renders correctly.
+
+16/07/02 RwFreeList implementation changed...
+  ...to decrease the number of allocations needed and to allow the user
+  control over RenderWare's freelist sizes to tune them for his/her game.
+  This should allow for better performance and decreased memory fragmentation.
+  The new API function RwFreeListCreateAndPreallocateSpace should now be
+  preferred over RwFreeListCreate. See also the RwFreeList overview in the
+  API reference for a list of functions used to control freelist sizes.
+
+15/07/02 Xbox and PC (PR#3632) RwFastRealToUInt32 inline assembler functions
+  changed to overwrite the default macro with the same name.
+
+12/07/02 PS2 PTank - new pipelines which use much less CPU time are used for all
+  PTanks which don't have the rpPTANKDFLAGMATRIX, rpPTANKDFLAGNORMAL or
+  rpPTANKDFLAGSTRUCTURE flags set. The rpPTANKSKYFLAGDONTALLOCATE platform
+  flag has been added to allow the user to supply the PTank with the required
+  memory which would otherwise be allocated when the PTank is created.
+
+11/07/02 GCN (PR#3472) Shadows were disappearing due to uninitialized matrix
+  flags.
+
+10/07/02 GCN (PR#3497) _RwGameCubeRasterExtOffset now inside extern "C" section.
+
+10/07/02 GCN (PR#3524) RwGameCubeCameraTextureFlush now asserts if the raster
+  passed was created with rwRASTERDONTALLOCATE.
+
+05/07/02 (PR#3606) sky/gcn skeleton: error in fgets implementation
+  String was not terminated with NULL when maximum characters read.
+
+04/07/02 RpHanim now relies on rtanim to provide it's keyframing and
+  interpolating schemes. Where, in previous versions, a RpHAnimHierarchy held
+  the animation's current state and the hierarchical data, it now contains
+  only a reference to an RtAnimInterpolator object and the hierarchical data
+  (matrix arrays, hierarchy definitions, ...).
+  A collection of legacy macros and typedefs are provided to ease the move to
+  the new system, though direct access to member variables will need to be
+  updated.
+  The file formats are compatible, and there is no need to re-export data to
+  fit the new system.
+  See RpHanim and RtAnim API reference for more informations.
+
+02/07/02 Added RtAnim toolkit (first part of Hanim Cut off).
+
+02/07/02 Xbox build machine upgraded to use the July 2002 SDK
+  (build number 4721).
+
+01/07/02 (PR#3592) D3D8 - Im3D index buffer size increased to 65535 indices.
+
+28/06/02 3dsmax Exporter - Removed the limit of 100.0 to the area light radius
+  in the RwMaterial.
+
+27/06/02 (PR#3581) Pakfile example doesn't work on Xbox, fixed.
+
+26/06/02 (PR#3582) Xbox - Bug in SSE RwMatrixMultiplyMacro. Fixed using "shufps"
+  to overwrite the 4th-float value that could have been invalid.
+
+25/06/02 3dsmax Exporter - Fix for procedural textures which caused an exception.
+
+24/06/02 Protected the ptank contents when emitting wihtout updating
+  - changed order destruction of ptank and its frame
+  - _rpPrtStdPropTabAdd was keeping only the first and the last proptab
+  - Added memory cleanup in engineclose callback
+
+21/06/02 New tristripper added. The callbacks for this tristripper also allow for
+  easier implementation of alternative tristrippers.
+
+20/06/06 PrtStd : changed the streaming function so that it is possible to
+  stream out the global data at once, or with each emitter. Modified the
+  propTab functions to that intents. Added RpPrtStdGet/SetDontStreamAll flag.
+
+20/06/02 3dsmax Exporter - Fixed a bug with palettised textures with opasity map.
+
+18/06/02 Xbox build machine upgraded to use the June 2002 SDK (build number 4627).
+
+18/06/02 3ds max Exporter - Fix for UV values when the UV sets were not
+  used in the right order.
+
+17/06/02 PS2: Miplevels and FSAA0 defaults
+  The default value of rpSKYRENDERSTATEMAXMIPLEVELS is now 7.
+  The default value of _rwSkyFSAAMode0SetVisibleWidth is now the back buffer
+  width.
+
+14/06/02 PrtStd : the particle now can completely fill a batch before creating
+  a new empty batch.
+
+14/06/02 PS2 library build env. PS2 builds against 2.5.2. Updated ps2.doc/pdf
+  (top level readmes).
+
+13/06/02 3ds max Exporter - Fix for rendered textures with alpha
+  Alpha was ignored in rws file texture dictionary when the size of the
+  texture was not power of 2.
+
+13/06/02 (PR#3520) PTank : texture upload/material setting was badly handled
+  forcing the pipeline to upload the texture twice.
+
+12/06/02 NULL target RenderWare Graphics DLL generation
+  If the make option RWDLL=1 is used to build the SDK for NULL targets then
+  a combined DLL, called rwdll.dll, exporting the majority of the SDK functions
+  is generated into a rwsdk/dll/null/[debug|release|metrics] folder.
+  An import library called rwdll.lib is also created in this folder for NULL
+  applications to link against to "import" the functions contained in the DLL.
+  Currently, only the rtpng, rttiff, rpdpvs libraries are not compatible with
+  the DLL generation.
+
+12/06/02 RpPrtStd - eClass, pClass and the proptable are now streamed as
+  platform independant data that gets realigned upon loading. Removed 4 sky
+  - functions made useless by the change. o Added RpPrtStdEmitterLinkPtank
+  - function and updated RpPrtStdEmitterCreatePtank accordingly. o
+  - Bumped version stamp to 2.
+
+12/06/02 (PR#3511) Maya Exporter. A problem that prevented skinned toon
+  clumps from exporting correctly has been fixed.
+
+11/06/02 (PR#3534) RtLtMap - the lightmap UV calculations have been modified
+  First of all, the lightmap UV generation has been optimised
+  (it was an O(n^2) operation and now is O(n), so extreme cases should
+  complete much faster).
+  Secondly, two 'magic numbers' have been exposed, so that worlds
+  of significantly varying scales may be robustly processed by the
+  lightmap generation and illumination code.
+  The functions for setting these values, for which there is API
+  reference documentation describing their purpose in detail, are:
+    RtLtMapSetSliverAreaThreshold
+    RtLtMapSetVertexWeldThreshold
+
+11/06/02 (PR#3543) Matfx -cross platform incompatibility.
+  Now, the DirectX and Xbox versions use two passes when the base texture
+  has alpha, and the framebuffer alpha is disabled.
+  Use "RpMatFXMaterialSetEnvMapFrameBufferAlpha" to enable multitexturing
+  when the base texture has alpha.
+
+10/06/02 Xbox (PR#3542) ptank point sprites not setting world matrix, fixed.
+
+10/06/02 Xbox (PR#3541) RpAtomicRender resets frame in PTank, fixed.
+
+07/06/02 3ds max - Filter Through Top-Level Biped Keys option bug fix.
+  It didn't filter the keyframes on the Bip01 root node.
+
+07/06/02 (PR#3519) The serialization code was incorrectly endianness converting
+  causing loading failures on big endian machines.
+
+06/06/02 Xbox (PR#3525) RpD3DTEXTUREOP enum is wrong. Fixed to match the D3D
+  definition.
+
+30/05/02 RpPtank : #pr3505 : Added an early out from ptank render when the
+number of active particle is 0.
+
+30/05/02 RpPtank : #pr3505 : SetMaterial was destroying the much needed mesh
+  when using custom pipes. (might have affected other platforms, not only ps2)
+
+30/05/02 RtWorldImport
+  Removed RtWorldImportSetSurfaceProperties and
+  RtWorldImportGetSurfaceProperties which were equivalent to the
+  removed RpWorldSetSurfaceProperties and RpWorldGetSurfaceProperties.
+
+29/05/02 Xbox - Texture dictionary format changed to read all the mip
+  levels at once. Previous tex dictionaries are now incompatible.
+
+29/05/02 Xbox - Added a Write Combining memory manager that provides the
+  following benefits:
+  - Reduced wasted space due to D3D allocations of 4KB blocks.
+  - Reduced memory fragmentation.
+  - Improved RwXboxLockDynamicVertexBuffer to never stall the CPU.
+  - Immediate mode indexed primitives rendering optimised using
+    RwXboxLockDynamicVertexBuffer.
+  - Im3D non indexed primitives rendering optimised using BeginPush.
+
+28/05/02  Removed '#include <windows.h>' from D3D8 and NULL public headers.
+
+27/05/02  The following legacy API has been removed.
+
+  RpWorldGetSurfaceProperties
+  _rpWorldGetSurfaceProperties
+
+  RpWorldSetSurfaceProperties
+  _rpWorldSetSurfaceProperties
+
+27/05/02  The following PS2 API functions have changed to accommodate the
+  removal of RpSurfaceProperties from RpWorld.
+
+  RxWorldLightingCallBack has changed from
+
+  void RxWorldLightingCallBack(
+           RwInt32 objectType,
+           void *object,
+           RwSurfaceProperties *surface);
+
+  to
+
+  void RxWorldLightingCallBack(
+           RwInt32 objectType,
+           void *object);
+
+
+  RxPipelineNodePS2ManagerApplyLight has changed from,
+
+  void RxPipelineNodePS2ManagerApplyLight(
+           const RpLight *light,
+           const RwMatrix *inverseMat,
+           RwReal invScale,
+           RwReal recipInvScale,
+           const RwSurfaceProperties *surfaceProps);
+
+  to
+
+  void RxPipelineNodePS2ManagerApplyLight(
+           const RpLight *light,
+           const RwMatrix *inverseMat,
+           RwReal invScale,
+           RwReal recipInvScale);
+
+
+  RxPipelineNodePS2AllApplyLight has changed from,
+
+  void RxPipelineNodePS2AllApplyLight(
+           const RpLight *light,
+           const RwMatrix *inverseMat,
+           RwReal invScale,
+           RwReal recipInvScale,
+           const RwSurfaceProperties *surfaceProps);
+
+  to
+
+  void RxPipelineNodePS2AllApplyLight(
+           const RpLight *light,
+           const RwMatrix *inverseMat,
+           RwReal invScale,
+           RwReal recipInvScale);
+
+27/05/02  The following legacy API has been removed.
+
+  RpGeometryGetSurfaceProperties
+  _rpGeometryGetSurfaceProperties
+
+  RpGeometrySetSurfaceProperties
+  _rpGeometrySetSurfaceProperties
+
+27/05/02 (PR#3498) Added an assert on the function _rxD3D8DefaultRenderCallback
+  that checks if the material pointer is non-NULL.
+
+27/05/02 The following legacy support macros have been removed.
+
+  RWIMVERTEXINDEX
+  RWIM2DVERTEX
+  RWIM2DVERTEXSetCameraY
+  RWIM2DVERTEXSetCameraZ
+  RWIM2DVERTEXSetRecipCameraZ
+  RWIM2DVERTEXGetCameraX
+  RWIM2DVERTEXGetCameraY
+  RWIM2DVERTEXGetCameraZ
+  RWIM2DVERTEXGetRecipCameraZ
+  RWIM2DVERTEXSetScreenX
+  RWIM2DVERTEXSetScreenY
+  RWIM2DVERTEXSetScreenZ
+  RWIM2DVERTEXGetScreenX
+  RWIM2DVERTEXGetScreenY
+  RWIM2DVERTEXGetScreenZ
+  RWIM2DVERTEXSetU
+  RWIM2DVERTEXSetV
+  RWIM2DVERTEXGetU
+  RWIM2DVERTEXGetV
+  RWIM2DVERTEXSetRealRGBA
+  RWIM2DVERTEXSetIntRGBA
+  RWIM2DVERTEXGetRed
+  RWIM2DVERTEXGetGreen
+  RWIM2DVERTEXGetBlue
+  RWIM2DVERTEXGetAlpha
+  RWIM2DVERTEXCopyRGBA
+  RWIM2DVERTEXClipRGBA
+  RWIM2DCAMERAVERTEXSetU
+  RWIM2DCAMERAVERTEXSetV
+
+  RWIM3DVERTEX
+  RWIM3DVERTEXGetNext
+  RWIM3DVERTEXSetPos
+  RWIM3DVERTEXGetPos
+  RWIM3DVERTEXSetU
+  RWIM3DVERTEXSetV
+  RWIM3DVERTEXSetRGBA
+  RWIM3DVERTEXSetNormal
+  RWIM3DVERTEXCopyRGBA
+
+  RXOBJSPACE3DVERTEXGetPos
+  RXOBJSPACE3DVERTEXSetPos
+  RXOBJSPACE3DVERTEXGetPreLitColor
+  RXOBJSPACE3DVERTEXSetPreLitColor
+  RXOBJSPACE3DVERTEXGetColor
+  RXOBJSPACE3DVERTEXGetNormal
+  RXOBJSPACE3DVERTEXSetNormal
+  RXOBJSPACE3DVERTEXGetU
+  RXOBJSPACE3DVERTEXGetV
+  RXOBJSPACE3DVERTEXSetU
+  RXOBJSPACE3DVERTEXSetV
+
+  RXOBJSPACE3DLITVERTEXGetPos
+  RXOBJSPACE3DLITVERTEXSetPos
+  RXOBJSPACE3DLITVERTEXGetColor
+  RXOBJSPACE3DLITVERTEXSetColor
+  RXOBJSPACE3DLITVERTEXGetU
+  RXOBJSPACE3DLITVERTEXGetV
+  RXOBJSPACE3DLITVERTEXSetU
+  RXOBJSPACE3DLITVERTEXSetV
+
+27/05/02 (build) added sncommon/cwcommon folder fixes and a shared folder for
+  Apireference & Tuorials .chms & .chis.
+
+24/05/02 GCN (PR#3341) Mipmap initialisation bug.
+
+Mip levels after the first edge to reach 1 pixel in dimension were not being
+initialised due to a missing clause catching zero length edges.
+
+e.g.
+Mip Level    Width    Height
+    0         64        4
+    1         32        2
+    2         16        1
+    3          8        1    Uninitialised
+    4          4        1    Uninitialised
+    5          2        1    Uninitialised
+    6          1        1    Uninitialised
+
+23/05/02 (build) changed packtargs to work with new build
+
+22/05/02 (build) changed buildtarget to identify type of build in logs
+
+21/05/02 GCN
+  Removed recipz from rwGameCube2DVertex struct.
+
+21/05/02 Xbox build machine upgraded to use the May 2002 SDK (build number 4531).
+
+20/05/02 D3D8 (PR#3481) Toon plugin not using world matrix for skinned models.
+  Fixed.
+
+16/05/02 Maya Exporter - A bug has been fixed that could cause an exception when
+  exporting polygons with vertices not referenced by any of the triangles in
+  the polygon.
+
+15/05/02 3ds max Exporter - Skinning Rollout in Anm exporter
+  is removed since these option should not effect anm file.
+
+15/05/02 XBOX (PR#3470) - picking example fixed.
+
+14/05/02 3ds max Exporter - Start and End Frame settings
+  We had an exception if the Start frame is equal or greater then the End
+  frame. Fixed. We display an error and use Start+1 for and End frame.
+
+14/05/02 Ptank - Sky : the resEntry was used without being checked causing
+  crash when the ressource Arenna was purged/freed/trashed.
+  Plus instance/swapping callback where not reseted after "official"
+  instancing call
+
+14/05/02 3ds max Exporter - Load/Save Selection buttons
+  Used to crash max if there were no batch nodes in the scene. Fixed now.
+
+14/05/02 2dconvrt (PR#3463) Export of .pngs fixed
+
+14/05/02 PTank - PrtStd : Workaround for PR#3461 : DMA Manager was causing
+  Instancing time glitches.
+
+13/05/02 RpPVS - Fixed PR#3451.
+  As such, ASSERTs no longer pop up with multiple worlds at run-time.
+
+13/05/02 3ds max Exporter - Material color modulation
+  For Standard Material we were not modulating color for bitmap textures.
+  Now this applies for all textures. This is because 3ds max doesn't
+  modulate material color in viewports and also because default color is
+  not white so textures would always look wrong. For RwMaterial we always
+  modulate the color, but since it defaults to white, it's not a problem.
+
+13/05/02 3ds max Exporter - Export Object in World Space option
+  Was set by default when Add Node or Auto Create Nodes buttons
+  were used, but was off when node was just switched to dff/anm
+  type. Now it's always on by default.
+
+13/05/02 3ds max Exporter - Preserve Normals option
+  in material settings rollout was ignored. Removed now. So if Export
+  2-Sided Materials option is turned on for all geometry that has
+  2-Sided Materials, vertices and triangles will be duplicated, and
+  normals flipped for right shading.
+
+13/05/02 3ds max Exporter - Cropping for all textures in RwMaterial.
+  Support for cropping in RwMaterial is added. Have in mind that cropping
+  in 3ds max is per bitmap information, and in RW is per material per UV
+  set information, so things will go wrong if two textures in the same
+  material using the same UV set, have crop applied on one of them. We will
+  put an error message in such case in Warning dialog, but continue export.
+  Another thing is cropping will affect your tristripping if you use tiled
+  texture. A warning for that is displayed too.
+  Also Apply option in Bitmap crop settings was ignored, fixed now.
+
+13/05/02 3ds max Exporter - Warning dialog bug fix.
+  If the option Display Report was turned off, and there are some errors,
+  dialog would appear, but except the icons it would be empty. Fixed now
+  and dialog will appear with just errors.
+
+10/05/02 PTANK : Capital R in front of ALL functions/typedef
+
+10/05/02 PTANK : 2d texcoordinates where not matching all the platforms
+
+10/05/02 PTANK : Published custom ptank creation stealth function
+
+10/05/02 PTANK : Replace 0 check in the custom render callback by a couple of
+  assert, and updated the examples accordingly
+
+10/05/02 GCN (PR#3426) RwRasterLock when locking rasters of type
+  rwRASTERTYPECAMERATEXTURE was not invalidating the pixel memory from DCache.
+
+10/05/02 GCN (PR#3430) Loading and rendering pre-instanced skinned geometries
+  would invoke the instancing code causing it to crash due to a missing flag
+  check.
+
+09/05/02 D3D8 (PR#3453) Video memory wasted on palettes.
+  Now available palette numbers are used in a more efficient way.
+
+08/05/02 (PR#3292) RwRasterGetStride now asserts if the rasters pixels have
+  not been locked.
+
+08/05/02 PS2All Im3D pipeline changes
+  Prior to the DMA system changes (of 28/04/02), the largest instanced Im3D
+  primitive supported on PS2 was 64k. This necessitated painfully slow
+  primitive splitting behind the scenes. As this restriction no longer
+  applies (the maximum instanced block allocation can now be increased
+  by calling _rwDMAPreAlloc before RwEngineStart), the primitive-splitting
+  code has been removed from the PS2All pipeline architecture (it still
+  remains in the PS2Manager code, as its status is now 'legacy code'). This
+  may result in a code size reduction and a (CPU-side) Im3D rendering
+  performance increase. In addition to this, the following items have been
+  removed from the API:
+    o RxPipelineNodePS2AllMatIm3DPreMeshCallBack,
+    o RxPipelineNodePS2AllMatIm3DPostMeshCallBack,
+    o RxPipelineNodePS2AllMatIm3DMeshSplitCallBack,
+    o _rwIm3DPS2AllIm3DPreMeshCallBack,
+    o _rwIm3DPS2AllIm3DPostMeshCallBack,
+    o _rwIm3DPS2AllMeshSplitCallBack,
+    o rxPS2ALLMATCALLBACKIM3DMESHSPLIT,
+    o rxPS2ALLMATCALLBACKIM3DPOSTMESH,
+    o rxPS2ALLMATCALLBACKIM3DPREMESH
+    o _rwIm3DPS2AllMeshEnd
+  Additionally, RwIm3DPS2AllPostMeshCallBack is now only required during
+  an RWMETRICS build.
+
+07/05/02 3ds max Exporter - Start and End frame support in DFF/ANM exporter.
+
+07/05/02 3ds max Exporter - Custom attributes fix.
+  If the custom attributes were not setup right the exporter could've crash.
+  Fixed now.
+
+07/05/02 3ds max Exporter - Vertices with different normals were duplicated
+  in the exporter even if the normals were not exported. That would usually
+  affect the prelight colors. Fixed now.
+
+03/05/02 RtImport and SectorEditor fixes:
+  RtImport: Asserts that maxWorldSectorPolygons and maxWorldSectorSize are
+  greater than zero.
+  Space culling respects hints.
+  SectorEditor: maxWorldSectorPolygons and maxWorldSectorSize now can't be set
+  zero or below.
+  PVS generation on an empty world crash fixed.
+
+03/05/02 OpenGL RpAnisot
+  Added support for anisotropic filtering to OpenGL via the extension
+  GL_EXT_texture_filter_anisotropic. This affects PC and Mac implementations.
+  Included rpanisot as a valid plugin to build for OpenGL in the top-level
+  makefile.
+
+03/05/02 RtImport
+  GuideKDtree child order flag was set incorrectly.
+
+02/05/02 Visualizer (PR#3384) Changed place where reg keys are stored from
+  HKEY_LOCAL_MACHINE to HKEY_CURRENT_USER to allow users without admin
+  priviledges to run the visualizer.
+
+01/05/02 D3D8 (PR#3424) resizing the windows in an example.
+  Changed to restore current cached values for alpha renderstates when doing
+  a device reset.
+
+01/05/02 Binary revision number bumped to 3.4.0.00
+
+01/05/02 OpenGL
+  Extension query function _rwOpenGLIsExtensionSupported() upgraded to
+  API status with a name change to RwOpenGLIsExtensionSupported() and
+  documented. Structure RwGlVertex changed to RwOpenGLVertex and documented.
+
+  Debug output upon calling RwEngineStart() has been changed to correctly
+  format ALL supported extensions by the OpenGL implementation. Also, for Win
+  and Mac drivers, information about the pixel format selected by the driver
+  is output.
+
+30/04/02 Xbox (PR#3419) rxXbAtomicMatFXEnvRender, prelit and material colour.
+  Using pixel shaders to modulate the diffuse color by the material color
+  before adding the envmap texture.
+
+30/04/02 GCN (PR#3418) RwCameraClear did not restore fog state correctly.
+
+  On GameCube, RwCameraClear disabled fog but did not restore the setting
+  again once finished. Later calls to rwRENDERSTATEFOGENABLE had no effect
+  because fog was already enabled according to the cache.
+
+29/04/02 (PR#3411) NULL Xbox calculates incorrectly the number of mip levels,
+  fixed.
+
+29/04/02 (PR#3409) D3D8 crashes when calling RwRasterGetNumLevels for a raster
+  created with rwRASTERDONTALLOCATE, fixed.
+
+29/04/02 GCN (PR#3407)
+   RwRasterGetNumLevels returns 1 to few if, a raster is created with
+   rwRASTERDONTALLOCATE and then RwRasterGetNumLevels is called.
+
+29/04/02 GCN
+  Added an assert into RwGameCubeTextureSetLOD that warns about the addressing
+  mode on non power of two sized textures.
+
+29/04/02 (PR#3404) Xbox prelight with material and lights: the material colour
+  was not modulating the prelight and texture correctly when lights are used.
+
+29/04/02 3ds max Exporter - "Filter Through Top-Level Biped Keys" bug fix.
+  This option didn't add keyframes from the biped root node to the rest of
+  biped nodes which resulted in wrong animation. Fixed now. Also removed
+  warnings if this function doesn't find all biped nodes.
+
+28/04/02 PS2 Dma system
+  The dma manager has been replaced with a more efficient version that uses
+  fewer interrupts and doen't do dynamic memory allocation. If you do not
+  use the dma mamnager, you need merely remove any references to "sweMaxFlips"
+  from your code (now hard coded to be 0), replace references to "sweDb"
+  and "tcaaDisp" with suitable members of _rwDMAFlipData, and change the
+  call to _swePreAlloc to _rwDMAPreAlloc (note the argument changes) to update.
+  If you do use the dma manager, for example in your own pipelines, you should
+  obtain a copy of dma.pdf from support.
+
+27/04/02 GCN
+  Changed RwRasterCreate to allocate a texture of the desired depth if no
+  explicit pixel format is specified. 4 & 8 bit rasters will not allocate
+  a palette if not explicitly requested.
+
+26/04/02 OpenGL public variable name change to uphold coding standards:
+  * (Win32) PixelFormatDesc -> _rwOpenGLPixelFormatDesc
+  * RwGlExt -> RwOpenGLExtensions
+  * gl -> _rwOpenGLExt
+
+26/04/02 Maya Exporter
+  A bug that could cause an exception on the attempted export of malformed
+  curves has been fixed.
+
+24/04/02 RtImport - Geometry Conditioning
+  This has now been made deterministic - so identical worlds will now produce
+  identical BSPs.
+
+24/04/02 3ds max Exporter - Add Node and Auto Create Nodes bug fix.
+  In some cases when a scene was just loaded or a modifier applied, etc, these
+  functions would get a validity interval from max to be [0, 0] and they would
+  create a dff node even though an object is static. Fixed now.
+
+24/04/02 RtImport - bug fix.
+  If RtWorldImportCreateWorld is called without setting a scheme or terminator
+  these are now set to default and subsequently set back to NULL. This fixes
+  a problem that occurred when no scheme was set and the world was built more
+  than once.
+
+23/04/02 3ds max Exporter - Number of references bug fix.
+  Number of references in batch exporter nodes used to increase every time
+  Save Selection button was used. Fixed now.
+
+23/04/02 3ds max Exporter - Support for Position XYZ controller.
+
+23/04/02 3ds max Exporter - Bsp world bounding box bug fix
+  We used to skip the max groups the calculation BBox which resulted in worlds
+  being smaller or empty. Fixed.
+
+18/04/02 3ds max Exporter - Biped export in World Space
+  Fixed a problem where a hierarchy whose root node was a biped part would not
+  be correctly orientated in a world space export.
+
+18/04/02 3ds max Exporter - A memory leak fix in ANM exporter.
+
+18/04/02 3ds max Exporter - Auto Create Nodes
+  Fixed a problem where a BSP node could be created containing only non-
+  renderable objects. This node would then fail to export.
+
+18/04/02 Xbox - RpSkin could incorrectly scale skins when rendering with
+ D3DMULTISAMPLE_4_SAMPLES_MULTISAMPLE_LINEAR and building against March XDK or
+ later.  Now fixed, but requires lib to be built against April XDK.
+
+17/04/02 Xbox - Upgraded to April XDK (Build 4432)
+
+17/04/02 PTank sky2 - prelighted color was not correctly reseted in vu pipes
+  (2d and 3d)
+
+17/04/02 Null driver - RwRasterSetFromImage
+  RwRasterSetFromImage failed to set all the pixels correctly in the raster
+  where the image and raster were both palettized but had differing strides.
+
+16/04/02 Maya/Max Exporter - Removed crease_ and silhouette_ in ink names
+  that are created from edge selection sets.
+
+16/04/02 Max Exporter - Custom Attributes were not exported with the skinned
+  geometries. Fixed.
+
+16/04/02 GCN: matfxadv example
+  - all textures now trilinear filtered
+  - demonstrates texture cache configuration for 32 bit mipmaps
+  - demonstrates how to create IA8 mipmapped textures for indirect texturing
+
+16/04/02 SoftImage Exporter
+    Skin weights are now sorted at export time in descending order.
+
+15/04/02 Maya Exporter
+  Skin weights are now sorted at export time in descending order.
+
+15/04/02 Visualizer Viewers
+  Tristrip length value for "Tristrips No Degenerates" option was ignored for
+  atomic rendering.
+
+15/04/02 updated the texture paths in the example model used in the artist guide.
+
+15/04/02 RpPVS
+  Worlds should now have collision data before calling any of the PVS
+  generation functions.
+
+15/04/02 Updating Dev branch to use the April XDK
+	 Mostly compiler switches change (makefile and DSP)
+
+15/04/02 2dconvrt bitmap problems
+  Fixed import of lossless bitmaps
+  Bitmaps now imported by default
+
+15/04/02 Xbox RpLogo crashes
+  RpLogo appears to be subject to a code optimizer bug in Visual C that could
+  sometimes crash in LogoCameraBeginUpdate.  Added workaround.
+  rwsdk/plugin/logo/rplogo.c
+
+15/04/02 Max Exporter
+  - "Save HAnim Hierarchy" option is now turned on by default for skinned
+    hierarchies.
+  - Env and Bump Map values in RwMaterials are no longer limited to 1.0,
+    the limit is set to 100.0
+  - If "Add Node" button fails to setup the options for the node, a message
+    box will be displayed and a dff node with default options will be created.
+  - Exporter would in some cases try to export to rws file even if there are
+    batch exporter nodes used before rws was introduced. Fixed.
+
+15/04/02 PS2 Sony libs update
+  Now building against 2.5 to enable DTV480p support.
+
+15/04/02 Max Exporter
+  - "Scale By" factor in bsp options was ignored when size of the world was
+     calculated. Fixed.
+  - "Enable Bezier Patches" is on by default.
+
+12/04/02 o Color multiply on sky : color multiply was not applyed by PTank
+
+12/04/02 Visualizer Viewer PC
+  Modified the PC viewer to release some cpu time when minimized.
+
+12/04/02 GCN RpCrowd: (PR#3345) fixed a problem with negative UVs in crowd
+  quads.
+
+12/04/02 Max Exporter - named selection sets for edges should be prefixed with
+  "silhouette_" or "crease_" and appropriate type of ink will be set.
+
+12/04/02 Visualizer control panel cpu usage
+  Reduced the cpu usage when the visualizer control panel is idling. This should
+  make other applications more responsive whilst the visualizer is running.
+
+12/04/02 Maya Exporter - Extended Support for toon shader.
+  Maya edge selection sets are supported and ink with the name of the maya set
+  will be set for those edges. Selection set names have to be prefixed with
+  "silhouette_" or "crease_" and appropriate type of ink will be set.
+  Maya blind data is used for setting the weights for the toon shader on
+  vertices.
+  Blind Data template has to be named "RpToon", vertex for association type,
+  double for data type and "VertexThickness" should be the long attribute name.
+  Values should be in 0.0 to 1.0 range.
+  RwMaterial is extended with the paint name. The name from the batch exporter
+  node settings will be used if the option is not enabled.
+
+12/04/02 Ptank plugin - Spr2dgen particles was twice as big as it should be
+
+12/04/02 Maya Exporter - A problem that stopped tesselated nurbs surfaces
+  exporting to bsps if export selection was used has been fixed.
+
+11/04/02 Maya Exporter - The auto node create/quick view code now ensures
+  normals are enabled if env mapping is detected on an object.
+
+11/04/02 Visualizer - Connecting to multiple targets
+  Modified the PC viewer to release some cpu time allowing for much faster
+  connections to multiple targets.
+
+11/04/02 Toon example win (D3D8 and OpenGL) CodeWarrior 7 MCP file added.
+
+11/04/02 (PR#3334) OpenGL and Softras skinning did not support skinned models
+  without a valid hierarchy.
+
+11/04/02 (PR#3330) OpenGL lightmaps incorrectly determining the availability of
+  an OpenGL extension for rendering the lightmaps only style.
+
+10/04/02 Visualizer Viewer PC
+  Fixed a problem where the clip planes would be incorrectly set after resizing
+  a PC viewer window.
+
+10/04/02 Visualizer Viewer
+  Fixed a problem where texture dictionaries were freed up before the assets
+  which potentially use them. If new textures were created and added to the
+  dictionary during loading it would cause crashes on exit of the viewer. This
+  was known to happen for bump maps exported from Maya.
+
+10/04/02 Visualizer Viewer
+  Unified the world and atomic rendering of tristrips, meshes etc. This reduces
+  code space overhead in the viewer.
+
+10/04/02 Bug fix. Fixed Color and UVs interpolation bug in rpprtstd. -ve values
+  were not handled correctly. RpPrtStdEmitterPrtColor and RpPrtStdParticleColor
+  have been replaced by their real counterparts.
+
+10/04/02 Added RWFORCEENUMSIZEINT to RpUserDataFormat enum.
+
+10/04/02 Max Exporter - Bones Pro exporter fix.
+
+10/04/02 Updated the Glossary pdf from Glossary doc (they were out of step)
+
+10/04/02 PS2: Codewarrior problem with Renderware (PR#3300)
+  Use only the local extent RWFORCEENUMSIZEINT within enum definitions
+  to force 4 byte enums, rather than a global extent pragma in rwcore.h.
+  A pragma is unneccessary since ANSI C enums should be no wider than an int
+  (see section 3.1.3.4 in ANSI C rationale). A global pragma in rwcore.h
+  also applies to application as well as RW enums, which can be undesirable
+  e.g. if some application files includes rwcore.h but others do not
+  leading to a mismatch in enum sizes.
+
+09/04/02 Visualizer
+  Added new controls on the control panel enabling the user to set the
+  sensitivity of the movement controls in the viewer.
+
+09/04/02 Visualizer Viewer
+  Improved the way orbit mode locks onto the orbit point.
+  Make orbit picking respect the cull modes in use.
+
+09/04/02 Visualizer Viewer PC
+  Only accept keyboard input for the viewer when the viewer app has the focus.
+
+09/04/02 (PR#3308) RpLtMap was saving plugin data for world sectors
+  even when in the default (non-lightmapped) state. It was also possible for
+  sector data to sometimes not be saved when it should have been.
+
+09/04/02 Maya Exporter - A problem that would cause an infinite loop when
+  processing animation curves with a single keyframe has been fixed.
+
+09/04/02 Maya Exporter - The exporter now correctly finds textures that include
+  spaces in their path + filenames.
+
+09/04/02 GCN: material color modulation of prelights now supported. Also,
+  texture alpha now affects unlit objects for correct transparency. Previously,
+  unlit objects were untextured.
+
+09/04/02 PR#3306 [sky] depth buffer write wasn't setted correctly
+
+09/04/02 (PR#3305) [Xbox] baseball demo has flashing players, fixed.
+
+09/04/02 Maya Exporter - A workaround for an exception in MFnMesh::getPolygonUVid when
+  exporting non-manifold geometry with a polyTriangulate command in it's history has
+  been added. The issue is logged with A|W (id #85974).
+
+09/04/02 Example.doc and .pdf updated
+
+08/04/02 Max Exporter - A bug fix for Add Node button when a skin is selected
+  Now a warning is displayed that a bone should be selected.
+
+08/04/02 Team plugin (OpenGL): missing stencil buffer support added to shadow
+  rendering code.
+
+08/04/02 Max Exporter - Selection bug fix in export nodes for subhierarchies.
+
+08/04/02 (PR #3301) NULL, OpenGL and Softras palettized set-from-image functions
+  used to calculate the raster stride for rwPalQuantMatchImage() incorrectly.
+
+05/04/02 Visualizer
+  Greatly reduced the memory overhead of downloading assets to the visualizer viewers.
+  This should fix lots problems with sending larger assets to consoles with smaller
+  amounts of memory.
+
+05/04/02 - (PR #3293) RtPITexDictionaryStreamWrite fixed. It failed on big endian
+  platforms (GameCube).
+
+05/4/2002 - Added visualizer support to the gcnfxeditor.
+
+05/4/2002 - (PR #3295) fixed the rpGAMECUBETEXMTX_USEFRAMEPOS flag setting problem in
+  the gcnfxeditor.
+
+05/04/02 Max Exporter - RwMaterial fix for alpha preview, including alpha
+  textures, in the Material Editor window and rendering.
+
+04/04/02 Visualizer Viewer PS2
+  Changed the orbit button from Select to R2 allowing better ease of use now that the
+  orbit is not a toggle button
+
+04/04/02 Visualizer Viewer
+  Scale all the movement based on the framerate, protects against movement being hampered
+  by very high or low framerates.
+
+04/04/02 Visualizer Viewer
+  Changed orbit mode to work when the orbit button is held down rather than orbit being
+  toggled on and off
+
+04/04/02 Visualizer Xbox launching
+  Fixed problem where the Xbox would not auto launch the visualizer viewer when trying to
+  connect
+
+04/04/02 Visualizer Viewer
+  Use return value of RwCameraBeginUpdate to protect against problems in the splash
+  screen rendering.
+
+04/04/02 PR#3283 : the depth testing state wasn't respected on by ptnak on ps2
+
+04/04/02 PS2 DTV480p support
+  If the source is built against libgraph.h 2.5 onwards, DTV480p is supported.
+  Select a 640x480x32 mode.
+
+03/04/02 Maya Exporter - Added reporting of the filter mode of textures exported to
+  texture dictionaries and the number of lights and camera exported to hierarchies.
+
+03/04/02 Visualizer
+  Tidied up some controls in the control panel and connection editor. Now more
+  user friendly.
+
+03/04/02 - (PR #3285) fixed visualizer bug in the xboxfxeditor. calls control.exe
+  instead of viewer.exe
+
+03/04/02 - (PR #3225) updated the sector editor to support vertex and polygon user data.
+  It currently only works if the userdata arrays within each sector are equal in length
+  to either the number of vertices or the number of polygons in that sector.
+
+03/04/02 (PR#3273) Win and Softras MCP project files for camera and
+  lightmap examples fixed.
+
+03/04/02 Max Exporter - Full support for RpToon toon shader plugin, including support for
+  named selection sets for edges, vertex weights assigned by RpToon Vertex Thickness
+  modifier, for both dff and bsp export node types.
+
+03/04/02 Max Exporter - Fix for RwMaterial when the matfx type is EnvMap and
+  the env texture is not provided.
+
+02/04/02 Visualizer viewers
+  Added support for displaying the target machines IP address once the visualizer
+  has been started. Support is available on D3d8, OpenGl, Ps2 DevKit, Ps2 Test Station
+  and Xbox
+
+02/04/02 (PR#3270) D3D8 - Pixel fog doesn't work right in ATI Rage video cards,
+  fixed.  Now vertex fog is used if the video card doesn't support w-fog.
+
+02/04/02 Max Exporter - View buttons now read the Ambient light scene setting
+
+27/03/02 Max Exporter - Bug fix in UV cropping
+
+26/03/02 (PR#3241) D3D8 - ATI Radeon 8500 driver crashes, fixed.
+
+26/03/02 Maya Exporter
+  Fixed a file handle leak. This could cause failure to open file errors after exporting
+  several hundred textures in the same session.
+
+26/03/02 Maya Exporter
+  Some default settings were set to wrong values. This resulted in collision
+  data and tristripping to be turned off for the quick view. Fixed now. Also
+  fixed the a problem in maya remote connections editor.
+
+25/03/02 (PR#3146) D3D8 RwIm2D subraster offset.
+  Fixed now for the RwRasterRender functions.
+
+25/03/02 (PR#3179) D3D8 Morph Skin, fixed.
+
+20/03/02 3ds max exporter
+  Fixed problem of the connection editor not being opened from 3ds max
+
+20/03/02 Null driver raster fixes
+  Fixed a problem of zero dimension rasters being changed to 1x1 minimum on lock
+  Fixed bug with rasters being incrementing incorrectly on set calls
+
+15/03/02 Lightmaps example added
+  The "lightmap" example is now complete. It exercises the RpLtMap
+  lightmap-rendering plugin and RtLtMap lightmap-generation toolkit.
+
+15/03/02 GCN: unlit objects now respect material alpha when material color
+  modulation is enabled.
+
+15/03/02 terminal.c\h have been removed from \shared\skel\ as no examples use
+  these source files.
+
+14/03/02 (PR#3146) D3D8 RwIm2D subraster offset, fixed.
+
+14/03/02 Max Exporter - Quick View Button and menu entry.
+  Internally it creates RenderWare Export nodes and lunches Visualizer, then
+  deletes the temporary nodes.
+
+14/03/02 Win build machine now uses Microsoft Visual C 6 (compiler version
+  12.00.8804) to build the D3D8, OpenGL and Softras SDKs, examples, demos and
+  viewers.
+
+13/03/02 Maya Exporters - LightMap support to the RwMaterial.
+
+13/03/02 Added tools/sectoredit to the build
+
+13/03/02 Removed tools/fxeditor
+
+13/03/02 GCN The build machine will now build dual target binaries.
+
+12/03/02 Max Exporters - LightMap support to the RwMaterial.
+
+12/03/02 API Reference now comes with a .chi file. The .chi file contains the
+  table of contents. The .chm and .chi must be in the same directory for
+  the table of contents to be displayed in the .chm. This means that
+  the RenderWare Graphics API can now be integrated with VC++.
+
+12/03/02 (PR#3012) D3D8 lightmap pipeline doesn't honour material alpha fixed.
+
+12/03/02 OpenGL stencil buffer support completed. Added two API functions to
+  access the clear value of the stencil buffer used in RwCameraClear:
+     RwOpenGLSetStencilClear
+     RwOpenGLGetStencilClear
+
+11/03/02 GCN The native texture dictionary binary format for GameCube has
+  been broken.
+
+  IMPORTANT:
+  All native GameCube texture dictionaries will have to be regenerated.
+
+11/03/02 PS2 builds: Updated requirements
+  This release is tested against Sony libs 2.4.3. A new set of *_sky2.mcp
+  files has been checked in for CodeWarrior users. These assume CW3.01 and
+  the "latest everything" tarball from Sony (libs 2.4.3 and toolchain
+  2.96-001003-01)
+
+  As of this morning, there are issues while linking with experimental
+  gcc 3.03 and some files are incorectly cased for use on case sensitive
+  file systems.
+
+11/03/02 Win build machine now uses the DirectX8.1 SDK. Note that RenderWare
+  Graphics for D3D8 remains compatible with the DirectX8.0 SDK.
+
+11/03/02 Max Exporters - Add Node button.
+  Automatic detection of the exporter type and the settings used for "Auto
+  Create Nodes" button is now used for "Add Node" button also, so the options
+  and the exporter correctly set. Again have in mind that the algorithm doesn't
+  cover all export settings you might want to use.
+
+10/03/02 Win (D3D8 and OpenGL) MCP files have been generated for examples and
+  viewers using the CodeWarrior 7 for Windows IDE. These are denoted by
+  <example>_win.mcp.
+  Similarly, Softras MCP files have also been generated and are denoted by
+  <example>_softras.mcp.
+
+09/03/02 Max Exporters - Max Script
+  Exposed LoadSelection() and SaveSelection() function to the max script.
+  They take one  argument which is the name of the RenderWare Export node.
+
+08/03/02 GCN multitexture: pre-render callback
+  is now called BEFORE any multitexture effect is uploaded to allow
+  per-material effect reconfiguration. The callback is also now
+  executed even no effect is set for the multitexture.
+
+08/03/02 GCN MCP files. New MCP files have been generated for all examples and
+  viewers (<example>_gcn.mcp), <examples>_gcn_gdev.mcp files have been removed.
+  The new MCP files work for both DDH & GDEV. By default they are configured
+  to run on GDEV. For DHH the setting in,
+
+  GAMECUBE HW2 Dbg/Rel Settings
+  Target Settings Panels
+      Debugger
+          GCN Debugger Setting
+          Protocol
+
+  Must be changed from MetroTRK - GDEV to MetroTRK - GameOptix.
+
+
+  The MCPs now use a Source Tree environment variable, RWSDK, that must be set
+  in the IDE.
+
+  From the menu select:
+
+    Edit
+    Preference
+        IDE Preferences Panels
+        General
+            Source Trees
+
+  and add RWSDK.
+
+08/03/02 D3D8 - Changed the behavior of the texture dictionary load.
+  Now it fails if a raster can not be created because the pixel format or
+  the texture dimensions are not supported by the video card.
+  Added a stealth function "_rwD3D8TexDictionaryEnableRasterFormatConversion"
+  to enable texture conversions on the fly.
+
+07/03/02 Added Xbox multi-texture effect editor to tools/xboxeditor
+  /tools/fxeditor is now redundent.
+
+07/03/02 Added a new GameCube multi texture effect editor to
+  /tools/gcnfxeditor. tools/fxeditor is now for xbox only.
+
+05/03/02 Plugins (PR#2503) did not free their registry data upon termination
+  if freelists are not used. Pointers to the registrys are now recorded and
+  used to perform a successful termination.
+
+04/03/02 GCN If VIGetTvFormat returns VI_EURGB60 RenderWare Graphics will
+  default to VI_PAL and use GXPal528IntDf.
+
+04/03/02 GCN (PR#2985) Missing volatile qualifier on global variables
+  was causing optimized builds to lock up in infinite loops in
+  RwGameCubeGetXFBs & RwGameCubeChangeRenderMode.
+
+04/03/02 RtImport
+  Removed noAlphaInOverlap from params. Alpha is always allowed in overlaps,
+  now.
+
+04/03/02 (PR#2804) RxClusterDefinition, RxPipelineNodeFindOutputByName,
+  RxPipelineClusterAssertAttributesSet use RwChar and not char.
+
+04/03/02 GCN Upgraded build machine to use CW_GCN_Patch_1_3_1.zip &
+  AMC_DDK_v302_Update2.zip
+
+04/03/02 GCN (PR#2981) DMorph,Skinned geometry now works.
+
+04/03/02 GCN (PR#2936) Morph target without normals now work.
+
+01/03/02 RtImport
+  Removed spaceFillingSectors from params. Now it always tries to find space
+  filling sectors.
+
+01/03/02 (PR#2978) added to User Guide chapter: Initialization and Resource
+  Mangement to say that Lock and Unlock should be used judiciously.
+
+01/03/02 (PR#2980) d3d8 fog is fixed for cards that only support
+  vertex fog.
+
+28/02/02 (PR#2979) XBox RwRasterDestroy wasn't releasing the surface
+  created by RwRasterCreate for rwRASTERTYPEZRASTER.
+
+28/02/02 Max Exporters - Spl exporter bug fix
+  Scale factor was ignored and set to a large value, fixed now.
+
+27/02/02 Particles - Checked in (or moved) the animation (prtstd) and the
+  rendering particle plugins
+
+27/02/02 Max/Maya Exporters - Support for the new RtWorldImport
+  Also max exporter used to set rpWORLDTEXTURED flag even on
+  worlds/geometries without textures. Fixed.
+
+27/02/02 RtMipK
+  RtMipK would previously fail if there was no current texture dictionary.
+  The tool now checks whether there is a current texture dictionary and if
+  there isn't will simply abort the calculation.
+
+27/02/02 Rt2dFontSetPath allows the ';' separator
+  It is now possible to have paths such as "path1\\;path2\\"
+
+27/02/02 GCN matfx multitexturing - major update
+  RW version number incremented to 3.3.0.02 due to binary format changes.
+  Support for indirect texturing, dynamic texture matrix generation, and
+  automatic NBT generation on instancing/reinstancing. This is fully
+  backward compatible with old effect files/dictionaries.
+  RpGameCubeMTEffectCreate() takes three new parameters.
+
+27/02/02 Checked in the new version of RtImport.
+
+25/02/02 GCN (PR#2951) Fixed token wrap bug. Wrapping token would always
+  return TRUE from _rwDlTokenQueryDone cause potential lockups,
+  retrace tearing & skin tearing.
+
+24/02/02 RpPVS plugin
+  Visibility leaks have been fixed. Preprocessing times should be faster.
+  Also, some feature requests added: RpPVSSetBackFaceCulling();
+  RpPVSConstructSector(); RpPVSSetViewSector();
+  RpPVSSetWorldSectorPairedVisibility();
+  Further, "set view position" returns the sector that contains that
+  viewpoint on success.
+
+22/02/02 GCN RpGameCubeVtxFmt support for NBTs
+  RpGameCubeVtxFmtSetNormal() now takes a third parameter of type RwBool,
+  which if set to TRUE is used to indicate that the vertex format should
+  use NBTs rather than standard normals.
+
+20/02/02 Added Maestro 2danim, 2dconvrt and 2dviewer to base SDK build.
+
+18/02/02 D3D8 Added two functions for getting access to the pointer of the
+  reinstance callback function:
+  RxD3D8AllInOneSetReinstanceCallBack
+  RxD3D8AllInOneGetReinstanceCallBack
+
+15/02/02 GCN Added support for EURGB60 to RenderWare Graphics default videomode
+  selection.
+
+15/02/02 GCN RpGameCubeVtxFmtSetFormat removed from API.
+
+15/02/02 3dsmax exporter - Lightmap support
+  The 3ds max exporter now has support to process geometry data in a way which
+  is compatible with RenderWare lightmap generation. This support is enabled
+  through an option available in both the dff and bsp geometry settings.
+
+15/02/02 (PR#2948) RwRasterClearRect wrong RWASSERT
+  The following asserts:
+    RWASSERT((rect->x + rect->w) < RwRasterGetWidth(curRaster));
+    RWASSERT((rect->y + rect->h) < RwRasterGetHeight(curRaster));
+  should be:
+    RWASSERT((rect->x + rect->w) <= RwRasterGetWidth(curRaster));
+    RWASSERT((rect->y + rect->h) <= RwRasterGetHeight(curRaster));
+
+14/02/02 GCN (PR#2946) Modifying positions or normal arrays now forces
+  GXInvalidateVtvCache to be called keeping vertex cache coherency.
+
+14/02/02 GCN Compressed vertex support added into RpSKin.
+
+  IMPORTANT:
+  The pre-instance binary format has been broken for skinned geometry's.
+  All pre-instanced skinned geometry's will have to be regenerated.
+
+13/02/02 3ds max exporter - Auto Create Nodes
+  Fixed a problem where this would not work from the floating window interface
+  to the batch exporter.
+
+13/02/02 PVSCNVRT tool does not require textures for the world to be present
+  The tool overloads the texture read callback so texture information is
+  retained.
+
+12/02/02 GCN (PR#2943) VIInit was not being called before all other VI
+  functions.  This was causing VIGetTvFormat to return the wrong format.
+
+  The call to VIInit has been removed from RenderWare Graphics and must be
+  called by the application. See \shared\skel\gcn.c for an example of usage.
+
+12/02/02 3ds max exporter - Parameter Wiring
+  Basic support for parameter wiring in 3ds max 4 has now been added. Where a
+  controller is wired to one or more other controllers, keyframes will be
+  sampled from all the linked controllers.
+
+12/02/02 (PR#2942) Maestro 2dconvrt would sometimes crash when trying to read
+ a font. This was because a raster format was not specified correctly.
+
+11/02/02 GCN New API functions,
+
+    RwGameCubeSetCopyClear
+    RwGameCubeGetCopyClear
+
+11/02/02 3ds max exporter bug fix
+  Fixed a problem where an export would fail if no materials were assigned to an
+  object. The bug was introduced with the changes to RpUserData export on
+  07/02/02.
+
+11/02/02 GCN New API functions,
+
+    RwGameCubeRasterSetRegion
+    RwGameCubeRasterGetRegion
+    RwGameCubeTextureSetLOD
+    RwGameCubeTextureGetLOD
+    RwGameCubePreLoadEntireTexture
+    RwGameCubeTextureSetPreLoaded
+    RwGameCubeTextureGetPreLoaded
+
+    Modified RwGameCubeCameraTextureFlush to return void and changed behaviour
+    if a region has been assigned.
+
+07/02/02 3ds max Exporter - Project configuration
+  The 3ds max exporter has now got Hybrid build targets which replace the old
+  Debug build targets, the Debug build targets are now setup for people who wish
+  to develop against Debug builds of 3ds max. To use these configurations setup
+  new environment variables of MAX3DEBUG_INSTALL_DIR or MAX4DEBUG_INSTALL_DIR to
+  point at the location of the debug 3dsmax.exe
+
+07/02/02 3ds max Exporter - RwMaterial properties renamed
+  A number of GCN/Xbox specific settings in RwMaterials had matching names, this
+  meant that they were not properly accessible through maxscript. The clashing
+  names have been changed to avoid clashes, e.g on gcn settings
+	effect_file -> gcn_effect_file
+	texmap_texture0 -> gcn_texture0
+	texmap_texture1 -> gcn_texture1 etc
+  and on Xbox settings
+	effect_file -> xbox_effect_file
+	texmap_texture0 -> xbox_texture0
+	texmap_texture1 -> xbox_texture1 etc
+
+
+07/02/02 3ds max Exporter - Changes to texture processing
+  The texture processing has been reworked in the exporter to allow future
+  support for writing out platform independent texture dictionaries.
+
+07/02/02 3ds max Exporter - Changes to RpUserData export
+  The 3ds max exporter now supports specially formatted custom attributes
+  on lights, cameras, textures, materials, geometries, vertices and polygons.
+  This data is supported both in the bsp and dff exporters.
+  (This functionality is not yet documented and hence not recommended for use.
+   It will be fully documented by the 3.3 release)
+
+07/02/02 Maya Exporter - Scene Settings implementation and .rws file format.
+  - RenderWare Editor changes are:  1. Multiple columns and 2. resizable scroll
+    list and other controls.
+  - New button and menu entry "Scene Settings" will popup a window with options
+    for exporting to .rws (RenderWare Scene) file and for exporting a texture
+    dictionary (that feature is still in development). If "Export all nodes to
+    .rws file" option is enabled, all binary data/chunks that were previously
+    stored in anm, bsp, dff, dma, spl file, will end up in one rws file. "Export
+    All Nodes" button will in this case export all RenderWareExport nodes to the
+    rws file, and "Export Highlighted Nodes" will process only the highlighted
+    nodes in the editor. In first case chunks will be ordered alphabetically
+    using node names, and in second case in order in which they are displayed
+    in the editor.
+  - Progress bar works now on per export basis, so even if you export several
+    dffs and a bsp it will go from 0 to 100 only one time.
+  - RenderWareExport command now takes RenderWareExport node names for its
+    arguments. You can supply as many argument (node names) as you need.
+  - Some processing is now done only once when exporting multiple nodes, which
+    makes export of many RenderWare nodes faster.
+
+06/02/02 GCN (PR#2932) Cache coherency problems with matFX perturbed UVs
+  for bump mapping fixed.
+
+05/02/02 Maya Exporter - changes to RpUserData export
+  The Maya exporter now exports blind data on lights, cameras, shaders
+  and textures to RpUserData. Since the Maya blind data editor does
+  not support these object types the data must be added through MEL
+  script. The blind data section of the Maya Artist Guide describes
+  how to do this.
+
+05/02/02 Changes to RpUserData plugin
+  This plugin had been been extended to support user data on RwCamera,
+  RpLight, RpMaterial and RwTexture objects. The plugin has also been
+  changed to prevent any data being streamed if no user data has been
+  added. The plugin is still compatible with earlier data.
+
+05/02/02 (PR#2927) Xbox skinmatx envmapping bug fixed
+  Files changed:
+	plugin/skin2/xbox/skinxboxmatfx.c
+
+05/02/02 Xbox driver consolidation
+Removed _rwXbRenderStateTexture and promoted _rwXbRenderStateSetTexture
+to API : RwXboxRenderStateSetTexture
+
+05/02/02 GCN Upgraded to use CodeWarrior 1.3.
+
+04/02/02 - (PR#2917) Tons of asserts .. ASSERTPOSITIVEORTHONORMAL
+Removed RWASSERTPOSITIVEORTHONORMAL() macros from
+rwsdk/plugin/hanim/rphanim.c
+since the assertions these make are no longer valid.
+Changelist #43904
+
+04/02/02 Xbox - Added Lazy State Cache
+D3D Render state and Texture stage state are now cached in a lazy manner
+(i.e. only updated when necessary). The RwRenderState caching is unchanged,
+so the behaviour of RwGetRenderState is consistent with previous versions.
+Users developing custom pipeline must change the following D3D calls
+
+D3DDevice_SetRenderState -> RwXboxSetCachedRenderState
+D3DDevice_GetRenderState -> RwXboxGetCachedRenderState
+D3DDevice_SetTextureStageState -> RwXboxSetCachedTextureStageState
+D3DDevice_GetTextureStageState -> RwXboxGetCachedTextureStageState
+D3DDevice_SetTexture -> RwXboxSetCachedTexture
+D3DDevice_GetTexture -> RwXboxSetCachedTexture
+D3DDevice_DrawIndexedVertices -> RwXboxDrawIndexedVertices
+D3DDevice_DrawIndexedVerticesUP -> RwXboxDrawIndexedVerticesUP
+D3DDevice_DrawVertices -> RwXboxDrawVertices
+D3DDevice_DrawVerticesUP -> RwXboxDrawVerticesUP
+D3DDevice_SetRenderTarget -> RwXboxSetRenderTarget
+o
+For more information on the lazy state cache and the new API, please consult the
+Xbox User Guide and API reference.
+
+31/01/02 (PR#2916) D3D8 - Identical lights not recognized
+  Now, each RpLight has an index to a D3D8 light, so all of them are unique and
+  can share the same space without any problem. But, the current
+  implementation of DirectX seems to have an internal limit in the number of
+  lights created although it is a high number: 2048 lights for T&L video cards
+  (don't confuse that with the maximum number of active lights).
+
+  Also, two new functions have been added to the RWD3D8 API:
+  * RpD3D8LightSetAttenuationParams
+  * RpD3D8LightGetAttenuationParams
+  They are very similar to the RWD3D7 ones.
+
+  Files changed:
+	driver\d3d8\d3d8device.c
+	world\pipe\p2\d3d8\d3d8lights.h
+	world\pipe\p2\d3d8\d3d8lights.c
+	world\pipe\p2\d3d8\nodeD3D8AtomicAllInOne.c
+	world\pipe\p2\d3d8\nodeD3D8WorldSectorAllInOne.c
+	world\pipe\p2\d3d8\wrldpipe.c
+	world\pipe\p2\d3d8\worlddoc.c
+
+31/01/02 GCN prelit alpha objects - alpha is no longer affected by dynamic lights
+  Previously the dynamic lights made prelit alpha objects more opaque.
+
+31/01/02 RwXbox prelit static objects with dynamic lighting & vertex alpha
+  Previously, the vertex alpha was ignored in this case, now it's used,
+  and has been brought into line with the behaviour of RwD3D8.
+
+31/01/02 PVS plugin - Header files rearranged
+  pvscnvrt failed because some typedefs were misplaced - they are now placed correctly, and made
+  stealth where necessary, to avoid conflicts.
+
+31/01/02 GCN RenderWare Graphics for GameCube can now be used with SN Systems ProDG for
+  Nintendo GameCube.
+
+  rwsdk/bin/patchlibsetjmp.exe must first be run on rtpng.a if using RenderWare
+  Graphics for GameCube with SN Systems ProDG for Nintendo GameCube.
+
+  e.g.
+      /* From the command line type */
+      patchlibsetjmp rtpng.a
+
+31/01/02 PVS plugin - Bug fix
+  Fixed detessellator, should now work better for scene with bizarre geometry.
+
+30/01/02 Maya Exporter - Changes UV limiting
+  The UV limiting functionality in the Maya exporter has been changed to an
+  algorithm with upper and lower bounds (as used in the 3ds max exporter). The
+  UV limiting and shifting settings in existing export nodes will now be ignored.
+
+30/01/02 3ds max Exporter - Fix for UV limiting
+  The previous code for UV limiting was not always generating UV's within the limits
+  specified. This has been fixed with a new algorithm.
+
+30/01/02 Null driver - RwImageSetFromRaster
+  The Null driver would previously crash if you pass an already locked RwRaster into
+  RwImageSetFromRaster. This has been corrected.
+
+29/01/02 3ds max Exporter - New batch exporter feature
+  The 3ds max batch exporter now has a new button marked "Auto Create Nodes" which
+  processes all the data in the current 3ds max scene and generates a set of batch
+  export nodes for the scene.
+  Note: Not all exporter options are modified for the new set of nodes (e.g.
+  tristrip methods are left to the user).
+
+28/01/02 Xbox mipmap levels
+  Now a mipmapped raster can contain less mipmap levels than the maximum.
+  ie. a 256x256 texture can now contain 2 mipmap levels.
+  Xbox texture dictionaries will need rebuilding.
+
+28/01/02 Maya Exporter - Dff Exporter.
+  "Coordinate System" option in the dff exporter is set to "World" now by default.
+
+28/01/02 Maya Exporter - Bsp Exporter.
+  Bsp exporting was very slow at the start when initialising data in large scenes and
+  working with selected objects only. Fixed now.
+
+28/01/02 3ds max exporter skinning support
+  The skinning support in 3ds max has been rewritten to be more generic. This means
+  that all types of skinned objects (currently Physique, Max Skin and Bones Pro) will
+  act exactly the same. A few minor behavioral changes occur because of this as listed.
+  1. There is now only a single option to enable skinned exports, this enables support for
+     all three types of skinning.
+  2. HAnim node id's for biped objects will always use the predefined set of id's set out
+     in the exporter code. Previously this only occured when Physique skins were used.
+  3. Where a skinned object is within the hierarchy representing it's skeleton in 3ds max
+     it is moved to the root of the exported clump. Previously except when using Physique
+     an RwFrame and HAnim node were still created where it was originally located. This
+     extra RwFrame and node are now removed for all types of skinning.
+
+28/01/02 Xbox SSE optimized RwMatrixMultiply
+  You should find this version much faster than the generic C version it
+  it is replacing. It is also about 30% faster than the hand optimized scalar FPU
+  version we use on PC, and slightly faster than the Xbox SDK's own 4x4
+  matrix multiply as RwMatrixMultiply does 4x3 matrices.
+  Note however that it destroys the pad values in RwMatrix which you should
+  NOT have been using anyway!
+  Files changed:
+    rwsdk\driver\xbox\drvmodel.h
+
+28/01/02 Maya Exporter - Renamings.
+  rwTriangulate command is renamed into RenderWareTriangulate.
+  RenderWareProcessScene command has the same name, but a menu entry is renamed
+  into "Auto Create Nodes". Also a button in the RenderWare Editor is added.
+
+28/01/02 Maya Exporter - New RenderWareProcessScene command
+  is added. It will process the scene and automatically create all RenderWareExport
+  nodes and set the settings. It doesn't cover all the options in the exporters so
+  you should check the setting if you have some special needs, but it should work in
+  the majority of cases. Also the same algorithm is used by the Add Node button.
+
+25/01/02 (PR#2908) D3D8 explicitly sets srcAlpha, invSrcAlpha
+  Now the default pipelines don't explicitly set the blending modes.
+  Files changed:
+    world\pipe\p2\d3d8\d3d8pipe.c
+    world\pipe\p2\d3d8\d3d8pipe.h
+    plugin\matfx\d3d8\effectPipesD3D8.c
+
+25/01/02 Win OpenGL pixel format descriptor (PixelFormatDesc) is now globally accessible.
+
+24/01/02 Maya Exporter - Vertices are now remapped by maya vertex index first.
+  This means, even if two vertices have the same position, normals, UVs and prelights,
+  if they are different in maya (have different maya vertex index)), they will be exported
+  as two vertices. This will fix some bugs with skinning and morphing.
+
+24/01/02 Maya Exporter - Two options are now turned on by default:
+  "Export Blind Data" and "Disable UV shifting". The first option will not have any
+  effect on the files exported if the scene doesn't have any  maya blind data templates.
+
+23/01/02 Light and camera export from 3ds max
+  Support for export of lights and cameras has been added to the 3ds max dff exporter.
+  There are no new export options in the user interface. Any lights or cameras in
+  the export hierarchy will be added to the clump. Both perspective and orthographic
+  cameras are supported as are directional, point, spot and soft spot lights.
+  Currently all cameras require manual clip planes defining, those cameras without
+  manually defined clip planes will take default RenderWare clip planes.
+  Soft spot lights are defined by 3ds max spot lights where the falloff angle and hotspot
+  angle differ by more than 5 degrees.
+
+23/01/02 (PR#2845) RpAtomicClone crashes with RpMorph data
+  RpInterpolatorSet* was not checking the atomic's frame before calling
+  RwFrameUpdateObjects.
+
+23/01/02 Light and camera export from Maya
+  Support for export of lights and cameras has been added to the Maya dff exporter.
+  There are no new export options in the user interface. Any lights or cameras in
+  the export hierarchy will be added to the clump. Both perspective and orthographic
+  cameras are supported as are ambient, directional, point and spot lights.
+
+22/01/02 New RpCollis API functions added
+  RpCollisionGeometryQueryData() and RpCollisionGeometryDestroyData() have been
+  added to mirror the existing functions RpCollisionWorldSectorQueryData() and
+  RpCollisionWorldSectorDestroyData()
+
+21/01/02 GCN upgraded to use December SDK.
+
+18/01/02 Maya Exporter - Removal of the File->Export method of exporting.
+  The File->Export methods of exporting are no longer supported and will now simply
+  point you to the RenderWare Editor, accessible through the RenderWare menu.
+  The RenderWare Exporter is now a command plugin and can be called from the
+  custom mel script interface.
+
+17/01/02 (PR#2881) Xbox RwRasterUnlock with rwRASTERTYPECAMERA/rwRASTERTYPEZBUFFER
+   crashed because it was calling D3DResource_Release when it shouldn't have.
+  Files changed:
+	rwsdk\driver\xbox\xbraster.c
+
+17/01/02 Example Documents  added to dev\doc\Examples
+  Added Word documents of the RW Examples to go out to users. One document is
+  "ExamplesGeneric", the other 4 are platform-specific. They are converted to pdfs.
+
+16/01/02 Maya Exporter - Bug fixes for nurbs surfaces.
+  place2dTexture node was ignored, fixed now. Also fixed a bug in destructor that could
+  lead to an exception. UV coordinates were wrong if the parameterisation for the surface
+  was not starting from zero. Fixed.
+
+16/01/02 3ds max Exporter - User Interface redesign
+  The user interface of the 3ds max exporter has been redesigned to ease use of the
+  batch export functionality of the exporter. The batch exporter now supports all
+  export types (previously spline export was excluded). The interface can now be
+  used as a floating dialog under 3ds max 4 accessible through a new RenderWare
+  menu bar. The export settings dialogs have been reorganised into categorized groups
+  set out in 3ds max style rollup windows.
+  The methods of exporting through the File->Export interface are no longer supported
+  and will now simply point you to the batch exporter.
+  The chm based online help has also been removed with tooltips replacing the context
+  sensitive help and a link to the RenderWare Artist Guide for 3ds max provided in the
+  RenderWare menu.
+
+15/01/02 Maya Exporter - command line batch export.
+  RenderWareBatch mel function has been split into two functions:
+  RenderWareNodeExport and RenderWareBatchExport.
+  The first one takes one argument which can be:
+  "-h" - export highlighted (selected in RenderWare Editor) RenderWareExport nodes,
+  "-s" - export selected RenderWareExport nodes,
+  "-a" - export all RenderWareExport nodes,
+  The second function "RenderWareBatchExport" will load all maya scenes from a
+  specified folder and export all RenderWareExport nodes from each scene. It takes
+  two arguments. The first one is a boolean value specifying recursion and the second
+  one is a path of a folder containing the scenes. If it is an empty string, a dialog will
+  be displayed for browsing a folder. For example to export scenes from a command
+  line you can execute one of these commands:
+  mayabatch -command "RenderWareBatchExport 1 \"C:/MayaScenes\""
+  maya -batch -command "RenderWareBatchExport 1 \"C:/MayaScenes\""
+
+14/01/02 GCN Modifed the token code to call GXReadDrawSync rather that installing
+  a callback to allow the performance libs to work.
+
+14/01/02 RpClump extended to contain lights and cameras. These are
+  streamed as part of the clump and automatically added to (or
+  removed from worlds) with the clump.
+  New API: RpClumpAddLight, RpClumpRemoveLight, RpClumpGetNumLights,
+  RpClumpForAllLights, RpLightGetClump and similarly for cameras.
+
+11/01/02 (R#2872) Patch plugin is not setting prelit data correctly, fix
+  The x component was not initialized and prelit triangle patches crashed
+  because a counter variable was not initialized.
+  Files changed:
+	plugin\patch\patchgeom.c
+	plugin\patch\patchexpander.c
+	plugin\patch\d3d8\noded3d8patchatomicinstance.h
+	plugin\patch\d3d8\noded3d8patchatomicinstance.c
+	plugin\patch\d3d8\noded3d8patchskinatomicinstance.c
+	plugin\patch\xbox\nodexboxpatchatomicinstance.h
+	plugin\patch\xbox\nodexboxpatchatomicinstance.c
+	plugin\patch\xbox\nodexboxpatchskinatomicinstance.c
+
+10/01/02 Archived Plugins and related functionality removed from the build.
+  The 3.2 archived plugins and any archive plugin dependancies have been
+  removed. This includes Anim, PVS310, Skin310, Prtsys, Matfx310 and
+  the tool Hanimcnv.
+
+08/01/02 Archived exporters removed from the build
+  The 3.2 archived exporters (supporting 3.1 functionality) have been removed
+  from the build.
+
+08/01/02 RenderWare version number increment
+  The CurrentLibraryVersion has been increased from 3.2 to 3.3 to reflect
+  the 3.3 development tree.
+
+21/12/01 3dsmax Exporter - two bug fixes
+  With hidden skins and physique using max bones.
+
+21/12/01 Maya Exporter - RenderWare menu implementation.
+  RenderWare menu is added. Options included are:
+  - RenderWare Editor,
+  - Export All Nodes,
+  - Export Maya Files From Directory,
+  - Export Maya Files From Directory Recursively,
+  - rwTriangulate command.
+
+21/12/01 (PR#2849) OpenGL restarts in same application instance, fix
+  Static variables were not being reinitialized causing the video selection
+  dialog to display incorrect and the OpenGL camera clear function to use
+  an incorrectly cached color.
+  Files changed:
+	driver/opengl/baintogl.c
+	driver/opengl/bawinogl.c
+
+20/12/01 Maya Exporter - Memory leaks fix
+  Fixed two memory leaks using virual destructors.
+
+20/12/01 (PR#2843) OpenGL charset output is untidy, fix
+  Pixel/texel alignment needed to be adjusted.
+  Files changed:
+	tool/charse/chrprint.c
+
+19/12/01 (PR#2842) OpenGL texture lost in camera SDK example fix
+  This problem arose when certain conditions surrounding camera textures were
+  apparent. Briefly, the texture bound to OGL would differ from that cached by
+  RenderWare Graphics causing texture binding to be skipped. The fix was to
+  invalidate the cached texture reference when the bound texture changed due to
+  the use of camera textures.
+  Files changed:
+	driver/opengl/baintogl.c
+	driver/opengl/barstate.c
+	driver/opengl/drvfns.h
+
+18/12/01 (PR#2841) RpWorldInstance would try and preinstance worlds that were
+  already in native form. RpWorldInstance now has the same behaviour as
+  RpAtomicInstance and returns TRUE if the world is already in native form.
+      files changed: baworld.c
+
+17/12/01 PS2 (PR#2840) _rpWorldSectorSkyFreeResEntry/_rpGeometrySkyFreeResEntry
+  weren't checking that repEntry != NULL causing a crash if instancing was attempted
+  before the worldsector/atomic was rendered.
+
+14/12/01 Maya Exporter - rwTriangulate command
+  - This new command works as the Polygons -> Triangulate maya command,
+  except it will align all new edges in the best way possible for
+  tri-stripping. Have in mind that for perfect tri-stripping, vertices have to
+  share: normals, UVs and prelights. It works only on quads, so in ideal case
+  you would do modelling in quads and use this command to turn them into
+  triangles before exporting.
+  - rwTriangulate command should be typed in the Command Line and alternatively
+  you can, before pressing the Enter key, drag the text to the shelf to create an icon.
+  - Command works with multiple selections of objects or polygons.
+  - If you get a warning: "// Warning: line 1: polyFlipEdge: Cannot flip edge xxxx,
+  contained by a concave quad //" it is because of the polyFlipEdge maya bug.
+  It should not hit more then 5% of edges that actually need to be flipped
+  (much less then the whole number of object edges), so even if this occurs,
+  the tri-stripping will still significantly improve. This is reported to the A|W and
+  hopefully will be fixed in the next main or intermediate (dot) release.
+
+14/12/01 PS2 World View
+  Added toggle for tristrip clipper to menu.
+
+13/12/01 3dsmax Exporter - Vertex Color
+  Added support for vertex color (prelight) alpha and illumination values.
+  Material self-illumination values are still baked into the prelight colors.
+  Vertex color alpha and illumination values are a max4.0 feature.
+
+13/12/01 3ds max Exporter - BSP batch exports
+  Fixed a problem where selections were being ignored and the whole scene
+  was always being exported.
+
+12/12/01 Maya Exporter - Multiple UV sets bug fix
+  A workaround has been added for a maya bug which could cause multiple
+  UV sets to be ignored and all textures would just use the first UV set. The
+  workaround was possible only in maya4.0 not maya3.0
+
+12/12/01 PS2 (PR#2827) RwUInt64, RwInt64 and ProDG
+  RwUInt64 and RWInt64 where not correctly defined when using SN's port of
+  the 2.95.3 compiler.
+
+11/12/01 GCN - Display list creation was over allocating by 64 bytes.
+
+11/12/01 D3D8 - Added a faster SSE version of the Skin plugin. If the
+  compiler doesn't support inline SSE assembler you can specify NOSSEASM
+  to disable it.
+
+10/12/01 Bin Tools. A subset of the the original bin tools from
+  rwsdk\bin exist in the source deliverable. The majority have been
+  removed for size and other reasons. These bin tools are available as
+  as a zip download if required.
+
+10/12/01 PS2 (PR#2809) - the maximum number of mip levels was not being
+  correctly set when reading textures from a texture dictionary, causing
+  image corruption. Files updated:
+      dev\rwsdk\driver\sky2\basky.c
+
+05/12/01 Maya Exporter - Nurbs material fix
+  A bug has been fixed that could cause an exception during dff exports of
+  hierarchies containing a mixture of polygon and nurbs shapes which
+  share a material with no textures.
+
+05/12/01 Compressed texture attributes in RwTexture to take up 1/3 the space.
+
+05/12/01 Maya Exporter - Progress Bar
+  The Maya 4.0 exporter now updates the global Maya progress bar. As well as
+  providing feedback this allows exports to be aborted using the escape key.
+
+Tue Apr 22 12:04:26 2003 -- build sky ( 64649 0x35000 )

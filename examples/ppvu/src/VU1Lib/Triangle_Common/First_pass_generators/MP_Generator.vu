@@ -1,0 +1,89 @@
+					;//==================================================================
+					;//==================================================================
+					;//==															   ==						
+					;//==  	  -PSX2-  MULTIPASS - PERSPECTIVE - NON FOG - TRIANGLES    ==
+					;//==															   ==					
+					;//==															   ==					
+					;//== Features : Transform vertices into screen space. Rgbas are   ==					
+					;//==			 converted from float to integer. Uv to stq    	   ==					
+					;//==			 perspective correction. clear adc/fog field. 	   ==	
+					;//==			 Support 24 bits and 16 bits Zbuffers.			   ==			
+					;//==															   ==					
+					;//== 			 Optimal!!!								-CHECKED-  ==					
+					;//==															   ==					
+					;//==================================================================
+					;//==================================================================
+
+	  
+	;----------------------------------------------------------------------------
+	ADDw.z VF07, VF00, VF00				LQ.xyz VF03, (0+0*vertexSize)(VI01)		; Prepare stq-1		- Load position-1
+	ADDw.z VF08, VF00, VF00				LQ.xy VF07, (1+0*vertexSize)(VI01)		; Prepare stq-2		- Load uv-1
+	ADDw.z VF09, VF00, VF00				LQ.xyzw VF11, (2+0*vertexSize)(VI01)	; Prepare stq-3		- Load rgba-1		
+	MULAw.xyzw ACC, VF31, VF00			IADDIU VI06, VI01, 0					; Transform pos-1	- Clone	input buffer adress
+	MADDAx.xyw ACC, VF28, VF03			LQ.xyz VF04, (0+1*vertexSize)(VI06)		; Transform pos-1	- Load position-2
+	MADDAy.xyw ACC, VF29, VF03			LQ.xy VF08, (1+1*vertexSize)(VI06)		; Transform pos-1	- Load uv-2		
+	MADDz.xyzw VF03, VF30, VF03			LQ.xyzw VF12, (2+1*vertexSize)(VI06)	; Transform pos-1	- Load rgba-2
+	MULx.w VF15, VF00, VF00				IADDIU VI05, VI14, 1					; Clear ADC-1		- Clone output buffer adress 		
+	MULx.w VF16, VF00, VF00				IADDIU VI04, VI12, 1					; Clear ADC-2		- Multipass Output Buffer 
+	MULx.w VF17, VF00, VF00				NOP										; Clear ADC-3		 
+	MULx.w VF18, VF00, VF00				DIV Q, VF00w, VF03w						; Clear ADC-4		- Inverse zpos-1
+	MULAw.xyzw ACC, VF31, VF00			NOP										; Transform pos-2	 
+	MADDAx.xyw ACC, VF28, VF04			ISW.x VI09, 0(VI14)						; Transform pos-2	- Store number of vertices
+	MADDAy.xyw ACC, VF29, VF04			NOP										; Transform pos-2	 
+	MADDz.xyzw VF04, VF30, VF04			NOP										; Transform pos-2	 
+	MULAw.xyz ACC, VF02, VF00			NOP										; Project pos-1 	 
+	ADDw.z VF10, VF00, VF00				SQ.yzw VF01, 0(VI14)					; Prepare stq-4		- Store Gif Tag				
+MPgeneratorLoop:;----------------------------------------------------------------		
+	MADDq.xyz VF15, VF03, Q				LQ.xyz VF05, (0+2*vertexSize)(VI06)		; Project pos-1 	- Load position-3
+	MULq.xyz VF19, VF07, Q				LQ.xy VF09, (1+2*vertexSize)(VI06)		; Build stq-1		- Load uv-3
+	FTOI0.xyzw VF11, VF11				DIV Q, VF00w, VF04w						; Int rgba-1		- Inverse zpos-2	
+	MULAw.xyzw ACC, VF31, VF00			LQ.xyzw VF13, (2+2*vertexSize)(VI06)	; Transform pos-3 	- Load rgba-3	
+	FTOI4.xyzw VF15, VF15				IADDIU VI06, VI06, vertexSize			; Convert pos-1		- Increment input buffer adress
+	MADDAx.xyw ACC, VF28, VF05			SQI.xyzw VF19, (VI05++)					; Transform pos-3 	- Store stq-1		
+	MADDAy.xyw ACC, VF29, VF05			SQI.xyzw VF11, (VI05++)					; Transform pos-3 	- Store rgba-1	
+	NOP									SQ.xyzw VF11, (1+0*OutverSize)(VI04)	;  					- Store multipass rgba-1
+	NOP									SQ.xyzw VF15, (2+0*OutverSize)(VI04)	; 					- Store multipass position-1	
+	MADDz.xyzw VF05, VF30, VF05			IBEQ VI06, VI10, MPgeneratorEnd			; Transform pos-3 	- End test	 
+	MULAw.xyz ACC, VF02, VF00			SQI.xyzw VF15, (VI05++)					; Project pos-2		- Store position-1		   	
+	MADDq.xyz VF16, VF04, Q				LQ.xyz VF06, (0+2*vertexSize)(VI06)		; Project pos-2 	- Load position-4
+	MULq.xyz VF20, VF08, Q				LQ.xy VF10, (1+2*vertexSize)(VI06)		; Build stq-2		- Load uv-4
+	FTOI0.xyzw VF12, VF12				DIV Q, VF00w, VF05w						; Int rgba-2		- Inverse zpos-3
+	MULAw.xyzw ACC, VF31, VF00			LQ.xyzw VF14, (2+2*vertexSize)(VI06)	; Transform pos-4 	- Load rgba-4
+	FTOI4.xyzw VF16, VF16				IADDIU VI06, VI06, vertexSize			; Convert pos-2		- Increment input buffer adress 	
+	MADDAx.xyw ACC, VF28, VF06			SQI.xyzw VF20, (VI05++)					; Transform pos-4 	- Store stq-2	 	
+	MADDAy.xyw ACC, VF29, VF06			SQI.xyzw VF12, (VI05++)					; Transform pos-4 	- Store rgba-2	 
+	NOP									SQ.xyzw VF12, (1+1*OutverSize)(VI04)	;  					- Store multipass rgba-2
+	NOP									SQ.xyzw VF16, (2+1*OutverSize)(VI04)	; 					- Store multipass position-2
+	MADDz.xyzw VF06, VF30, VF06			IBEQ VI06, VI10, MPgeneratorEnd			; Transform pos-4 	- End test	  
+	MULAw.xyz ACC, VF02, VF00			SQI.xyzw VF16, (VI05++)					; Project pos-3		- Store position-2	  		
+	MADDq.xyz VF17, VF05, Q				LQ.xyz VF03, (0+2*vertexSize)(VI06)		; Project pos-3 	- Load position-1
+	MULq.xyz VF21, VF09, Q				LQ.xy VF07, (1+2*vertexSize)(VI06)		; Build stq-3		- Load uv-1
+	FTOI0.xyzw VF13, VF13				DIV Q, VF00w, VF06w						; Int rgba-3		- Inverse zpos-4
+	MULAw.xyzw ACC, VF31, VF00			LQ.xyzw VF11, (2+2*vertexSize)(VI06)	; Transform pos-1 	- Load rgba-1
+	FTOI4.xyzw VF17, VF17				IADDIU VI06, VI06, vertexSize			; Convert pos-3		- Increment input buffer adress 	
+	MADDAx.xyw ACC, VF28, VF03			SQI.xyzw VF21, (VI05++)					; Transform pos-1 	- Store stq-4	 		
+	MADDAy.xyw ACC, VF29, VF03			SQI.xyzw VF13, (VI05++)					; Transform pos-1 	- Store rgba-3	 
+	NOP									SQ.xyzw VF13, (1+2*OutverSize)(VI04)	;  					- Store multipass rgba-3	
+	NOP									SQ.xyzw VF17, (2+2*OutverSize)(VI04)	; 					- Store multipass position-3
+	MADDz.xyzw VF03, VF30, VF03			IBEQ VI06, VI10, MPgeneratorEnd			; Transform pos-1 	- End test	  	
+	MULAw.xyz ACC, VF02, VF00			SQI.xyzw VF17, (VI05++)					; Project pos-4		- Store position-3	 		
+	MADDq.xyz VF18, VF06, Q				LQ.xyz VF04, (0+2*vertexSize)(VI06)		; Project pos-4 	- Load position-2
+	MULq.xyz VF22, VF10, Q				LQ.xy VF08, (1+2*vertexSize)(VI06)		; Build stq-4		- Load uv-2
+	FTOI0.xyzw VF14, VF14				DIV Q, VF00w, VF03w						; Int rgba-4		- Inverse zpos-1
+	MULAw.xyzw ACC, VF31, VF00			LQ.xyzw VF12, (2+2*vertexSize)(VI06)	; Transform pos-2 	- Load rgba-2
+	FTOI4.xyzw VF18, VF18				IADDIU VI06, VI06, vertexSize			; Convert pos-4		- Increment input buffer adress 
+	MADDAx.xyw ACC, VF28, VF04			SQI.xyzw VF22, (VI05++)					; Transform pos-2 	- Store stq-4	 		
+	MADDAy.xyw ACC, VF29, VF04			SQI.xyzw VF14, (VI05++)					; Transform pos-2 	- Store rgba-4	 
+	NOP									SQ.xyzw VF14, (1+3*OutverSize)(VI04)	;  					- Store multipass rgba-4
+	NOP									SQ.xyzw VF18, (2+3*OutverSize)(VI04)	; 					- Store multipass position-4
+	NOP									IADDIU VI04, VI04, (4*OutverSize)		;					- Increment multipass buffer adress		
+	MADDz.xyzw VF04, VF30, VF04			IBNE VI06, VI10, MPgeneratorLoop		; Transform pos-2 	- End test	  
+	MULAw.xyz ACC, VF02, VF00			SQI.xyzw VF18, (VI05++)					; Project pos-2		- Store position-1	 		
+MPgeneratorEnd:;-----------------------------------------------------------------
+
+								
+;//================================================================================================================
+;//=======================================					=======================================================
+;//===================						    THE END					    			  =========================
+;//=======================================			        =======================================================
+;//============================================================================================= JCL Janvier 2001 =

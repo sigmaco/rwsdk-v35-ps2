@@ -1,0 +1,72 @@
+					;//==================================================================
+					;//==================================================================
+					;//==															   ==						
+					;//==  	  -PSX2-    MULTIPASS PERSPECTIVE MATRIX PRE-PROCESSOR	   ==
+					;//==															   ==					
+					;//==															   ==					
+					;//== Features : Generate matrix for perspective projection.	   ==					
+					;//==			 Analyse Render state for Jumps/Memory structure.  ==					
+					;//==			 Contain fog first clamping information. 		   ==
+					;//==			 Support 24 bits and 16 bits Zbuffers.			   ==			
+					;//==															   ==					
+					;//== 			  										-CHECKED-  ==					
+					;//==															   ==					
+					;//==================================================================
+					;//==================================================================
+
+
+	;----------------------------------------------------------------------------	
+	SUB.z VF28, VF28, VF28				LOI 0.5									; Clean z field		- Assemble constant 0.5	
+	SUB.z VF29, VF29, VF29				LQ.xyw VF28, vuSDmat0(VI00)				; Clean z field		- Load matrix
+	SUB.z VF30, VF30, VF30				LQ.xyw VF29, vuSDmat1(VI00)				; Clean z field		- Load matrix		
+	ADDw.z VF31, VF00, VF00				LQ.xyw VF30, vuSDmat2(VI00)				; Unity z Field		- Load matrix	
+	SUB.w VF02, VF02, VF02				LQ.xyw VF31, vuSDmat3(VI00)				; Unity z field		- Load matrix			
+	MULi.w VF21, VF28, I				ILW.x VI02, vuSDVUSwitch(VI00)			; Adjust matrix	    - Load Render States 
+	MULi.w VF22, VF29, I				LQ.xyz VF02, vuSDoffXoffYzShift(VI00)	; Adjust matrix	    - Offset
+	MULi.w VF23, VF30, I				IADDIU VI03, VI00, 2					; Adjust matrix	    - Clipping Mask
+	MULi.w VF25, VF31, I				LQ.xyz VF05, vuSDcamWcamHzScale(VI00)	; Adjust matrix		- Camera Scale 	
+	SUBw.xy VF28, VF28, VF21			IAND VI03, VI02, VI03					; Adjust matrix		- Extract clipping Flag	 
+	SUBw.xy VF29, VF29, VF22			LQ.xy VF03, vuSDrealOffset(VI00)		; Adjust matrix		- GS offset    
+	SUBw.xy VF30, VF30, VF23			IBEQ VI03, VI00, SwitchNoClip  			; Adjust matrix		- Clipping Test
+	SUBw.xy VF31, VF31, VF25			IADDIU VI05, VI00, 4					; Adjust matrix		- Primitive Mask	
+SwitchClipping:;---------- CLIPPING SWITCH --------------------------------------		 	
+	MUL.xy  VF28, VF28, VF05			IAND VI05, VI02, VI05					; Prescale matrix   - Extract primitive Flag 
+	MUL.xy  VF29, VF29, VF05			IADDIU VI06, VI00, 8					; Prescale matrix	- Clip method Mask	 
+	MUL.xy  VF30, VF30, VF05			IADDIU VI12, VI00, ExpandBuffer1		; Prescale matrix	- First XGKICK addres
+	MUL.xyz VF31, VF31, VF05			IBEQ VI05, VI00, SwitchTSCLip  			; Prescale matrix	- Primitive test
+	ADD.xy VF02, VF02, VF03				IAND VI06, VI02, VI06					; Combine Offsets 	- Extract methode Flag
+SwitchTLCLip:;------------ TRI-LIST CLIPPING ------------------------------------			 	
+	NOP									IADDIU VI13, VI00, XExpandBuffer2 		; 					- Clipping Second XGKICK addres
+	NOP									IADDIU VI14, VI00, XExpandBuffer3 		; 					- Clipping Third XGKICK addres
+	NOP									IBEQ VI06, VI00, SwithSystemExit  		;					- Methode test
+	NOP									IADDIU VI15, VI00, TLCullRender			;					- Tri-List culling adress	
+	NOP									B SwithSystemExit						;					- End Jump 
+	NOP									IADDIU VI15, VI00, TLClipRender			;					- Tri-List clipping adress
+SwitchTSCLip:;------------ TRI-STRIP CLIPPING -----------------------------------			 	
+	NOP									IADDIU VI13, VI00, XExpandBuffer2 		; 					- Clipping Second XGKICK addres
+	NOP									IADDIU VI14, VI00, XExpandBuffer3 		; 					- Clipping Third XGKICK addres
+	NOP									IBEQ VI06, VI00, SwithSystemExit  		;					- Methode test
+	NOP									IADDIU VI15, VI00, TSCullRender			;					- Tri-Strip culling adress			
+	NOP									B SwithSystemExit						;					- End Jump 
+	NOP									IADDIU VI15, VI00, TSClipRender			;					- Tri-Strip clipping adress		 	
+SwitchNoClip:;------------ NO CLIPPING SWITCH -----------------------------------		 	
+	MUL.xy  VF28, VF28, VF05			IADDIU VI04, VI00, 1					; Prescale matrix   - Fog Mask 
+	MUL.xy  VF29, VF29, VF05			IAND VI04, VI02, VI04					; Prescale matrix	- Extract Fog Mask 	
+	MUL.xy  VF30, VF30, VF05			IADDIU VI12, VI00, ExpandBuffer1		; Prescale matrix	- First XGKICK addres
+	MUL.xyz VF31, VF31, VF05			IADDIU VI13, VI00, ExpandBuffer2 		; Prescale matrix	- Second XGKICK addres	
+	ADD.xy VF02, VF02, VF03				IBEQ VI04, VI00, SwitchNoFog 			; Combine Offsets 	- Fog Test 
+	NOP									IADDIU VI14, VI00, ExpandBuffer3 		; 					- Third XGKICK addres
+	NOP									B SwithSystemExit						;					- End Jump
+	NOP									IADDIU VI15, VI00, FoggedRender			;					- Fog rendering adress
+SwitchNoFog:;------------- NO FOGGING SWITCH ------------------------------------
+	NOP									IADDIU VI15, VI00, GenericRender		;					- Generic rendering adress
+SwithSystemExit:;--------- END OF DYNAMIC SWITCH PROCESSING ---------------------
+	NOP 								ISW.y VI15, vuSDVUSwitch(VI00)			;					- Store Renderinf System adress
+	;----------------------------------------------------------------------------
+		
+
+;//================================================================================================================
+;//=======================================					=======================================================
+;//===================						    THE END					                  =========================
+;//=======================================			        =======================================================
+;//============================================================================================= JCL Janvier 2001 =

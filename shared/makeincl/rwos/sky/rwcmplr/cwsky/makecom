@@ -1,0 +1,249 @@
+###########################################################################
+#
+# File :     makecom/cwsky
+#
+# Abstract : sky gcc specific compile time options.
+#
+#            See
+#            o GCC homepage
+#               http://www.gnu.org/software/gcc
+#            o GCC compilations flags
+#               http://www.gnu.org/software/gcc/onlinedocs/gcc_2.html
+#
+#            This file is included from a generic top level makefile when
+#            the Visual C compiler is selected
+#
+###########################################################################
+#
+# This file is a product of Criterion Software Ltd.
+#
+# This file is provided as is with no warranties of any kind and is
+# provided without any obligation on Criterion Software Ltd. or Canon Inc.
+# to assist in its use or modification.
+#
+# Criterion Software Ltd. will not, under any circumstances, be liable for
+# any lost revenue or other damages arising from the use of this file.
+#
+# Copyright (c) 1999 Criterion Software Ltd.
+# All Rights Reserved.
+#
+# RenderWare is a trademark of Canon Inc.
+#
+###########################################################################
+
+# Indicate that compiler options have been included
+MAKECOM=1
+
+ifndef PS2CWFOLDER
+PS2CWFOLDER = $(shell $(RWGSDK)/bin/cwpath.exe 'PS2 R3.0')
+endif
+
+ifeq ($(SMALLCODE), 1)
+C_OPT = -O4,s # -opt dump
+else
+C_OPT = -O4,p # -opt dump
+endif
+
+ifeq ($(COPTIMIZE), 1)
+CFLAGS += $(C_OPT) -DNDEBUG
+else
+CFLAGS += -O0
+#----------------
+# # gcc requires the generation of a dependency tree, and hence at least -O1,
+# # to detect any use of uninitialized variables
+# so build optimised then. Code generation options win.
+endif
+
+ifeq ($(CDEBUG), 1)
+CFLAGS += -g -prefix PREFIX_PS2_DEBUG_TC296.h
+else
+CFLAGS += -prefix PREFIX_PS2_TC296.h
+endif
+
+ifeq ($(PG), 1)
+CFLAGS += -pg -DPG
+endif
+
+CFLAGS += -DRW_USE_SPF
+
+ifeq ($(SCE_11),1)
+CFLAGS += -DSCE_11
+endif
+
+ifdef IOPPATH
+CFLAGS += -DIOPPATH=$(IOPPATH)
+endif
+
+ifdef PS2_DRIVE
+CFLAGS += -DPS2_DRIVE=$(PS2_DRIVE)
+endif
+
+# These seem to be platform specific, not compiler specific
+
+ifeq ($(NOASM), 1)
+CFLAGS += -DNOASM
+endif
+
+ifeq ("$(COMPILER)", "")
+COMPILER=cc
+endif
+
+ifeq ("$(LINKER)", "")
+# It should be this, but we have a rather strange idea of LINKER
+LINKER=link.exe
+endif
+
+######
+# included burst from sony Makefiles
+######
+
+ifeq ("$(PS2_DRIVE)", "")
+SCE = /usr/local/sce/ee
+else
+SCE = $(PS2_DRIVE):/usr/local/sce/ee
+endif
+
+SCELIBDIR      = $(SCE)/lib
+SCEINCDIR      = $(SCE)/include
+
+PS2DIR = '$(subst \,/,$(PS2CWFOLDER)/PS2 Support)'
+PS2LIB = '$(subst \,/,$(PS2CWFOLDER)/PS2 Support/Runtime/Libraries)'
+
+# LCFILE      = $(PS2DIR)/PS2LinkSegment.lcf
+LCFILE      = $(RWGDIR)/shared/cwcommon/LinkSeg_PS2_296cl.lcf
+
+
+######
+# The debug version of this seems to have been removed, so always use non-debug
+#ifeq ($(CDEBUG), 1)
+#MSLGCC_PS2_LIB = '$(subst \,/,$(PS2CWFOLDER)/PS2 Support/Runtime/Libraries/MSLGCC_PS2D.LIB)'
+#else # ($(CDEBUG), 1)
+MSLGCC_PS2_LIB = '$(subst \,/,$(PS2CWFOLDER)/PS2 Support/Runtime/Libraries/MSLGCC_PS2.LIB)'
+#endif # ($(CDEBUG), 1)
+ANSICPP_PS2_LIB= '$(subst \,/,$(PS2CWFOLDER)/PS2 Support/Msl/MSL_C++/MSL_MIPS/Lib/ANSICPP_PS2.LIB)'
+
+# RenderWare is a trademark of Canon Inc.
+
+SYSLIBS     = \
+              $(PS2DIR)/gcc_wrapper.c \
+              $(SCELIBDIR)/libgraph.a \
+              $(SCELIBDIR)/libdma.a \
+              $(SCELIBDIR)/libdev.a \
+              $(SCELIBDIR)/libpkt.a \
+	      $(SCELIBDIR)/libvu0.a \
+	      $(SCELIBDIR)/libmpeg.a \
+	      $(SCELIBDIR)/libipu.a \
+	      $(SCELIBDIR)/libpc.a \
+	      $(SCELIBDIR)/libkernl.a \
+	      $(SCELIBDIR)/libcdvd.a \
+	      $(SCELIBDIR)/liblout.a \
+	      $(SCELIBDIR)/libpad.a \
+	      $(SCELIBDIR)/libsdr.a \
+	      $(SCELIBDIR)/libssyn.a \
+	      $(SCELIBDIR)/libmc.a \
+	      $(SCELIBDIR)/libmsin.a \
+ 	      $(SCELIBDIR)/../gcc/ee/lib/libg.a \
+	      $(SCELIBDIR)/../gcc/ee/lib/libm.a \
+	      $(SCELIBDIR)/../gcc/lib/gcc-lib/ee/2.96-ee-001003-1/libgcc.a  \
+	      $(MSLGCC_PS2_LIB) \
+	      $(ANSICPP_PS2_LIB)
+
+#	      $(SCELIBDIR)/../gcc/lib/gcc-lib/ee/2.95.2/libgcc.a  \
+#	      $(SCELIBDIR)/../gcc/lib/gcc-lib/ee/2.9-ee-990721/libgcc.a  \
+
+
+CFLAGS +=										\
+	-D__EXCEPTION__									\
+	-D__NEW__									\
+	-I'$(subst \,/,$(PS2CWFOLDER)/PS2 Support/Msl/MSL_C++/MSL_Common/Include)'		\
+	-I'$(subst \,/,$(PS2CWFOLDER)/PS2 Support/Msl/MSL_C/MSL_Common/Include)'		\
+	-I'$(subst \,/,$(PS2CWFOLDER)/PS2 Support/Msl/MSL_C/MSL_MIPS/Include)'		\
+        -I$(SCEINCDIR)
+
+#	-I'$(subst \,/,$(PS2CWFOLDER)/PS2 Support/Msl/MSL_C/MSL_MIPS/Include/cname)'	\
+
+
+ifndef SCE_11
+SYSLIBS += $(SCELIBDIR)/libpad.a
+endif
+
+ifeq ($(RWDEBUG), 1)
+ifeq ($(RWMEMDEBUG), 1)
+SYSLIBS += -L$(RWLIBDIR) -lrtdbmalloc
+endif # ($(RWMEMDEBUG), 1)
+endif # ($(RWDEBUG), 1)
+
+CWARNINGS = \
+	-warn all \
+	-warn notinlined \
+	-warn pedantic  \
+	-warn unused \
+	-warn unusedvar \
+	-warn noimplicit \
+	-warn nounusedarg
+
+#	-warn dump
+
+CC        = mwccps2 --gcc-compat
+CPP       = $(CC)
+COUT      = -o 
+LOUT      = -e
+SOUT      = -S -o $@
+CPPOPT    = -E -P
+CFLAGS   += $(CWARNINGS)
+CFLAGS   += -c
+CFLAGS   += -DSKY
+LD        = mwccps2  --gcc-compat
+LFLAGS   = -I$(SCEINCDIR) -T $(LCFILE) -warn off -main ENTRYPOINT -g -nostartfiles -L$(SCE)/lib  # -lm
+LOUT = -o 
+
+AS        = asm_r5900_elf.exe
+AOUT      = -o
+ASFLAGS   = -c_preprocess -gnu # -w
+ASFLAGS  += -list $(OBJDIR)/$(basename $(notdir $<)).lsa
+
+DVPASM        = ee-dvp-as
+DVPASFLAGS    = -I$(SRCDIR) -I$(DEVDIR)/$(RWTARGET)
+DVPAOUT       = -o
+
+RUN = pc-ps2d -d miko 
+
+ifeq ($(CDEBUG), 1)
+DVPASMFLAGS += --gstabs
+else
+ASFLAGS     += -nodebug
+endif
+
+# We do want assembler
+
+CFLAGS += -I$(SCE)/../common/include -I$(SCE)/include
+
+# Add crtO.o to list of object files
+
+OBJ += crt0.o
+
+VPATH += $(SCELIBDIR)
+
+# Define some compiler/platform specific parameters for the naming of object
+# and library files
+
+O = o
+L = a
+LP = lib
+EXE = .elf
+
+# Directory creation
+ifndef MD
+MD = mkdir -p
+endif
+
+
+# The following rule is required, as it is not a default
+#.SUFFIXES: .c .$(O) .asm .dsm
+
+$(OBJDIR)/%.$(O) : %.dsm
+	$(DVPASM) $(DVPASFLAGS) -alhs $(DVPAOUT)$@ $^ > $(OBJDIR)/$*.lsd
+
+
+
+CPPFLAGS += $(CFLAGS)

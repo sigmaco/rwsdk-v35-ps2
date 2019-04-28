@@ -1,0 +1,95 @@
+--------------------------------------------------------------------------
+          RenderWare Graphics Example (PlayStation 2): Collis3
+--------------------------------------------------------------------------
+
+PURPOSE
+
+The COLLIS3 example demonstrates the use of the RenderWare collision 
+plugin (RpCollision) for the detection of collisions between atomics, and 
+highlights the use of geometry collision data for improved performance.
+
+The example shows several spheres being pushed around by a set of spinning
+objects. This is not a realistic simulation - the algorithm is crude and
+is used purely to illustrate the collision testing process (it is possible
+for geometry to penetrate when a collision cannot be resolved).
+
+On startup, the geometries of the bowl and spinners do not have collision 
+data. During a sphere intersection test, every triangle in every spinner
+is individually tested. In this state the frame-rate of the application is
+limited by this testing.
+
+Collision data may be built via the menu, and once created the performance
+should improve. This data provides information to enable fast isolation of
+the triangles in the geometry which potentially intersect the sphere 
+before individual tests are performed.
+
+Collision data generation is intended for offline use in custom tools and
+exporters. The code provided with this example shows the simple steps
+required to load an atomic, build geometry collision data, and resave.
+
+--------------------------------------------------------------------------
+GENERAL CONTROLS
+
+SELECT button         - Toggle menu/help/plain mode.
+
+START + SELECT        - Quit the application.
+
+--------------------------------------------------------------------------
+MENU OPTIONS
+
+RESET                 - Restarts the example, reverting to geometry
+                        without collision data.
+
+BUILD COLLISION DATA  - Builds geometry collision data for the 
+                        the atomics used in the example. This should
+                        significantly improve performance.
+
+SAVE COLLISION DATA   - Saves the atomics with geometry collision data
+                        if built.
+
+FPS                   - Allows the user to read the number of frames per
+                        second being rendered (updated every second).
+
+--------------------------------------------------------------------------
+MENU CONTROLS
+
+DPAD UP and DOWN        - Select menu item.
+
+DPAD LEFT and RIGHT     - Modify menu item value or execute associated 
+                          command.
+
+LEFT ANALOG stick       - Modify floating point value (if applicable) 
+                          otherwise do what you would do in general 
+                          controls.
+
+--------------------------------------------------------------------------
+HELP CONTROLS
+
+DPAD UP and DOWN        - Scroll a line at a time (autorepeat available).
+
+LEFT SHOULDER #1 and #2 - Scroll a page at a time.
+
+--------------------------------------------------------------------------
+VIDEO MODE SELECTION
+
+The command-line option '-vms' can be used to enable a simple video 
+selection screen, which appears before the application starts running. 
+Use the UP and DOWN DPAD buttons to highlight the required video
+mode and press START to make the selection. Note there are several pages
+of video modes; use the LEFT SHOULDER buttons to move from page to page.
+
+--------------------------------------------------------------------------
+This demonstration program is copyright Criterion Software Limited 2003. 
+Criterion Software grants you a license to use it only in the form as 
+supplied. You may not disassemble, decompile or reverse engineer this 
+demonstration program.
+
+This demonstration program is provided as is with no warranties of any
+kind. Criterion Software will not, under any circumstances, be liable for
+any lost revenue or other damages arising from the use of this
+demonstration program.
+
+RenderWare is a registered trademark of Canon Inc.
+Other trademarks acknowledged.
+--------------------------------------------------------------------------
+Tue Apr 22 12:04:26 2003 -- build sky ( 64649 0x35000 )

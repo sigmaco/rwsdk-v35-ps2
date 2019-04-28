@@ -1,0 +1,80 @@
+--------------------------------------------------------------------------
+          RenderWare Graphics Example (PlayStation 2): Texdict
+--------------------------------------------------------------------------
+
+PURPOSE
+
+The TEXDICT example demonstrates how RenderWare can use texture
+dictionaries to improve texture loading speeds.
+
+The example initially creates an empty world. From the menu the user can
+then repeatedly load a world, from an rwID_WORLD binary stream chunk,
+that references many textures. The loader first loads the world without
+a texture dictionary (loading textures directly from the supplied image
+files, which then populates the current texture dictionary). The current
+texture dictionary is saved to a RenderWare Graphics stream file. It then
+loads the world again after reading this texture dictionary file and
+making it the current dicitionary.
+
+The load times are recorded in the lower right corner of the view.
+
+--------------------------------------------------------------------------
+GENERAL CONTROLS
+
+SELECT button          - Toggle menu/help/plain mode.
+
+START+SELECT           - Quit the application.
+
+--------------------------------------------------------------------------
+MENU OPTIONS
+
+LOAD WORLD             - Initiates loading of the world with and without a
+                         texture dictionary.
+
+FPS                    - Allows the user to read the number of frames 
+                         per second being rendered (updated every 
+                         second).
+
+--------------------------------------------------------------------------
+MENU CONTROLS
+
+DPAD UP and DOWN       - Select menu item.
+
+DPAD LEFT and RIGHT    - Modify menu item value or execute associated 
+                         command.
+
+Left analogue stick    - Modify floating point value (if applicable) 
+                         otherwise do what you would do in general 
+                         controls.
+
+--------------------------------------------------------------------------
+HELP CONTROLS
+
+DPAD UP and DOWN         - Scroll a line at a time (autorepeat available).
+
+LEFT SHOULDER #1 and #2  - Scroll a page at a time.
+
+--------------------------------------------------------------------------
+VIDEO MODE SELECTION
+
+The command-line option '-vms' can be used to enable a simple video 
+selection screen, which appears before the application starts running. 
+Use the UP and DOWN DPAD buttons to highlight the required video
+mode and press START to make the selection. Note there are several pages
+of video modes; use the LEFT SHOULDER buttons to move from page to page.
+
+--------------------------------------------------------------------------
+This demonstration program is copyright Criterion Software Limited 2003. 
+Criterion Software grants you a license to use it only in the form as 
+supplied. You may not disassemble, decompile or reverse engineer this 
+demonstration program.
+
+This demonstration program is provided as is with no warranties of any
+kind. Criterion Software will not, under any circumstances, be liable for
+any lost revenue or other damages arising from the use of this
+demonstration program.
+
+RenderWare is a registered trademark of Canon Inc.
+Other trademarks acknowledged.
+--------------------------------------------------------------------------
+Tue Apr 22 12:04:26 2003 -- build sky ( 64649 0x35000 )

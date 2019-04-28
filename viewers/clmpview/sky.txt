@@ -1,0 +1,151 @@
+--------------------------------------------------------------------------
+     RenderWare Graphics Viewer Program (PlayStation 2): Clump viewer
+--------------------------------------------------------------------------
+
+PURPOSE
+
+The CLMPVIEW application may be used to load and explore clumps.
+
+On startup the viewer reads the "clmpview.ini" file and loads the files
+(*.dff & *.wrl) specified there, ie this can be used as an alternative to 
+command line parameter passing.
+
+When a clump is loaded, the viewer will look for a texture dictionary
+file (TXD) in the same directory as the DFF file. As there are platform
+dependencies, the texture dictionary file must be identified as such,
+and it is assumed that the file name includes "_d3d8" for D3D8, "_ogl"
+for OpenGL, etc. So, for example, the texture dictionary file for a DFF 
+called "clump.dff" running on D3D8 should be called "clump_d3d8.txd". If 
+no texture dictionary file is available, textures are loaded from 
+individual image files, and it is assumed the image files reside in a 
+directory located with the DFF which is either named according to the 
+DFF's name or is simply called "textures". Texture dictionaries can be 
+saved from the viewer to a disk file using the naming convention 
+described above.
+
+The viewer now supports tristrip rendering these are the following options
+under the "Render Mode" menu entry:
+
+MESH              - If the clump is tristripped renders each mesh that
+                    is a collection of tristrips and degenerates in a
+                    separate color.
+
+TRISTIPS          - Renders each tristrip in a separate color.
+
+TRISTRIP LENGTHS  - Highlights in red any tristrips that are n
+                    triangles in length. The length is set by the menu
+                    option "Tristrip length".
+                    e.g. if the length is 5 all strips with 5 triangles
+                    or less will be highlighted. You want to try and
+                    eliminate the strips that are highlighted.
+
+The Clump View document, clmpviewwrldview.pdf, can be found in 
+docs\viewers in the RenderWare Graphics directory.
+
+--------------------------------------------------------------------------
+GENERAL CONTROLS
+
+LEFT ANALOG stick        - Rotate the clump.
+
+TRIANGLE                 - Translate clump away from camera.
+
+CROSS                    - Translate clump towards camera.
+
+CIRCLE                   - Select next atomic.
+
+DPAD                     - Rotate the clump.
+
+SELECT button            - Toggle menu/help/plain mode.
+
+START+SELECT             - Quit the application.
+
+--------------------------------------------------------------------------
+MENU OPTIONS
+
+AMBIENT LIGHT         - Toggles the use of a white ambient light.
+
+AMBIENT INTENSITY     - Sets the intensity of the ambient light.
+
+MAIN LIGHT            - Toggles the use of a white directional light.
+
+MAIN INTENSITY        - Sets the intensity of the main light.
+
+RENDER MODE           - Switches between a number of rendering modes:
+                        SOLID, WIREFRAME, SKELETON, WIRE+SKELETON,
+                        WIRE+SOILD, SOLID+SKELTON, ALL.
+
+NORMALS               - Toggles rendering of vertex normals.
+
+NORMALS LENGTH        - Sets scale factor used to render vertex normals.
+
+FACE CULLING          - Sets the face culling mode: FRONT, BACK or NONE.
+
+TRISTRIP LENGTH       - Select the number of triangles in a tristrip to
+                        highlight for the menu options TRISTRIP LENGTHS
+
+FIELD OF VIEW         - Sets the camera's horizontal field-of-view.
+
+FAR CLIP PLANE        - Sets the distance of the far clip-plane.
+
+NEAR CLIP PLANE       - Sets the distance of the near clip-plane.
+
+RESET CLUMP           - Resets the clump position and orientation to that
+                        it had when first loaded.
+
+SPIN CLUMP            - Gives the clump rotational momentum when rotated.
+
+DUMP CLUMP            - Saves a copy of the clump to the file "new.dff"
+                        in the same directory as the original DFF.
+
+DUMP TEX DICT         - Saves a copy of the current texture dictionary
+                        in the same directory as the DFF.
+
+ON SCREEN INFO        - Toggles display of the FPS and the position of 
+                        the camera.
+
+FPS                   - Toggles display of the number of frames per
+                        second being rendered (updated every second).
+
+--------------------------------------------------------------------------
+MENU CONTROLS
+
+DPAD UP and DOWN        - Select menu item.
+
+DPAD LEFT and RIGHT     - Modify menu item value or execute associated 
+                          command.
+
+Left ANALOG stick     - Modify floating point value (if applicable) 
+                          otherwise do what you would do in general 
+                          controls.
+
+--------------------------------------------------------------------------
+HELP CONTROLS
+
+DPAD UP and DOWN         - Scroll a line at a time (autorepeat available).
+
+LEFT SHOULDER #1 and #2  - Scroll a page at a time.
+
+--------------------------------------------------------------------------
+VIDEO MODE SELECTION
+
+The command-line option '-vms' can be used to enable a simple video 
+selection screen, which appears before the application starts running. 
+Use the UP and DOWN DPAD buttons to highlight the required video
+mode and press START to make the selection. Note there are several pages
+of video modes; use the LEFT SHOULDER buttons to move from page to page.
+
+--------------------------------------------------------------------------
+This Viewer Program is copyright Criterion Software Limited 2001. 
+Criterion Software grants you a license to use it only in the form as 
+supplied. You may not disassemble, decompile or reverse engineer this 
+Viewer Program.
+
+This Viewer Program is provided as is with no warranties of any
+kind. Criterion Software will not, under any circumstances, be liable for
+any lost revenue or other damages arising from the use of this
+Viewer Program.
+
+RenderWare is a registered trademark of Canon Inc.
+Other trademarks acknowledged.
+--------------------------------------------------------------------------
+Tue Apr 22 12:04:26 2003 -- build sky ( 64649 0x35000 )

@@ -1,0 +1,96 @@
+--------------------------------------------------------------------------
+           RenderWare Graphics Example (PlayStation 2): Frame
+--------------------------------------------------------------------------
+
+PURPOSE
+
+The FRAME example shows the frame hierarchy of a series of atomics
+in a clump. Each atomic has its own frame and can be selected and 
+rotated. Note that the root atomic and clump share the same frame. The 
+selected frame is represented by highlighting the bounding box of its
+atomic.
+
+Any rotation applied to a frame will affect the frame as well as its child
+frames. So if you rotate the root all its frames will be rotated relative 
+to it. If you rotate a frame with no child frames only that frame will be 
+rotated.
+
+The atomics are colored depending upon their frame position within the 
+hierarchy e.g. the root is red, the children of the root are green, the 
+grandchildren of the root are blue etc.
+
+
+--------------------------------------------------------------------------
+GENERAL CONTROLS
+
+LEFT ANALOG stick       - Rotate the selected frame.
+
+CIRCLE                  - Select the next frame that is on the same 
+                          level.
+
+SQUARE                  - Select the previous frame that is on the same 
+                          level.
+
+TRIANGLE                - Select the current frame's parent.
+
+CROSS                   - Select the current frame's first child frame.
+
+SELECT button           - Toggle menu/help/plain mode.
+
+START + SELECT          - Quit the application.
+
+--------------------------------------------------------------------------
+MENU OPTIONS
+
+RESET                   - Allows the user to reset the rotation of the 
+                          frames.
+
+ATOMICS                 - Allows the user to turn the rendering of the 
+                          atomics on / off.
+
+FPS                     - Allows the user to read the number of frames per
+                          second being rendered (updated every second).
+
+--------------------------------------------------------------------------
+MENU CONTROLS
+
+DPAD UP and DOWN        - Select menu item.
+
+DPAD LEFT and RIGHT     - Modify menu item value or execute associated 
+                          command.
+
+LEFT ANALOG stick       - Modify floating point value (if applicable) 
+                          otherwise do what you would do in general 
+                          controls.
+
+--------------------------------------------------------------------------
+HELP CONTROLS
+
+DPAD UP and DOWN         - Scroll a line at a time (autorepeat available).
+
+LEFT SHOULDER #1 and #2  - Scroll a page at a time.
+
+--------------------------------------------------------------------------
+VIDEO MODE SELECTION
+
+The command-line option '-vms' can be used to enable a simple video 
+selection screen, which appears before the application starts running. 
+Use the UP and DOWN DPAD buttons to highlight the required video
+mode and press START to make the selection. Note there are several pages
+of video modes; use the LEFT SHOULDER buttons to move from page to page.
+
+--------------------------------------------------------------------------
+This demonstration program is copyright Criterion Software Limited 2003. 
+Criterion Software grants you a license to use it only in the form as 
+supplied. You may not disassemble, decompile or reverse engineer this 
+demonstration program.
+
+This demonstration program is provided as is with no warranties of any
+kind. Criterion Software will not, under any circumstances, be liable for
+any lost revenue or other damages arising from the use of this
+demonstration program.
+
+RenderWare is a registered trademark of Canon Inc.
+Other trademarks acknowledged.
+--------------------------------------------------------------------------
+Tue Apr 22 12:04:26 2003 -- build sky ( 64649 0x35000 )

@@ -1,0 +1,113 @@
+Microsoft Developer Studio Workspace File, Format Version 6.00
+# WARNING: DO NOT EDIT OR DELETE THIS WORKSPACE FILE!
+
+###############################################################################
+
+Project: "GeomFilter"=.\TravAction\GeomFilter.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    GeomFilter
+    .\travaction
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "MaxSimple"=.\MaxSimple\MaxSimple.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    MaxSimple
+    .\maxsimple
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "OptTex"=.\ExportObject\OptTex.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    OptTex
+    .\exportobject
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "PreLight"=.\VertexFilter\PreLight.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    PreLight
+    .\vertexfilter
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "ScaleAnim"=.\ScaleAnim\ScaleAnim.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    ScaleAnim
+    .\scaleanim
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "Stream"=.\PostProcess\Stream.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    Stream
+    .\postprocess
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Global:
+
+Package=<5>
+{{{
+}}}
+
+Package=<3>
+{{{
+}}}
+
+###############################################################################
+

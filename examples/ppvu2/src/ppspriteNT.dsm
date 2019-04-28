@@ -1,0 +1,19 @@
+; A null transform routine
+.global ppspriteNT
+.balign 16,0
+ppspriteNT:
+
+DMAret *
+MPG 0, *
+
+.vu
+loop:
+	NOP[e]	NOP
+	NOP	NOP
+
+	NOP	B loop
+	NOP	NOP
+
+.endmpg
+.EndDmaData
+

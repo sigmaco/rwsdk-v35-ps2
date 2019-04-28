@@ -1,0 +1,76 @@
+					;//==================================================================
+					;//==================================================================
+					;//==															   ==						
+					;//== -PSX2- FXNORMALS PERSPECTIVE - TRIANGLE LIST - FAST CULLING  ==
+					;//==															   ==					
+					;//==															   ==					
+					;//== Features : Transform vertices into camera space and		   ==					
+					;//==			 perform clipping using the frustum info.	  	   ==					
+					;//==			 Clipped triangles are inserted as a new lists	   ==					
+					;//==			 in the previous list.  						   ==
+					;//==			 Process Normals.								   ==														
+					;//==															   ==					
+					;//== 													-CHECKED-  ==					
+					;//==															   ==					
+					;//==================================================================
+					;//==================================================================
+					  
+	
+	;----------------------------------------------------------------------------				
+	NOP									LQ.xyzw VF03, (0+0*vertexSize)(VI11)	;  					- Load position-1 	
+	NOP									LQ.xyzw VF26, vuSDClipvec1(VI00)		;  					- Load Clipping vector-1			
+	NOP									LQ.yz	VF24, vuSDClipvec2(VI00)		; 					- Load Frustrum y-z1
+	MULAw.xyzw ACC, VF31, VF00			LQ.xyzw VF04, (0+1*vertexSize)(VI11)	; Transform pos-1   - Load position-2	
+	MADDAx.xyw ACC, VF28, VF03		    LQ.xyzw VF05, (0+2*vertexSize)(VI11)	; Transform pos-1   - Load position-3
+	MADDAy.xyw ACC, VF29, VF03		  	MR32.x VF26, VF26						; Transform pos-1   - Frustrum x coef	
+	MADDz.xyzw VF17, VF30, VF03			MR32.x VF24, VF26						; Transform pos-1   - Frustrum x coef				
+	MULAw.xyzw ACC, VF31, VF00			NOP										; Transform pos-2   
+	MADDAx.xyw ACC, VF28, VF04			NOP										; Transform pos-2   
+	MADDAy.xyw ACC, VF29, VF04			NOP										; Transform pos-2   
+	MADDz.xyzw VF18, VF30, VF04			IADDIU VI07, VI00, ClippingBuffer		; Transform pos-2	- Set Clipping buffer adress
+	MULAw.xyzw ACC, VF31, VF00			IADDIU VI09, VI00, 0					; Transform pos-3	- Set vertex counter to 0
+	MADDAx.xyw ACC, VF28, VF05			LQ.xyzw VF06, (1+0*vertexSize)(VI11)	; Transform pos-3	- Load uv-1
+	MADDAy.xyw ACC, VF29, VF05			LQ.xyzw VF09, (2+0*vertexSize)(VI11)	; Transform pos-3	- Load rgba-1
+	MADDz.xyzw VF19, VF30, VF05			LQ.xyzw VF12, (3+0*vertexSize)(VI11)	; Transform pos-3	- Load normal-1
+GTLCullExpLoop:;----------------------------------------------------------------- 
+	ADDA.z ACC, VF00, VF26				SQ.xyzw VF17, (0+0*vertexSize)(VI07)	; Zmapping offset   - Anticipate storage of position-1
+	MUL.xy VF21, VF17, VF24				SQ.xyzw VF06, (1+0*vertexSize)(VI07)	; Zmapping pos-1	- Anticipate storage of uv-1
+	MADDw.z VF21, VF24, VF17			SQ.xyzw VF09, (2+0*vertexSize)(VI07)	; Zmapping pos-1	- Anticipate storage of rgba-1
+	MUL.xy VF22, VF18, VF24				SQ.xyzw VF12, (3+0*vertexSize)(VI07)	; Zmapping pos-2	- Anticipate storage of normal-1
+	MADDw.z VF22, VF24, VF18			LQ.xyzw VF03, (0+3*vertexSize)(VI11)	; Zmapping pos-2	- Load position-1	
+	MUL.xy VF23, VF19, VF24				SQ.xyzw VF18, (0+1*vertexSize)(VI07)	; Zmapping pos-3	- Anticipate storage of position-2
+	MADDw.z VF23, VF24, VF19			LQ.xyzw VF07, (1+1*vertexSize)(VI11)	; Zmapping pos-3	- Load uv-2
+	MULAw.xyzw ACC, VF31, VF00			LQ.xyzw VF10, (2+1*vertexSize)(VI11)	; Transform pos-1	- Load rgba-2
+	CLIPw.xyz VF21, VF17				LQ.xyzw VF13, (3+1*vertexSize)(VI11)	; Clip pos-1		- Load normal-2
+	CLIPw.xyz VF22, VF18				LQ.xyzw VF04, (0+4*vertexSize)(VI11)	; Clip pos-2		- Load position-2
+	CLIPw.xyz VF23, VF19				SQ.xyzw VF07, (1+1*vertexSize)(VI07)	; Clip pos-3		- Anticipate storage of uv-2 
+	MADDAx.xyw ACC, VF28, VF03			SQ.xyzw VF10, (2+1*vertexSize)(VI07)	; Transform pos-1   - Anticipate storage of rgba-2 
+	MADDAy.xyw ACC, VF29, VF03			SQ.xyzw VF13, (3+1*vertexSize)(VI07)	; Transform pos-1   - Anticipate storage of normal-2  
+	MADDz.xyzw VF17, VF30, VF03			LQ.xyzw VF05, (0+5*vertexSize)(VI11)	; Transform pos-1   - Load position-3 
+	MULAw.xyzw ACC, VF31, VF00			FCAND VI01, 0x03ffff					; Transform pos-2	- Test clipping flag 0000 0011 1111 1111 1111 1111
+	MADDAx.xyw ACC, VF28, VF04			IBNE VI01, VI00, GTLCullExpFullClip		; Transform pos-2	- Trig inside frustum
+	MADDAy.xyw ACC, VF29, VF04			IADDIU VI11, VI11, (3*vertexSize)		; Transform pos-2	- Increment input buffer adress
+	NOP									LQ.xyzw VF08, (1-1*vertexSize)(VI11)	;					- Load uv-3 
+	NOP									LQ.xyzw VF11, (2-1*vertexSize)(VI11)	; 					- Load rgba-3
+	NOP									LQ.xyzw VF14, (3-1*vertexSize)(VI11)	; 					- Load normal-3
+	NOP									SQ.xyzw VF19, (0+2*vertexSize)(VI07)	; 					- Save position-3
+	NOP									SQ.xyzw VF08, (1+2*vertexSize)(VI07)	; 					- Save uv-3
+	NOP									SQ.xyzw VF11, (2+2*vertexSize)(VI07)	; 					- Save rgba-3
+	NOP									SQ.xyzw VF14, (3+2*vertexSize)(VI07)	; 					- Save normal-3
+	NOP									IADDIU VI07, VI07, (3*vertexSize)		;  					- Increment clipping buffer adress
+	NOP									IADDIU VI09, VI09, 3					;					- Increment number of vertices
+GTLCullExpFullClip:;-------------------------------------------------------------
+	MADDz.xyzw VF18, VF30, VF04			ISUBIU VI01, VI07, TLClipRedLine		; Transform pos-2 	- Test Clipping buffer upper limit
+	MULAw.xyzw ACC, VF31, VF00			LQ.xyzw VF06, (1+0*vertexSize)(VI11)	; Transform pos-3	- Load uv-1
+	MADDAx.xyw ACC, VF28, VF05			IBGEZ VI01, GTLCullExpExit 				; Transform pos-3 	- Test clipping buffer growth
+	MADDAy.xyw ACC, VF29, VF05			LQ.xyzw VF09, (2+0*vertexSize)(VI11)	; Transform pos-3 	- Load rgba-1
+	MADDz.xyzw VF19, VF30, VF05			IBNE VI11, VI10, GTLCullExpLoop			; Transform pos-3 	- Test end of input buffer	 
+	NOP									LQ.xyzw VF12, (3+0*vertexSize)(VI11)	;					- Load normal-1
+GTLCullExpExit:;-----------------------------------------------------------------	
+
+			
+;//================================================================================================================
+;//=======================================					=======================================================
+;//===================						    THE END					                  =========================
+;//=======================================			        =======================================================
+;//============================================================================================= JCL Janvier 2001 =

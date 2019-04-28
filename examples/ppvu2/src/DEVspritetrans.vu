@@ -1,0 +1,131 @@
+;***************************************************************************
+;*
+;* This file is a product of Criterion Software Ltd.
+;*
+;* This file is provided as is with no warranties of any kind and is
+;* provided without any obligation on Criterion Software Ltd.
+;* or Canon Inc. to assist in its use or modification.
+;*
+;* Criterion Software Ltd. and Canon Inc. will not, under any
+;* circumstances, be liable for any lost revenue or other damages
+;* arising from the use of this file.
+;*
+;* Copyright (c) 2001 Criterion Software Ltd.
+;* All Rights Reserved.
+;*
+;*
+;****************************************************************************
+;*
+;* DEVspritetrans.vu
+;*
+;* Copyright (C) 2001 Criterion Technologies.
+;*
+;* Original author: Alexandre Hadjdaj.
+;*
+;* Purpose: a Sprite Transform pipeline
+;*          
+;*          
+;****************************************************************************
+
+
+;**********************************************************************************************************************
+; Set up the output buffers - this is only done when the rendering is started. We switch buffers from then on.
+	NOP								XTOP		VI02									;								Get and save Input Buffer 1
+	NOP								IADDIU		VI03,VI00,vuSymbVIFOffset				;								Calc and save Input Buffer 2
+	NOP								IADDIU		VI04,VI00,vuSymbOutputBuffer1			;								Calc and save Output Buffer 1
+	NOP								IADDIU		VI05,VI00,vuSymbOutputBuffer2			;								Calc and save Output Buffer 2
+	
+doAllSprites:												
+	NOP								IADD		VI09,VI00,VI04							;								Get Output Buffer
+	NOP								IADD		VI06,VI00,VI02							;								Get Input buffer
+	NOP								XITOP		VI07									;								Get number of vertices
+
+;**********************************************************************************************************************
+; Set up my GIFtag
+	NOP								LQ.yzw		VF05,vuSymbSpriteGifTag(VI00)			;								Load custom GifTag
+	NOP								IADDIU		VI08,VI00,0x4000						;								Generate EOP step 1
+	NOP								IADD		VI08,VI08,VI08							; 								Generate EOP step 2 
+	NOP								IOR			VI08,VI08,VI07							;								OR EOP with the number of vertices
+	NOP								SQ.yzw		VF05,0(VI09)							;								Write GIFTAG
+	NOP								ISW.x		VI08,0(VI09)							;								Write EOP
+	NOP								IADD		VI08,VI00,VI09							;								Save the Kick Addresse
+	NOP								IADDIU		VI09,VI09,1								;								Increment Output Buffer
+	
+spriteLoop:												
+	NOP								LQ.xyz		VF06,(0*vertexSize)+inPos(VI06)			;								Load input Position
+	NOP								NOP													;								 
+	NOP								NOP													;								 
+	MULAw		ACC,VF04,VF00w		NOP													; Transform Position - step 1
+	MADDAx.xyw	ACC,VF01,VF06x		NOP													; Transform Position - step 2
+	MADDAy.xyw	ACC,VF02,VF06y		NOP													; Transform Position - step 3
+	MADDz		VF05,VF03,VF06z		NOP													; Transform Position - step 4
+	NOP								NOP													;
+	NOP								NOP													;								
+	NOP								NOP													;								
+	NOP								LQ.xy		VF06,(0*vertexSize)+inHW(VI06)			;								Load Height and Widte
+	NOP								MOVE.z		VF06,VF00								;								Clear V1HeWi.z
+	NOP								MR32.w		VF06,VF00								;								Clear V1HeWi.w
+	NOP								NOP													;								
+	NOP								NOP													;
+	NOP								NOP													;								 
+	SUB			VF07,VF05,VF06		NOP													; Offset Top/Left Position 								
+	ADD			VF06,VF05,VF06		NOP													; Offset Bottom/Right Position 
+	NOP								NOP													;								 
+	ADDa.z		ACC,VF00,VF26		NOP													; Prepare Z Mapping								 
+	MUL.xy		VF08,VF07,VF24		NOP													; T/L Vertex Z Mapping step 1								 
+	MADDw.z		VF08,VF24,VF07w		NOP													; T/L Vertex Z Mapping step 2
+	NOP								NOP													; 
+	MADDw.z		VF05,VF24,VF06w		NOP													; B/R Vertex Z Mapping step 1								 
+	MUL.xy		VF05,VF06,VF24		NOP													; B/R Vertex Z Mapping step 2								 
+	CLIPW.xyz	VF08xyz,VF07w		NOP													; Clipping Test of T/L Vertex
+	NOP								NOP													; 
+	NOP								DIV		Q,VF00w,VF05w								; Calculate Z recip (1/w)
+	NOP								NOP													;								 
+	CLIPW.xyz	VF05xyz,VF06w		NOP													; Clipping Test of B/R Vertex
+	NOP								NOP													;								 
+	NOP								NOP													;								 
+	NOP								LQ		VF05,(0*vertexSize)+inUV1(VI06)				; Load T/L and B/R UVs
+	NOP								NOP													;								 
+	MULQ.xyz	VF07,VF07,Q			NOP													; Project T/L Vertex			 
+	MULQ.xyz	VF06,VF06,Q			NOP													; Project B/R Vertex
+	ADDw.y		VF26,VF00,VF05w		NOP													; V1UV.w to V1UV2.x - step 1								 
+	ADDz.x		VF26,VF00,VF05z		NOP													; V1UV.z to V1UV2.y - step 2								 
+	ADD.xyz		VF07,VF07,VF30		NOP													; Offset T/L Vertex by GS&VP
+	ADD.xyz		VF06,VF06,VF30		NOP													; Offset B/R Vertex by GS&VP
+	FTOI4		VF10,VF07			NOP													; Convert T/L Vertex
+	FTOI4		VF11,VF06			NOP													; Convert B/R Vertex
+	ADD.xy		VF08,VF00,VF05		NOP													; T/L Vertex's UVs - Step 1
+	ADDw.z		VF08,VF00,VF00w		NOP													; T/L Vertex's UVs - Step 2
+	NOP								LQ		VF09,(0*vertexSize)+inRGBA(VI06)			;								Load Sprite Color
+	ADDw.z		VF05,VF00,VF00w		FCAND	VI01,0x0fff									; B/R Vertex's UVs - Step 1		Get the 2 last CLIP test (clipping flag 0000 0000 0000 1111 1111 1111)
+	ADD.xy		VF05,VF00,VF26		IADDIU	VI01,VI01,0x7fff							; B/R Vertex's UVs - Step 1		Format Clip Resultat
+	NOP								NOP													;								 
+	NOP								SQ.xyz	VF08,(0*outVertexSize)+outSTa(VI09)			; 						 		Write T/L Vertex UVs
+	NOP								SQ		VF09,(0*outVertexSize)+outRGBA(VI09)		; 						 		Write Sprite Color
+	NOP								SQ.xyz	VF10,(0*outVertexSize)+outPosa(VI09)		; 								Write T/L vertex position
+	NOP								SQ.xyz	VF05,(0*outVertexSize)+outSTb(VI09)			; 								Write B/R vertex UVs
+	NOP								SQ.xyz	VF11,(0*outVertexSize)+outPosb(VI09)		;								Write B/R Vertex position 
+	NOP								ISW.w	VI01,(0*outVertexSize)+outPosb(VI09)		;								Write ADC Flag according to the Clipping results	
+	NOP								IADDIU	VI09,VI09,(1*outVertexSize)					;								Increment Output Buffer
+	NOP								ISUBIU	VI07,VI07,1									;								Decrement Number of sprite
+	NOP								IADDIU	VI06,VI06,(1*vertexSize)					;								Increment Input Buffer
+	NOP								IBGTZ	VI07,spriteLoop								;								Loop against Number of Vertex
+	NOP								NOP													;								
+																														
+;**********************************************************************************************************************
+; XGKICK the drawing now
+	NOP								XGKICK	VI08										;								Kick Output Buffer 
+
+	NOP								IADD	VI01,VI00,VI02								;								Swap Input Buffer 1 & 2 - step 1								
+	NOP								IADD	VI02,VI00,VI03								;								Swap Input Buffer 1 & 2 - step 2
+	NOP								IADD	VI03,VI00,VI01								;								Swap Input Buffer 1 & 2 - step 3
+
+	NOP								IADD	VI01,VI00,VI04								;								Swap Output Buffer 1 & 2 - step 1
+	NOP								IADD	VI04,VI00,VI05								;								Swap Output Buffer 1 & 2 - step 2
+	NOP								IADD	VI05,VI00,VI01								;								Swap Output Buffer 1 & 2 - step 3
+
+	NOP[E]							NOP													; Exit if no more batch to do
+	NOP								NOP													;								 
+
+	NOP								B		doAllSprites								; Proceed to next Batch
+	NOP								NOP													;								 

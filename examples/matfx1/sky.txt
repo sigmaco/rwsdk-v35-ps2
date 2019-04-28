@@ -1,0 +1,109 @@
+--------------------------------------------------------------------------
+       RenderWare Graphics Example (PlayStation 2): Material-effects
+--------------------------------------------------------------------------
+
+PURPOSE
+
+The MATFX1 example illustrates how to use the RpMaterialEffects plugin.
+The example shows how to create and manipulate clumps with
+
+1. environment maps
+2. bump maps
+3. combined bump map with environment map
+4. dual texturing
+5. single texture with an animated UV transform
+6. dual textures each with a separate animated UV transform
+
+--------------------------------------------------------------------------
+GENERAL CONTROLS
+
+LEFT ANALOG stick        - Rotates the clump.
+
+RIGHT ANALOG stick       - Moves the clump towards or away from the camera.
+
+SELECT button            - Toggle menu/help/plain mode.
+
+START + SELECT           - Quit the application.
+
+--------------------------------------------------------------------------
+MENU OPTIONS
+
+MATERIAL EFFECT          - Toggles the current material effects.
+                           
+EFFECT TYPE              - Allows the user to switch between objects that 
+                           illustrate different material effects.
+
+ENVIRONMENT-MAP          - Allows the user to select a different texture 
+                           to use as an environment-map.
+
+ACTIVE MATERIAL          - Allows the user to select which materials are
+                           affected by the environment-map.
+
+SHININESS                - Allows the user to vary the intensity of the 
+                           reflection of the environment-map.
+
+BUMP-MAP                 - Allows the user to select a different clump 
+                           with a different bump-map.
+
+ACTIVE MATERIAL          - Allows the user to select which materials are
+                           affected by the bump-map.
+
+BUMPINESS                - Allows the user to vary the magnitude of the 
+                           bump-mapping.
+
+SRC BLEND MODE		 - Allows the user to set the source blend mode
+                           for the second texture in a dual pass.
+
+DEST BLEND MODE		 - Allows the user to set the destination blend
+                           mode for the second texture in a  dual pass.
+
+SPIN LIGHT               - Allows the user to rotate the directional 
+                           light around the object.
+
+FPS                      - Allows the user to read the number of frames 
+                           per second being rendered (updated every
+                           second).
+
+--------------------------------------------------------------------------
+MENU CONTROLS
+
+DPAD UP and DOWN        - Select menu item.
+
+DPAD LEFT and RIGHT     - Modify menu item value or execute associated 
+                          command.
+
+LEFT ANALOG stick       - Modify floating point value (if applicable) 
+                          otherwise do what you would do in general 
+                          controls.
+
+--------------------------------------------------------------------------
+HELP CONTROLS
+
+DPAD UP and DOWN         - Scroll a line at a time (autorepeat available).
+
+LEFT SHOULDER #1 and #2  - Scroll a page at a time.
+
+--------------------------------------------------------------------------
+VIDEO MODE SELECTION
+
+The command-line option '-vms' can be used to enable a simple video 
+selection screen, which appears before the application starts running. 
+Use the UP and DOWN DPAD buttons to highlight the required video
+mode and press START to make the selection. Note there are several pages
+of video modes; use the LEFT SHOULDER buttons to move from page to page.
+
+--------------------------------------------------------------------------
+This demonstration program is copyright Criterion Software Limited 2003. 
+Criterion Software grants you a license to use it only in the form as 
+supplied. You may not disassemble, decompile or reverse engineer this 
+demonstration program.
+
+This demonstration program is provided as is with no warranties of any
+kind. Criterion Software will not, under any circumstances, be liable for
+any lost revenue or other damages arising from the use of this
+demonstration program.
+
+RenderWare is a registered trademark of Canon Inc.
+Other trademarks acknowledged.
+--------------------------------------------------------------------------
+Tue Apr 22 12:04:26 2003 -- build sky ( 64649 0x35000 )

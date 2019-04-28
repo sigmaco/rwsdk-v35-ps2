@@ -1,0 +1,680 @@
+					;//==================================================================
+					;//==================================================================
+					;//==															   ==						
+					;//==  	  -PSX2-  FX-NORMALS & ANIMATION - SINGLE SIDED LIGHTS	   ==
+					;//==															   ==					
+					;//==															   ==					
+					;//== Features : Convert normals and rgbas from integer to float.  ==					
+					;//==			 Lights supported : ambient, directional, spot,	   ==					
+					;//==			 					point, spot-soft.			   ==
+					;//==			 Normals are processed when no lights for SFX.     ==
+					;//==			 Support FAST Morph in VU.						   ==															
+					;//==															   ==					
+					;//== 									  			  -ACTIVATED-  ==					
+					;//==															   ==					
+					;//==================================================================
+					;//==================================================================
+
+
+	;----------------------------------------------------------------------------
+	NOP									LQ.xyzw VF03, vuSDsurfProps(VI00)		; 				  	- Surface properties	
+	ADDx.w VF25, VF00, VF00				ILW.w VI03, (vuSDLightOffset+4)(VI00)	; Create I vector 	- First light	
+	ADDw.xyz VF25, VF00, VF00			LOI 0.0078125							; Create I vector 	- Normals scale
+	NOP									LQ.xyzw VF08, (vuSDLightOffset+0)(VI00)	; 				  	- Light matrix-1	
+	ADDx.w VF24, VF03, VF00				LQ.xyzw VF09, (vuSDLightOffset+1)(VI00) ; Morph x test 	  	- Light matrix-2
+	SUBw.w VF27, VF00, VF03				IBEQ VI03, VI00, preProcessNoLighting	; Morph 1-x	 	  	- no-lighting								
+	ADDw.x VF27, VF00, VF03				IADDIU VI04, VI00,vuEnumLightDirectional; Morph x			- Directional light code
+	NOP									LQ.xyzw VF10, (vuSDLightOffset+2)(VI00)	;	  				- Light matrix-3
+	NOP									FMAND VI03, VI04 						; 				  	- Preprocess select
+	MULw.xyz VF08, VF08, VF08			IADDIU VI05, VI00, vuEnumLightAmbient	; Scale Matrix    	- Ambient light code	 	
+	MULw.xyz VF09, VF09, VF08			IADDIU	VI02, VI00, vuSDLightOffset+3	; Scale Matrix		- Light indices
+	MULw.xyz VF10, VF10, VF08			IBEQ VI03, VI00, MPmorphNormals			; Scale Matrix		- Morphing / Preprocess
+	MULi.xyzw VF26, VF27, I				LQI.xyzw VF11, (VI02++)					; Normals Morph    	- Light matrix-4
+	;----------------------------------------------------------------------------
+
+
+;//================================================================================================================
+;//======================================= Process Normals with rgbas =============================================
+;//================================================================================================================
+
+
+	;----------------------------------------------------------------------------
+	NOP									LQ.xyzw VF12, (0*vertexSize+3)(VI01)	;                   - Load norm-1
+	NOP									LQ.xyzw VF13, (1*vertexSize+3)(VI01)	; 					- Load norm-2
+	NOP									LQ.xyzw VF14, (2*vertexSize+3)(VI01)	; 					- Load norm-3
+	NOP									LQ.xyzw VF15, (3*vertexSize+3)(VI01)	;					- Load norm-4	
+	ITOF0.xyzw VF16, VF12				IADDIU VI03, VI01, (4*vertexSize)		; Float norm-1      - Input buffer adressing
+	ITOF0.xyzw VF17, VF13				NOP										; Float norm-2    	- Morph Mask in FMAC  
+	ITOF0.xyzw VF18, VF14				NOP										; Float norm-3		- Morph Processing Needed
+	ITOF0.xyzw VF19, VF15				NOP										; Float norm-4		
+ConversionLoop: ;----------------------------------------------------------------
+	MULi.xyzw VF16, VF16, I				LQ.xyzw	VF20, (2-4*vertexSize)(VI03)	; Scale norm-1		- Load rgba-1
+	MULi.xyzw VF17, VF17, I				LQ.xyzw	VF21, (2-3*vertexSize)(VI03)	; Scale norm-2		- Load rgba-2
+	MULi.xyzw VF18, VF18, I				LQ.xyzw	VF22, (2-2*vertexSize)(VI03)	; Scale norm-3		- Load rgba-3
+	MULi.xyzw VF19, VF19, I				LQ.xyzw	VF23, (2-1*vertexSize)(VI03)	; Scale norm-3		- Load rgba-4
+	ITOF0.xyzw VF20, VF20				LQ.xyzw	VF12, (3+0*vertexSize)(VI03)	; Float rgba-1      - Load norm-1
+	ITOF0.xyzw VF21, VF21				LQ.xyzw VF13, (3+1*vertexSize)(VI03)	; Float rgba-2      - Load norm-2
+	ITOF0.xyzw VF22, VF22				LQ.xyzw VF14, (3+2*vertexSize)(VI03)	; Float rgba-3      - Load norm-3
+	ITOF0.xyzw VF23, VF23				LQ.xyzw VF15, (3+3*vertexSize)(VI03)	; Float rgba-4      - Load norm-4
+	ITOF0.xyzw VF16, VF12				SQ.xyzw VF16, (3-4*vertexSize)(VI03)	; Float norm-1      - Save norm-1 
+	ITOF0.xyzw VF17, VF13				SQ.xyzw VF17, (3-3*vertexSize)(VI03)	; Float norm-2      - Save norm-2 
+	ITOF0.xyzw VF18, VF14				SQ.xyzw VF18, (3-2*vertexSize)(VI03)	; Float norm-3      - Save norm-3 	
+	ITOF0.xyzw VF19, VF15				SQ.xyzw VF19, (3-1*vertexSize)(VI03)	; Float norm-4      - Save norm-4 
+	NOP									SQ.xyzw	VF20, (2-4*vertexSize)(VI03)	;					- Save rgba-1  									
+	NOP									SQ.xyzw	VF21, (2-3*vertexSize)(VI03)	;					- Save rgba-2 									
+	NOP									SQ.xyzw	VF22, (2-2*vertexSize)(VI03)	;					- Save rgba-3 									
+	NOP									SQ.xyzw	VF23, (2-1*vertexSize)(VI03)	;					- Save rgba-4 									
+	NOP									IBNE VI03, VI11, ConversionLoop			;					- End Test 	
+	NOP									IADDIU	VI03, VI03, (4*vertexSize)		;					- Increment buffer adress
+	NOP									B nextLight								;					- Bypass to Lights Manager
+	;----------------------------------------------------------------------------
+
+
+;//================================================================================================================
+;//=============================== Morphing & Process Normals with rgbas ==========================================
+;//================================================================================================================
+
+
+MPmorphNormals:;-----------------------------------------------------------------
+	NOP 								IADDIU VI03, VI01, 0					;					- Standard input buffer
+	NOP 								IADDIU VI06, VI10, 0					;					- Second Target positions buffer
+	NOP 								IADD VI07, VI06, VI09					;					- Second target normals buffer
+	NOP 								LQ.xyzw	VF12, (3+0*vertexSize)(VI03)	;					- Load normal1-1
+	NOP 								LQI.xyzw VF13, (VI07++) 				;					- Load normal1-2 
+	NOP 								LQ.xyzw	VF14, (0+0*vertexSize)(VI03)	;					- Load position1-1
+	NOP 								LQI.xyzw VF15, (VI06++) 				;	  				- Load position1-2
+	ITOF0.xyzw VF12, VF12				LQ.xyzw	VF16, (2+0*vertexSize)(VI03)	; Float norm1-1		- Load rgba-1
+MPmorphNormalsLoop:;-------------------------------------------------------------
+	ITOF0.xyzw VF13, VF13				LQ.xyzw	VF17, (3+1*vertexSize)(VI03)	; Float norm1-2		- Load normal2-1			
+	MULAw.xyzw ACC, VF14, VF27			LQI.xyzw VF18, (VI07++) 				; Process pos-1		- Load normal2-2
+	MADDx.xyzw VF14, VF15, VF27			LQ.xyzw	VF19, (0+1*vertexSize)(VI03)	; Process pos-1		- Load position2-1
+	ITOF0.xyzw VF16, VF16				LQI.xyzw VF20, (VI06++) 				; Float rgba-1	 	- Load position2-2
+	MULAw.xyzw ACC, VF12, VF26			LQ.xyzw	VF21, (2+1*vertexSize)(VI03)	; Process norm-1	- Load rgba-2
+	MADDx.xyzw VF12, VF13, VF26			IADDIU VI03, VI03, vertexSize			; Process norm-1	- Increment input buffer adress
+	NOP									SQ.xyzw	VF14, (0-1*vertexSize)(VI03)	;  					- Store position-1
+	NOP									SQ.xyzw	VF16, (2-1*vertexSize)(VI03)	;  					- Store rgba-1
+	NOP									IBEQ VI03, VI10, MPmorphNormalsEnd		;					- End test
+	ITOF0.xyzw VF17, VF17				SQ.xyzw	VF12, (3-1*vertexSize)(VI03)	; Float norm2-1  	- Store normla-1							 
+	ITOF0.xyzw VF18, VF18				LQ.xyzw	VF12, (3+1*vertexSize)(VI03)	; Float norm2-2		- Load normal1-1
+	MULAw.xyzw ACC, VF19, VF27			LQI.xyzw VF13, (VI07++) 				; Process pos-2		- Load normal1-2
+	MADDx.xyzw VF19, VF20, VF27			LQ.xyzw	VF14, (0+1*vertexSize)(VI03)	; Process pos-2		- Load position1-1
+	ITOF0.xyzw VF21, VF21				LQI.xyzw VF15, (VI06++) 				; Float rgba-2	  	- Load position1-2
+	MULAw.xyzw ACC, VF17, VF26			LQ.xyzw	VF16, (2+1*vertexSize)(VI03)	; Process norm-2 	- Load rgba-1
+	MADDx.xyzw VF17, VF18, VF26			IADDIU VI03, VI03, vertexSize			; Process norm-2	- Increment input buffer adress	
+	NOP									SQ.xyzw	VF19, (0-1*vertexSize)(VI03)	;  					- Store position-2
+	NOP									SQ.xyzw	VF21, (2-1*vertexSize)(VI03)	;  					- Store rgba-2
+	NOP									IBNE VI03, VI10, MPmorphNormalsLoop		;					- End test
+	ITOF0.xyzw VF12, VF12				SQ.xyzw	VF17, (3-1*vertexSize)(VI03)	; Flota norm1-1 	- Store normal-2						 
+MPmorphNormalsEnd:;--------------------------------------------------------------
+
+ 
+;//================================================================================================================
+;//=========================================                       ================================================
+;//=================================   		Lights Operating System			=======================================
+;//=========================================                       ================================================
+;//================================================================================================================
+	
+											   				
+nextLight:;----------------------------------------------------------------------
+	NOP									ILWR.w VI03, (VI02)						;					- Get light type
+	NOP									LQ.xyzw VF05, 1(VI02)				    ; 					- Light param 1
+	NOP									LQ.xyzw	VF06, 2(VI02)					; 					- Light param 2
+	NOP									LQ.xyzw VF04, 0(VI02)					; 					- Get light color
+	NOP									IBEQ VI03, VI05, lightAmbient			; 					- Ambient Light
+	MULAx.xyz ACC, VF08, VF05			IADDIU VI06, VI00, vuEnumLightPoint		; Process param-1	- Point light code
+	MADDAy.xyz ACC, VF09, VF05			IBEQ VI03, VI04, lightDirectional		; Process param-1	- Directional light  
+	MADDz.xyz VF07, VF10, VF05			IADDIU VI07, VI00, vuEnumLightSpot		; Process param-1	- Spot light code 
+	MADDAz.xyz ACC, VF10, VF05			IBEQ VI03, VI06, lightPoint				; Process param-1	- Point light 
+	MADDw.xyz VF05, VF11, VF00			IADDIU VI06, VI00, vuEnumLightSpotSoft	; Process param-1	- Spot soft light code 
+	NOP									IBEQ VI03, VI07, lightSpot				; 					- Spot light 
+	NOP									LOI 255.0								; 					- Max color componant
+	NOP									IBEQ VI03, VI06, lightSpotSoft			; 					- Spot soft light
+	;----------------------------------------------------------------------------
+
+
+;//================================================================================================================
+;//====================================== Clamp the colors in 0-255 range =========================================
+;//================================================================================================================
+
+
+	;----------------------------------------------------------------------------
+	NOP									LQ.xyzw VF12, (0*vertexSize+2)(VI01)	; 					- Load rgba-1
+	NOP									LQ.xyzw VF13, (1*vertexSize+2)(VI01)	; 					- Load rgba-2
+	NOP									LQ.xyzw VF14, (2*vertexSize+2)(VI01)	; 					- Load rgba-3
+	NOP									LQ.xyzw VF15, (3*vertexSize+2)(VI01)	; 					- Load rgba-4	
+	MINIi.xyzw VF16, VF12, I			LQ.xyzw VF20, vuSDcolScale(VI00)        ; Clamp rgba-1		- Load Color Scale
+	MINIi.xyzw VF17, VF13, I			IADDIU	VI03, VI01, (4*vertexSize)		; Clamp rgba-2		- Clone Input buffer
+	MINIi.xyzw VF18, VF14, I			NOP										; Clamp rgba-3			
+	MINIi.xyzw VF19, VF15, I			NOP										; Clamp rgba-4		
+postProcessLoop: ;---------------------------------------------------------------
+	MUL.xyzw VF16, VF16, VF20			LQ.xyzw	VF12, (2+0*vertexSize)(VI03)	; Scale rgba-1		- Load rgba-1 
+	MUL.xyzw VF17, VF17, VF20			LQ.xyzw VF13, (2+1*vertexSize)(VI03)	; Scale rgba-1		- Load rgba-2 
+	MUL.xyzw VF18, VF18, VF20			LQ.xyzw VF14, (2+2*vertexSize)(VI03)	; Scale rgba-1		- Load rgba-3
+	MUL.xyzw VF19, VF19, VF20			LQ.xyzw VF15, (2+3*vertexSize)(VI03)	; Scale rgba-1		- Load rgba-4
+	NOP									SQ.xyzw VF16, (2-4*vertexSize)(VI03)	;					- Save rgba-1
+	NOP									SQ.xyzw VF17, (2-3*vertexSize)(VI03)	; 					- Save rgba-2
+	MINIi.xyzw VF16, VF12, I			SQ.xyzw VF18, (2-2*vertexSize)(VI03)	; Clamp rgba-1		- Save rgba-3 					
+	MINIi.xyzw VF17, VF13, I			SQ.xyzw VF19, (2-1*vertexSize)(VI03)	; Clamp rgba-2		- Save rgba-4 				
+	MINIi.xyzw VF18, VF14, I			IBNE VI03, VI11, postProcessLoop		; Clamp rgba-3		- End Test
+	MINIi.xyzw VF19, VF15, I			IADDIU VI03, VI03, (4*vertexSize)		; Clamp rgba-4		- Increment buffer Adress
+	;----------------------------------------------------------------------------								
+	NOP									B exitLighting							; 					- Work Complete	
+	;----------------------------------------------------------------------------
+
+ 
+;//================================================================================================================
+;//=========================================                      =================================================
+;//=================================   		   Directional Light			=======================================
+;//=========================================                      =================================================
+;//================================================================================================================
+
+
+lightDirectional:;---------------------------------------------------------------										
+	SUB.xyz VF07, VF00, VF07			LQ.xyz VF12, (0*vertexSize+3)(VI01)		; Reverse at vector	- Load norm-1
+	MULz.xyz VF04, VF04, VF03			LQ.xyz VF13, (1*vertexSize+3)(VI01)		; Scale Ambiant Col - Load norm-2
+	NOP									LQ.xyz VF14, (2*vertexSize+3)(VI01)		; 					- Load norm-3
+	NOP									LQ.xyz VF15, (3*vertexSize+3)(VI01)		; 					- Load norm-4
+	MUL.xyz VF12, VF12, VF07			NOP										; Process norm-1	
+	MUL.xyz VF13, VF13, VF07			NOP										; Process norm-2
+	MUL.xyz VF14, VF14, VF07			NOP										; Process norm-3
+	MUL.xyz VF15, VF15, VF07			NOP										; Process norm-4
+	ADDz.x	VF12, VF12, VF12			NOP										; Collect norm-1		
+	ADDx.y	VF13, VF13, VF13			NOP										; Collect norm-2		
+	ADDy.z	VF14, VF14, VF14			IADDIU VI03, VI01, 0					; Collect norm-3	- Clone input adress	
+	ADDz.y	VF15, VF15, VF15			MR32.xyzw VF26, VF15					; Collect norm-4	- Rotate norm-4
+directionalLoop: ;---------------------------------------------------------------
+	ADDy.x	VF24, VF12, VF12			LQ.xyz	VF12, (3+4*vertexSize)(VI03)	; Collect norm-1	- Load norm-1
+	ADDz.y	VF24, VF13, VF13			LQ.xyz	VF13, (3+5*vertexSize)(VI03)	; Collect norm-2	- Load norm-2
+	ADDx.z	VF24, VF14, VF14			LQ.xyz	VF14, (3+6*vertexSize)(VI03)	; Collect norm-3	- Load norm-3 
+	ADDy.w	VF24, VF26, VF15			LQ.xyz	VF15, (3+7*vertexSize)(VI03)	; Collect norm-4	- Load norm-4
+	NOP									LQ.xyz	VF16, (2+0*vertexSize)(VI03)	; 					- Load rgba-1
+	MUL.xyz VF12, VF12, VF07			LQ.xyz	VF17, (2+1*vertexSize)(VI03)	; Process norm-1	- Load rgba-2
+	MUL.xyz VF13, VF13, VF07			LQ.xyz	VF18, (2+2*vertexSize)(VI03)	; Process norm-2	- Load rgba-3
+	MAXx.xyzw VF24, VF24, VF00          NOP										; Clamp light coefs	
+	MUL.xyz VF14, VF14, VF07			LQ.xyz VF19, (2+3*vertexSize)(VI03)		; Process norm-3	- Load rgba-4
+	MUL.xyz VF15, VF15, VF07  			NOP							 			; Process norm-4
+	ADDA.xyz ACC, VF16, VF00			NOP							 			; Calc rgba-1
+	MADDx.xyz VF20, VF04, VF24			NOP							 			; Calc rgba-1
+	ADDA.xyz ACC, VF17, VF00			NOP										; Calc rgba-2
+	MADDy.xyz VF21, VF04, VF24			NOP										; Calc rgba-2
+	ADDA.xyz ACC, VF18, VF00			IADDIU	VI03, VI03, (4*vertexSize)		; Calc rgba-3		- Increment buffer adress
+	MADDz.xyz VF22, VF04, VF24			SQ.xyz VF20, (2-4*vertexSize)(VI03)		; Calc rgba-3		- Store rgba-1
+	ADDA.xyz ACC, VF19, VF00			MR32.xyzw VF26, VF15					; Calc rgba-4		- Rotate norm-4
+	MADDw.xyz VF23, VF04, VF24			SQ.xyz VF21, (2-3*vertexSize)(VI03)		; Calc rgba-4		- Store rgba-2
+	ADDz.x	VF12, VF12, VF12			NOP										; Collect norm-1
+	ADDx.y	VF13, VF13, VF13			SQ.xyz VF22, (2-2*vertexSize)(VI03)		; Collect norm-2	- Store rgba-3
+	ADDy.z	VF14, VF14, VF14			IBNE VI03, VI11, directionalLoop		; Collect norm-3	- Loop test
+	ADDz.y	VF15, VF15, VF15			SQ.xyz VF23, (2-1*vertexSize)(VI03)		; Collect norm-4	- Store rgba-4
+	;----------------------------------------------------------------------------
+	NOP									B nextLight								;					- Jump to next light
+	NOP									IADDIU VI02, VI02, 2					;					- Increment Lighting adress
+	;----------------------------------------------------------------------------
+	
+
+;//================================================================================================================
+;//=========================================                      =================================================
+;//=================================   		     Ambiant Light	     		=======================================
+;//=========================================                      =================================================
+;//================================================================================================================
+
+
+lightAmbient:;-------------------------------------------------------------------
+	MULx.xyz VF04, VF04, VF03			LQ.xyz VF12, (0*vertexSize+2)(VI01)		; Scale Ambiant Col - Load rgba-1
+	NOP									LQ.xyz VF13, (1*vertexSize+2)(VI01)		;					- Load rgba-2
+	NOP									LQ.xyz VF14, (2*vertexSize+2)(VI01)		;					- Load rgba-3
+	NOP									LQ.xyz VF15, (3*vertexSize+2)(VI01)		;					- Load rgba-4
+	NOP									IADDIU VI03, VI01, (4*vertexSize)		;					- Buffer Adress
+ambientLoop: ;-------------------------------------------------------------------
+	ADD.xyz VF16, VF12, VF04			LQ.xyz VF12, (0*vertexSize+2)(VI03)		; Add Ambiant-1		- Load rgba-1
+	ADD.xyz	VF17, VF13, VF04			LQ.xyz VF13, (1*vertexSize+2)(VI03)		; Add Ambiant-2		- Load rgba-2
+	ADD.xyz	VF18, VF14, VF04			LQ.xyz VF14, (2*vertexSize+2)(VI03)		; Add Ambiant-3		- Load rgba-3
+	ADD.xyz	VF19, VF15, VF04			LQ.xyz VF15, (3*vertexSize+2)(VI03)		; Add Ambiant-4		- Load rgba-4
+	NOP									SQ.xyz VF16, (2-4*vertexSize)(VI03)		; 					- Save rgba-1
+	NOP									SQ.xyz VF17, (2-3*vertexSize)(VI03)		;					- Save rgba-2
+	NOP									SQ.xyz VF18, (2-2*vertexSize)(VI03)		; 					- Save rgba-3
+	NOP									SQ.xyz VF19, (2-1*vertexSize)(VI03)		; 					- Save rgba-4	
+	NOP									IBNE VI03, VI11, ambientLoop			;					- End test
+	NOP									IADDIU VI03, VI03, (4*vertexSize)		;					- Increment Buffer Adress
+	;----------------------------------------------------------------------------
+	NOP									B nextLight								;					- Jump to next light
+	NOP									IADDIU VI02, VI02, 1					;					- Increment Lights adress
+	;----------------------------------------------------------------------------
+	
+
+;//================================================================================================================
+;//=========================================                      =================================================
+;//=================================   		     Point Light			    =======================================
+;//=========================================                      =================================================
+;//================================================================================================================
+	
+	
+lightPoint:;---------------------------------------------------------------------
+	MUL.w VF05, VF05, VF08				LQ.xyz VF20, (0*vertexSize+0)(VI01)		; Scale radius		- Load pos-1  
+	MULz.xyz VF04, VF04, VF03			LQ.xyz VF21, (1*vertexSize+0)(VI01)		; Scale light color - Load pos-2   	
+	SUB.w VF04, VF04, VF04				LQ.xyz VF22, (2*vertexSize+0)(VI01)		; Clear vf04w		- Load pos-3  
+	NOP									LQ.xyz VF12, (0*vertexSize+3)(VI01)		;  					- Load norm-1
+	SUB.xyz VF20, VF05, VF20			DIV Q, VF00w, VF05w						; Calc lpos-1		- Reverse radius		
+	SUB.xyz VF21, VF05, VF21			LQ.xyz VF13, (1*vertexSize+3)(VI01)		; Calc lpos-2		- Load morm-2
+	NOP									LQ.xyz VF14, (2*vertexSize+3)(VI01)		; 					- Load norm-3
+	NOP									IADDIU VI03, VI01, 0					;					- Clone input/output buffer adress
+	MUL.xyz VF26, VF20, VF20			NOP										; Calc Lenght-1
+	MUL.xyz VF12, VF20, VF12			NOP										; Dot lpos1.norm1	 
+	MUL.xyz VF27, VF21, VF21			NOP										; Calc Lenght-2
+	MUL.xyz VF13, VF21, VF13			NOP										; Dot lpos2.norm2
+	ADDAz.x ACC, VF26, VF26				NOP										; Collect lenght1	
+	MADDy.x VF26, VF25, VF26			NOP										; Collect lenght1
+	ADDAz.x ACC, VF12, VF12				NOP										; Collect lpos.norm1
+	MADDy.x VF12, VF25, VF12			NOP										; Collect lpos.norm1
+	SUBq.w VF04, VF04, Q				NOP										; Calc -1/radius
+	ADDAz.x ACC, VF27, VF27				RSQRT Q, VF00w, VF26x					; Collect lenght2 	- Calc reverse lenght1		
+	MADDy.x VF27, VF25, VF27			NOP										; Collect lenght2	
+	MAXx.x VF12, VF12, VF00				NOP										; Clamp lpos.norm1
+	NOP									NOP										;
+	NOP									NOP										;
+	NOP									NOP										;
+	MULx.xyz VF12, VF04, VF12			NOP										; Process rgba-1
+	SUB.xyz VF22, VF05, VF22			NOP										; Calc lpos-3
+	ADDAz.x ACC, VF13, VF13				NOP										; Collect lpos.norm2
+	MADDy.x VF13, VF25, VF13			NOP										; Collect lpos.norm2
+	MULAw.xyz ACC, VF12, VF04			WAITQ									; Process rgba-1	- Synchronise Q 	
+pointLoop: ;---------------------------------------------------------------------		
+	MADDq.xyz VF12, VF12, Q				RSQRT Q, VF00w, VF27x					; Process rgba-1	- Calc reverse lenght2						
+	MAXx.x VF13, VF13, VF00				NOP										; Clamp lpos.norm2
+	MUL.xyz VF24, VF22, VF22			NOP										; Calc Lenght-3
+	MUL.xyz VF14, VF22, VF14			NOP										; Dot lpos3.norm3
+	MAXx.xyz VF12, VF12, VF00			LQ.xyz VF16, (0*vertexSize+2)(VI03)		; Clamp light-1 	- Load rgba-1
+	MULx.xyz VF13, VF04, VF13			NOP										; Process rgba-2
+	ADDAz.x ACC, VF24, VF24				LQ.xyz VF23, (3*vertexSize+0)(VI03)		; Collect lenght3	- Load pos-4  
+	MADDy.x VF24, VF25, VF24			NOP										; Collect lenght3		
+	ADD.xyz VF16, VF16, VF12			LQ.xyz VF15, (3*vertexSize+3)(VI03)		; Process rgba-1	- Load norm-4
+	ADDAz.x ACC, VF14, VF14				IADDIU VI03, VI03, vertexSize			; Collect lpos.norm3- Increment buffer adress
+	MADDy.x VF14, VF25, VF14			NOP										; Collect lpos.norm3 
+	SUB.xyz VF23, VF05, VF23			IBEQ VI03, VI10, pointExit				; Calc lpos-4		- End test
+	MULAw.xyz ACC, VF13, VF04			SQ.xyz VF16, (2-1*vertexSize)(VI03)		; Process rgba-2	- Store rgba-1
+	MADDq.xyz VF13, VF13, Q				RSQRT Q, VF00w, VF24x					; Process rgba-2	- Calc reverse lenght3						
+	MAXx.x VF14, VF14, VF00				NOP										; Clamp lpos.norm3
+	MUL.xyz VF07, VF23, VF23			NOP										; Calc Lenght-4
+	MUL.xyz VF15, VF23, VF15			NOP										; Dot lpos4.norm4
+	MAXx.xyz VF13, VF13, VF00			LQ.xyz VF17, (0*vertexSize+2)(VI03)		; Clamp light-2	  	- Load rgba-2
+	MULx.xyz VF14, VF04, VF14			NOP										; Process rgba-3
+	ADDAz.x ACC, VF07, VF07				LQ.xyz VF20, (3*vertexSize+0)(VI03)		; Collect lenght4	- Load pos-1  
+	MADDy.x VF07, VF25, VF07			NOP										; Collect lenght4	
+	ADD.xyz VF17, VF17, VF13			LQ.xyz VF12, (3*vertexSize+3)(VI03)		; Process rgba-2  	- Load norm-1
+	ADDAz.x ACC, VF15, VF15				IADDIU VI03, VI03, vertexSize			; Collect lpos.norm4- Increment buffer adress
+	MADDy.x VF15, VF25, VF15			NOP										; Collect lpos.norm4 
+	SUB.xyz VF20, VF05, VF20			IBEQ VI03, VI10, pointExit				; Calc lpos-1		- End test
+	MULAw.xyz ACC, VF14, VF04			SQ.xyz VF17, (2-1*vertexSize)(VI03)		; Process rgba-3  	- Store rgba-2
+	MADDq.xyz VF14, VF14, Q				RSQRT Q, VF00w, VF07x					; Process rgba-3	- Calc reverse lenght4							
+	MAXx.x VF15, VF15, VF00				NOP										; Clamp lpos.norm4
+	MUL.xyz VF26, VF20, VF20			NOP										; Calc Lenght-1
+	MUL.xyz VF12, VF20, VF12			NOP										; Dot lpos1.norm1
+	MAXx.xyz VF14, VF14, VF00			LQ.xyz VF18, (0*vertexSize+2)(VI03)		; Clamp light-3	  	- Load rgba-3	
+	MULx.xyz VF15, VF04, VF15			NOP										; Process rgba-4
+	ADDAz.x ACC, VF26, VF26				LQ.xyz VF21, (3*vertexSize+0)(VI03)		; Collect lenght1	- Load pos-2  
+	MADDy.x VF26, VF25, VF26			NOP										; Collect lenght1	
+	ADD.xyz VF18, VF18, VF14			LQ.xyz VF13, (3*vertexSize+3)(VI03)		; Process rgba-3 	- Load norm-2
+	ADDAz.x ACC, VF12, VF12				IADDIU VI03, VI03, vertexSize			; Collect lpos.norm1- Increment buffer adress
+	MADDy.x VF12, VF25, VF12			NOP										; Collect lpos.norm1
+	SUB.xyz VF21, VF05, VF21			IBEQ VI03, VI10, pointExit				; Calc lpos-1		- End test
+	MULAw.xyz ACC, VF15, VF04			SQ.xyz VF18, (2-1*vertexSize)(VI03)		; Process rgba-4	- Store rgba-3
+	MADDq.xyz VF15, VF15, Q				RSQRT Q, VF00w, VF26x					; Process rgba-4	- Calc reverse lenght1							
+	MAXx.x VF12, VF12, VF00				NOP										; Clamp lpos.norm1
+	MUL.xyz VF27, VF21, VF21			NOP										; Calc Lenght-2
+	MUL.xyz VF13, VF21, VF13			NOP										; Dot lpos2.norm2
+	MAXx.xyz VF15, VF15, VF00			LQ.xyz VF19, (0*vertexSize+2)(VI03)		; Clamp light-4 	- Load rgba-4
+	MULx.xyz VF12, VF04, VF12			NOP										; Process rgba-1
+	ADDAz.x ACC, VF27, VF27				LQ.xyz VF22, (3*vertexSize+0)(VI03)		; Collect lenght2	- Load pos-3  
+	MADDy.x VF27, VF25, VF27			NOP										; Collect lenght2		
+	ADD.xyz VF19, VF19, VF15			LQ.xyz VF14, (3*vertexSize+3)(VI03)		; Process rgba-4  	- Load norm-3
+	ADDAz.x ACC, VF13, VF13				IADDIU VI03, VI03, vertexSize			; Collect lpos.norm2- Increment buffer adress
+	MADDy.x VF13, VF25, VF13			NOP										; Collect lpos.norm2
+	SUB.xyz VF22, VF05, VF22			IBNE VI03, VI10, pointLoop				; Calc lpos-2		- End test
+	MULAw.xyz ACC, VF12, VF04			SQ.xyz VF19, (2-1*vertexSize)(VI03)		; Process rgba-1 	- Store rgba-4
+pointExit: ;---------------------------------------------------------------------
+	NOP									B nextLight								;					- Jump to next light
+	NOP									IADDIU	VI02, VI02, 2					;					- Increment Lighting adress
+	;----------------------------------------------------------------------------
+	
+
+;//================================================================================================================
+;//=========================================                      =================================================
+;//=================================   		       Spot Light			    =======================================
+;//=========================================                      =================================================
+;//================================================================================================================
+
+
+lightSpot:;----------------------------------------------------------------------
+	MUL.w VF05, VF05, VF08				LQ.xyz VF20, (0*vertexSize+0)(VI01)		; Scale radius		- Load pos-1
+	MULAx.xyz ACC, VF08, VF06			LQ.xyz VF21, (1*vertexSize+0)(VI01)		; Transform at vect	- Load pos-2		
+	MADDAy.xyz ACC, VF09, VF06			LQ.xyz VF12, (0*vertexSize+3)(VI01)		; Transform at vect	- Load norm-1
+	MADDz.xyz VF06, VF10, VF06			LQ.xyz VF13, (1*vertexSize+3)(VI01)		; Transform at vect	- Load norm-2	
+	SUB.xyz VF20, VF05, VF20			DIV Q, VF00w, VF05w						; Light-pos-1		- Reverse radius				
+	SUB.xyz VF21, VF05, VF21			NOP										; Light-pos-2		
+	SUB.w VF04, VF04, VF04				IADDIU VI03, VI01, 0					; Clear vf04w		- Clone input/output buffer adress	
+	MULz.xyz VF04, VF04, VF03			NOP						 				; Scale light color  
+	MUL.xyz VF26, VF20, VF20			NOP										; light to pos-1 lenght 
+	MUL.xyz VF12, VF20, VF12			NOP						 				; Dot lpos-1.norm.1	
+	MUL.xyz VF20, VF20, VF06			NOP						 				; Dot lpos-1.at vect
+	MUL.xyz VF27, VF21, VF21			NOP						 				; Lenght lpos-2	
+	ADDAz.x ACC, VF26, VF26				NOP						 				; Collect lenght1	
+	MADDy.x VF26, VF25, VF26			NOP						 				; Collect lenght1
+	ADDAz.x ACC, VF12, VF12 			NOP										; Collect lpos1.norm1
+	MADDy.x VF12, VF25, VF12			NOP										; Collect lpos1.norm1 
+	ADDAz.x ACC, VF20, VF20				NOP										; Collect lpos1.at 
+	MADDy.x VF20, VF25, VF20			RSQRT Q, VF00w, VF26x					; Collect lpos1.at	 - Calc rev lenght-1
+	SUBq.w VF04, VF04, Q				NOP										; Calc -1/radius	
+	MAXx.x VF12, VF12, VF00				NOP										; Clamp lpos.norm1
+	MUL.xyz VF13, VF21, VF13			NOP										; Dot lpos2-norm2
+	MUL.xyz VF21, VF21, VF06			NOP						 				; Dot lpos2-at vect
+	ADDAz.x ACC, VF27, VF27				NOP						 				; Collect lenght2
+	MADDy.x VF27, VF25, VF27			NOP						 				; Collect lenght2
+	MULx.xyz VF12, VF04, VF12			NOP						 				; Transform rgba-1	
+lightSpotLoop:;------------------------------------------------------------------
+	ADDAz.x ACC, VF13, VF13 			NOP										; Collect lpos2.norm2
+	MADDy.x VF13, VF25, VF13			WAITQ									; Collect lpos2.norm2
+	MULq.x VF20, VF20, Q				RSQRT Q, VF00w, VF27x					; Cosine-1			- Calc rev lenght-2
+	MULAw.xyz ACC, VF12, VF04			LQ.xyz VF22, (2*vertexSize+0)(VI03)		; Transform rgba-1	- Load pos-3
+	MADDq.xyz VF12, VF12, Q				NOP										; Transform rgba-1		
+	MAXx.x VF13, VF13, VF00				NOP										; Clamp lpos.norm2
+	SUBx.w VF20, VF06, VF20				NOP										; Falloff test-1 	
+	SUB.xyz VF22, VF05, VF22			LQ.xyz VF14, (2*vertexSize+3)(VI03)		; Light-pos-3		- Load norm-3
+	MAXx.xyz VF12, VF12, VF00			LQ.xyz VF16, (0*vertexSize+2)(VI03)		; Clamp rgba-1		- Load rgba-1
+	ADDAz.x ACC, VF21, VF21				IADDIU VI06, VI00, 0x0010				; Collect lpos2.at	- FMAC filter 0000 0000 0001 0000
+	MADDy.x VF21, VF25, VF21			FMAND VI07, VI06						; Collect lpos2.at	- FMAC sign of w field test
+	MUL.xyz VF24, VF22, VF22			IBNE VI07, VI00, lightSpotSwap1			; Lenght lpos-3	
+	MUL.xyz VF14, VF22, VF14			NOP										; Dot lpos3-norm3
+	ADD.xyz VF16, VF16, VF12			NOP										; Transform rgba-1
+lightSpotSwap1:																	; Hard Falloff	
+	MUL.xyz VF22, VF22, VF06			IADDIU VI03, VI03, vertexSize			; Dot lpos3-at		- Increment buffer adress
+	MULx.xyz VF13, VF04, VF13			NOP						 				; Transform rgba-2
+	ADDAz.x ACC, VF24, VF24				IBEQ VI03, VI10, lightSpotExit			; Collect lenght3 	- End test 
+	MADDy.x VF24, VF25, VF24			SQ.xyz VF16, (2-1*vertexSize)(VI03)		; Collect lenght3	- Save rgba-1	
+	ADDAz.x ACC, VF14, VF14 			NOP										; Collect lpos3.norm3 
+	MADDy.x VF14, VF25, VF14			WAITQ									; Collect lpos3.norm3
+	MULq.x VF21, VF21, Q				RSQRT Q, VF00w, VF24x					; Cosine-2			- Calc rev lenght-3
+	MULAw.xyz ACC, VF13, VF04			LQ.xyz VF23, (2*vertexSize+0)(VI03)		; Transform rgba-2	- Load pos-4
+	MADDq.xyz VF13, VF13, Q				NOP										; Transform rgba-2	
+	MAXx.x VF14, VF14, VF00				NOP										; Clamp lpos.norm3
+	SUBx.w VF21, VF06, VF21				NOP										; Calc falloff-2	
+	SUB.xyz VF23, VF05, VF23			LQ.xyz VF15, (2*vertexSize+3)(VI03)		; Light-pos-4		- Load norm-4
+	MAXx.xyz VF13, VF13, VF00			LQ.xyz VF17, (0*vertexSize+2)(VI03)		; Clamp rgba-2		- Load rgba-2
+	ADDAz.x ACC, VF22, VF22				IADDIU VI06, VI00, 0x0010				; Collect lpos3.at	- FMAC filter 0000 0000 0001 0000
+	MADDy.x VF22, VF25, VF22			FMAND VI07, VI06						; Collect lpos3.at	- FMAC sign of w field test
+	MUL.xyz VF07, VF23, VF23			IBNE VI07, VI00, lightSpotSwap2			; Lenght lpos-4		
+	MUL.xyz VF15, VF23, VF15			NOP										; Dot lpos4-norm4
+	ADD.xyz VF17, VF17, VF13			NOP										; Transform rgba-2
+lightSpotSwap2:																	; Hard Falloff	
+	MUL.xyz VF23, VF23, VF06			IADDIU VI03, VI03, vertexSize			; Dot lpos4-at		- Increment buffer adress
+	MULx.xyz VF14, VF04, VF14			NOP						 				; Transform rgba-3
+	ADDAz.x ACC, VF07, VF07				IBEQ VI03, VI10, lightSpotExit			; Collect lenght4 	- End test 
+	MADDy.x VF07, VF25, VF07			SQ.xyz VF17, (2-1*vertexSize)(VI03)		; Collect lenght4 	- Save rgba-2	
+	ADDAz.x ACC, VF15, VF15 			NOP										; Collect lpos4.norm4 
+	MADDy.x VF15, VF25, VF15			WAITQ									; Collect lpos4.norm4 
+	MULq.x VF22, VF22, Q				RSQRT Q, VF00w, VF07x					; Cosine-3			- Calc rev lenght-4
+	MULAw.xyz ACC, VF14, VF04			LQ.xyz VF20, (2*vertexSize+0)(VI03)		; Transform rgba-3	- Load pos-1
+	MADDq.xyz VF14, VF14, Q				NOP										; Transform rgba-3			
+	MAXx.x VF15, VF15, VF00				NOP										; Clamp lpos.norm4
+	SUBx.w VF22, VF06, VF22				NOP										; Calc falloff-3	
+	SUB.xyz VF20, VF05, VF20			LQ.xyz VF12, (2*vertexSize+3)(VI03)		; Light-pos-1		- Load norm-1	
+	MAXx.xyz VF14, VF14, VF00			LQ.xyz VF18, (0*vertexSize+2)(VI03)		; Clamp rgba-3		- Load rgba-3
+	ADDAz.x ACC, VF23, VF23				IADDIU VI06, VI00, 0x0010				; Collect lpos4.at	- FMAC filter 0000 0000 0001 0000
+	MADDy.x VF23, VF25, VF23			FMAND VI07, VI06						; Collect lpos4.at	- FMAC sign of w field test
+	MUL.xyz VF26, VF20, VF20			IBNE VI07, VI00, lightSpotSwap3			; Lenght lpos-1	
+	MUL.xyz VF12, VF20, VF12			NOP										; Dot lpos1-norm1
+	ADD.xyz VF18, VF18, VF14			NOP										; Transform rgba-3
+lightSpotSwap3:																	; Hard Falloff	
+	MUL.xyz VF20, VF20, VF06			IADDIU VI03, VI03, vertexSize			; Dot lpos1-at		- Increment buffer adress
+	MULx.xyz VF15, VF04, VF15			NOP						 				; Transform rgba-4
+	ADDAz.x ACC, VF26, VF26				IBEQ VI03, VI10, lightSpotExit			; Collect lenght1 	- End test
+	MADDy.x VF26, VF25, VF26			SQ.xyz VF18, (2-1*vertexSize)(VI03)		; Collect lenght1 	- Save rgba-3	
+	ADDAz.x ACC, VF12, VF12 			NOP										; Collect lpos1.norm1 
+	MADDy.x VF12, VF25, VF12			WAITQ									; Collect lpos1.norm1 
+	MULq.x VF23, VF23, Q				RSQRT Q, VF00w, VF26x					; Cosine-4			- Calc rev lenght-1
+	MULAw.xyz ACC, VF15, VF04			LQ.xyz VF21, (2*vertexSize+0)(VI03)		; Transform rgba-4	- Load pos-2
+	MADDq.xyz VF15, VF15, Q				NOP										; Transform rgba-4	 		
+	MAXx.x VF12, VF12, VF00				NOP										; Clamp lpos.norm1
+	SUBx.w VF23, VF06, VF23				NOP										; Calc falloff-4	
+	SUB.xyz VF21, VF05, VF21			LQ.xyz VF13, (2*vertexSize+3)(VI03)		; Light-pos-2		- Load norm-2
+	MAXx.xyz VF15, VF15, VF00			LQ.xyz VF19, (0*vertexSize+2)(VI03)		; Clamp rgba-4		- Load rgba-4
+	ADDAz.x ACC, VF20, VF20				IADDIU VI06, VI00, 0x0010				; Collect lpos1.at	- FMAC filter 0000 0000 0001 0000	
+	MADDy.x VF20, VF25, VF20			FMAND VI07, VI06						; Collect lpos1.at	- FMAC sign of w field test
+	MUL.xyz VF27, VF21, VF21			IBNE VI07, VI00, lightSpotSwap4			; Lenght lpos-2		- Hard Falloff jump-4
+	MUL.xyz VF13, VF21, VF13			NOP										; Dot lpos2-norm2
+	ADD.xyz VF19, VF19, VF15			NOP										; Transform rgba-4
+lightSpotSwap4:																	; Hard Falloff	
+	MUL.xyz VF21, VF21, VF06			IADDIU VI03, VI03, vertexSize			; Dot lpos2-at		- Increment buffer adress	
+	MULx.xyz VF12, VF04, VF12			NOP						 				; Transform rgba-1
+	ADDAz.x ACC, VF27, VF27				IBNE VI03, VI10, lightSpotLoop			; Collect lenght2 	- End test
+	MADDy.x VF27, VF25, VF27			SQ.xyz VF19, (2-1*vertexSize)(VI03)		; Collect lenght2 	- Save rgba-4	
+lightSpotExit: ;-----------------------------------------------------------------
+	NOP									B nextLight								;					- Jump to next light
+	NOP									IADDIU	VI02, VI02, 3					;					- Increment Lighting adress
+	;----------------------------------------------------------------------------
+
+	
+;//================================================================================================================
+;//=========================================                      =================================================
+;//=================================   		   Soft Spot Light	    		=======================================
+;//=========================================                      =================================================
+;//================================================================================================================
+
+
+lightSpotSoft:;------------------------------------------------------------------
+	ADD.w VF07, VF00, VF06				LQ.xyz VF20, (0*vertexSize+0)(VI01)		; One minus cos		- Load pos-1
+	MUL.w VF05, VF05, VF08				LQ.xyz VF12, (0*vertexSize+3)(VI01)		; Scale radius		- Load norm-1	
+	MULAx.xyz ACC, VF08, VF06			LQ.xyz VF21, (1*vertexSize+0)(VI01)		; Transform at vect	- Load pos-2	
+	MADDAy.xyz ACC, VF09, VF06			LQ.xyz VF13, (1*vertexSize+3)(VI01)		; Transform at vect	- Load norm-2	
+	SUB.xyz VF20, VF05, VF20			ERCPR P, VF07w							; Light-pos-1		- Reverse 1-cos					
+	MADDz.xyz VF06, VF10, VF06			DIV Q, VF00w, VF05w						; Transform at vect	- Reverse radius 
+	SUB.w VF04, VF04, VF04				IADDIU VI03, VI01, 0					; Clear vf04w		- Clone input/output buffer adress	
+	MULz.xyz VF04, VF04, VF03			NOP						 				; Scale light color  
+	MUL.xyz VF26, VF20, VF20			NOP										; light to pos-1 lenght 
+	MUL.xyz VF12, VF20, VF12			NOP						 				; Dot lpos-1.norm.1	
+	MUL.xyz VF20, VF20, VF06			NOP						 				; Dot lpos-1.at vect
+	SUB.xyz VF21, VF05, VF21			NOP										; Light-pos-2		
+	ADDAz.x ACC, VF26, VF26				NOP						 				; Collect lenght1	
+	MADDy.x VF26, VF25, VF26			NOP						 				; Collect lenght1
+	ADDAz.x ACC, VF12, VF12 			NOP										; Collect lpos1.norm1
+	MADDy.x VF12, VF25, VF12			NOP										; Collect lpos1.norm1 
+	ADDAz.x ACC, VF20, VF20				NOP										; Collect lpos1.at 
+	MADDy.x VF20, VF25, VF20			MFP.w VF05w, P							; Collect lpos1.at	- Get 1/(1-cos)
+	SUBq.w VF04, VF04, Q				RSQRT Q, VF00w, VF26x					; Calc -1/radius	- Calc rev lenght-1
+	MAXx.x VF12, VF12, VF00				NOP										; Clamp lpos.norm1
+	MULw.w VF06, VF06, VF05				NOP						 				; Calc cos/(1-cos)	
+	MUL.xyz VF27, VF21, VF21			NOP						 				; Lenght lpos-2	
+	MUL.xyz VF13, VF21, VF13			NOP										; Dot lpos2-norm2
+	MUL.xyz VF21, VF21, VF06			NOP						 				; Dot lpos2-at vect
+	MULx.xyz VF12, VF04, VF12			NOP						 				; Transform rgba-1
+	ADDAz.x ACC, VF27, VF27				NOP						 				; Collect lenght2
+	MADDy.x VF27, VF25, VF27			NOP						 				; Collect lenght2
+lightSpotSoftLoop:;--------------------------------------------------------------
+	ADDAz.x ACC, VF13, VF13 			NOP										; Collect lpos2.norm2
+	MADDy.x VF13, VF25, VF13			NOP										; Collect lpos2.norm2
+	ADDAz.x ACC, VF21, VF21				NOP										; Collect lpos2.at
+	MADDy.x VF21, VF25, VF21			NOP										; Collect lpos2.at
+	MULq.x VF20, VF20, Q				RSQRT Q, VF00w, VF27x					; Cosine-1			- Calc rev lenght-2
+	MULAw.xyz ACC, VF12, VF04			LQ.xyz VF22, (2*vertexSize+0)(VI03)		; Transform rgba-1	- Load pos-3
+	MADDq.xyz VF12, VF12, Q				NOP										; Transform rgba-1		
+	ADDAx.w ACC, VF06, VF00				NOP										; Calc falloff-1	
+	MSUBx.w VF20, VF05, VF20			NOP										; Calc falloff-1	
+	SUB.xyz VF22, VF05, VF22			LQ.xyz VF14, (2*vertexSize+3)(VI03)		; Light-pos-3		- Load norm-3
+	MAXx.xyz VF12, VF12, VF00			LQ.xyz VF16, (0*vertexSize+2)(VI03)		; Clamp rgba-1		- Load rgba-1
+	MAXx.x VF13, VF13, VF00				NOP										; Clamp lpos.norm2
+	MAXx.w VF20, VF20, VF00				NOP										; Clamp falloff-1	
+	MUL.xyz VF24, VF22, VF22			NOP						 				; Lenght lpos-3	
+	MUL.xyz VF14, VF22, VF14			NOP										; Dot lpos3-norm3
+	ADDA.xyz ACC, VF16, VF00			NOP										; Transform rgba-1
+	MADDw.xyz VF16, VF12, VF20			NOP										; Transform rgba-1 
+	MUL.xyz VF22, VF22, VF06			IADDIU VI03, VI03, vertexSize			; Dot lpos3-at		- Increment buffer adress
+	MULx.xyz VF13, VF04, VF13			NOP						 				; Transform rgba-2
+	ADDAz.x ACC, VF24, VF24				IBEQ VI03, VI10, lightSpotSoftExit		; Collect lenght3 	- End test 
+	MADDy.x VF24, VF25, VF24			SQ.xyz VF16, (2-1*vertexSize)(VI03)		; Collect lenght3	- Save rgba-1	
+	ADDAz.x ACC, VF14, VF14 			NOP										; Collect lpos3.norm3 
+	MADDy.x VF14, VF25, VF14			NOP										; Collect lpos3.norm3
+	ADDAz.x ACC, VF22, VF22				NOP										; Collect lpos3.at
+	MADDy.x VF22, VF25, VF22			NOP										; Collect lpos3.at
+	MULq.x VF21, VF21, Q				RSQRT Q, VF00w, VF24x					; Cosine-2			- Calc rev lenght-3
+	MULAw.xyz ACC, VF13, VF04			LQ.xyz VF23, (2*vertexSize+0)(VI03)		; Transform rgba-2	- Load pos-4
+	MADDq.xyz VF13, VF13, Q				NOP										; Transform rgba-2	
+	ADDAx.w ACC, VF06, VF00				NOP										; Calc falloff-2	
+	MSUBx.w VF21, VF05, VF21			NOP										; Calc falloff-2	
+	SUB.xyz VF23, VF05, VF23			LQ.xyz VF15, (2*vertexSize+3)(VI03)		; Light-pos-4		- Load norm-4
+	MAXx.xyz VF13, VF13, VF00			LQ.xyz VF17, (0*vertexSize+2)(VI03)		; Clamp rgba-2		- Load rgba-2
+	MAXx.x VF14, VF14, VF00				NOP										; Clamp lpos.norm3
+	MAXx.w VF21, VF21, VF00				NOP										; Clamp falloff-2	
+	MUL.xyz VF07, VF23, VF23			NOP						 				; Lenght lpos-4		
+	MUL.xyz VF15, VF23, VF15			NOP										; Dot lpos4-norm4
+	ADDA.xyz ACC, VF17, VF00			NOP										; Transform rgba-2
+	MADDw.xyz VF17, VF13, VF21			NOP										; Transform rgba-2
+	MUL.xyz VF23, VF23, VF06			IADDIU VI03, VI03, vertexSize			; Dot lpos4-at		- Increment buffer adress
+	MULx.xyz VF14, VF04, VF14			NOP						 				; Transform rgba-3
+	ADDAz.x ACC, VF07, VF07				IBEQ VI03, VI10, lightSpotSoftExit		; Collect lenght4 	- End test 
+	MADDy.x VF07, VF25, VF07			SQ.xyz VF17, (2-1*vertexSize)(VI03)		; Collect lenght4 	- Save rgba-2	
+	ADDAz.x ACC, VF15, VF15 			NOP										; Collect lpos4.norm4 
+	MADDy.x VF15, VF25, VF15			NOP										; Collect lpos4.norm4 
+	ADDAz.x ACC, VF23, VF23				NOP										; Collect lpos4.at
+	MADDy.x VF23, VF25, VF23			NOP										; Collect lpos4.at
+	MULq.x VF22, VF22, Q				RSQRT Q, VF00w, VF07x					; Cosine-3			- Calc rev lenght-4
+	MULAw.xyz ACC, VF14, VF04			LQ.xyz VF20, (2*vertexSize+0)(VI03)		; Transform rgba-3	- Load pos-1
+	MADDq.xyz VF14, VF14, Q				NOP										; Transform rgba-3			
+	ADDAx.w ACC, VF06, VF00				NOP										; Calc falloff-3	
+	MSUBx.w VF22, VF05, VF22			NOP										; Calc falloff-3	
+	SUB.xyz VF20, VF05, VF20			LQ.xyz VF12, (2*vertexSize+3)(VI03)		; Light-pos-1		- Load norm-1	
+	MAXx.xyz VF14, VF14, VF00			LQ.xyz VF18, (0*vertexSize+2)(VI03)		; Clamp rgba-3		- Load rgba-3
+	MAXx.x VF15, VF15, VF00				NOP										; Clamp lpos.norm4
+	MAXx.w VF22, VF22, VF00				NOP										; Clamp falloff-3	
+	MUL.xyz VF26, VF20, VF20			NOP										; Lenght lpos-1	
+	MUL.xyz VF12, VF20, VF12			NOP										; Dot lpos1-norm1
+	ADDA.xyz ACC, VF18, VF00			NOP										; Transform rgba-3
+	MADDw.xyz VF18, VF14, VF22			NOP										; Transform rgba-3
+	MUL.xyz VF20, VF20, VF06			IADDIU VI03, VI03, vertexSize			; Dot lpos1-at		- Increment buffer adress
+	MULx.xyz VF15, VF04, VF15			NOP						 				; Transform rgba-4
+	ADDAz.x ACC, VF26, VF26				IBEQ VI03, VI10, lightSpotSoftExit		; Collect lenght1 	- End test
+	MADDy.x VF26, VF25, VF26			SQ.xyz VF18, (2-1*vertexSize)(VI03)		; Collect lenght1 	- Save rgba-3	
+	ADDAz.x ACC, VF12, VF12 			NOP										; Collect lpos1.norm1 
+	MADDy.x VF12, VF25, VF12			NOP										; Collect lpos1.norm1 
+	ADDAz.x ACC, VF20, VF20				NOP										; Collect lpos1.at
+	MADDy.x VF20, VF25, VF20			NOP										; Collect lpos1.at
+	MULq.x VF23, VF23, Q				RSQRT Q, VF00w, VF26x					; Cosine-4			- Calc rev lenght-1
+	MULAw.xyz ACC, VF15, VF04			LQ.xyz VF21, (2*vertexSize+0)(VI03)		; Transform rgba-4	- Load pos-2
+	MADDq.xyz VF15, VF15, Q				NOP										; Transform rgba-4	 		
+	ADDAx.w ACC, VF06, VF00				NOP										; Calc falloff-4	
+	MSUBx.w VF23, VF05, VF23			NOP										; Calc falloff-4	
+	SUB.xyz VF21, VF05, VF21			LQ.xyz VF13, (2*vertexSize+3)(VI03)		; Light-pos-2		- Load norm-2
+	MAXx.xyz VF15, VF15, VF00			LQ.xyz VF19, (0*vertexSize+2)(VI03)		; Clamp rgba-4		- Load rgba-4
+	MAXx.x VF12, VF12, VF00				NOP										; Clamp lpos.norm1
+	MAXx.w VF23, VF23, VF00				NOP										; Clamp falloff-4	
+	MUL.xyz VF27, VF21, VF21			NOP						 				; Lenght lpos-2		
+	MUL.xyz VF13, VF21, VF13			NOP										; Dot lpos2-norm2
+	ADDA.xyz ACC, VF19, VF00			NOP										; Transform rgba-4
+	MADDw.xyz VF19, VF15, VF23			NOP										; Transform rgba-4
+	MUL.xyz VF21, VF21, VF06			IADDIU VI03, VI03, vertexSize			; Dot lpos2-at		- Increment buffer adress	
+	MULx.xyz VF12, VF04, VF12			NOP						 				; Transform rgba-1
+	ADDAz.x ACC, VF27, VF27				IBNE VI03, VI10, lightSpotSoftLoop		; Collect lenght2 	- End test
+	MADDy.x VF27, VF25, VF27			SQ.xyz VF19, (2-1*vertexSize)(VI03)		; Collect lenght2 	- Save rgba-4		
+lightSpotSoftExit: ;-------------------------------------------------------------
+	NOP									B nextLight								;					- Jump to next light		
+	NOP									IADDIU	VI02, VI02, 3					;					- Increment Lighting adress
+	;----------------------------------------------------------------------------
+
+
+;//================================================================================================================
+;//=========================================                      =================================================
+;//=================================      No Light + Normals for FX	   		=======================================
+;//=========================================                      =================================================
+;//================================================================================================================
+ 
+
+preProcessNoLighting:;-----------------------------------------------------------
+	MULi.xyzw VF26, VF27, I				LQ.xyzw VF20, (0*vertexSize+2)(VI01)	; Morph Norm Intp	- Load rgba-1
+	NOP									LQ.xyzw VF21, (1*vertexSize+2)(VI01)	; 					- Load rgba-2
+	NOP									LQ.xyzw VF22, (2*vertexSize+2)(VI01)	; 					- Load rgba-3
+	NOP									LQ.xyzw VF23, (3*vertexSize+2)(VI01)	; 					- Load rgba-4	
+	ITOF0.xyzw VF20, VF20				LQ.xyzw VF24, vuSDcolScale(VI00)        ; Float rgba-1      - Color Scale
+	ITOF0.xyzw VF21, VF21				FMAND VI03, VI04 						; Float rgba-2     	- Preprocess select	
+	ITOF0.xyzw VF22, VF22				IBEQ VI03, VI00, MPmorphnoLights		; Float rgba-3		- Morph mormals pre-process 
+	ITOF0.xyzw VF23, VF23				IADDIU VI03, VI01, (4*vertexSize)		; Float rgba-4		- Input buffer adress
+FXProcessNoLightLoop:;-----------------------------------------------------------
+	MUL.xyzw VF16, VF20, VF24			LQ.xyzw	VF12, (3-4*vertexSize)(VI03)	; Scale rgba-1		- Load norm-1
+	MUL.xyzw VF17, VF21, VF24			LQ.xyzw	VF13, (3-3*vertexSize)(VI03)	; Scale rgba-2		- Load norm-2
+	MUL.xyzw VF18, VF22, VF24			LQ.xyzw	VF14, (3-2*vertexSize)(VI03)	; Scale rgba-3		- Load norm-3
+	MUL.xyzw VF19, VF23, VF24			LQ.xyzw	VF15, (3-1*vertexSize)(VI03)	; Scale rgba-4		- Load norm-4
+	ITOF0.xyzw VF12, VF12				LQ.xyzw	VF20, (2+0*vertexSize)(VI03)	; Float norm-1		- Load rgba-1
+	ITOF0.xyzw VF13, VF13				LQ.xyzw	VF21, (2+1*vertexSize)(VI03)	; Float norm-2		- Load rgba-2
+	ITOF0.xyzw VF14, VF14				LQ.xyzw	VF22, (2+2*vertexSize)(VI03)	; Float norm-3		- Load rgba-3
+	ITOF0.xyzw VF15, VF15				LQ.xyzw	VF23, (2+3*vertexSize)(VI03)	; Float norm-3		- Load rgba-4
+	MULi.xyzw VF12, VF12, I				SQ.xyzw VF16, (2-4*vertexSize)(VI03)	; Scale norm-1		- Save rgba-1 
+	MULi.xyzw VF13, VF13, I				SQ.xyzw VF17, (2-3*vertexSize)(VI03)	; Scale norm-2		- Save rgba-2
+	MULi.xyzw VF14, VF14, I				SQ.xyzw VF18, (2-2*vertexSize)(VI03)	; Scale norm-3		- Save rgba-3	
+	MULi.xyzw VF15, VF15, I				SQ.xyzw VF19, (2-1*vertexSize)(VI03)	; Scale norm-4		- Save rgba-4	
+	NOP									SQ.xyzw VF12, (3-4*vertexSize)(VI03)	; 					- Save norm-1
+	NOP									SQ.xyzw VF13, (3-3*vertexSize)(VI03)	;					- Save norm-2
+	ITOF0.xyzw VF20, VF20				SQ.xyzw VF14, (3-2*vertexSize)(VI03)	; Float rgba-1      - Save norm-3  	
+	ITOF0.xyzw VF21, VF21				SQ.xyzw VF15, (3-1*vertexSize)(VI03)	; Float rgba-2      - Save norm-4  				
+	ITOF0.xyzw VF22, VF22				IBNE VI03, VI11, FXProcessNoLightLoop   ; Float rgba-3      - End Test  
+	ITOF0.xyzw VF23, VF23				IADDIU	VI03, VI03, (4*vertexSize)		; Float rgba-4      - Increment adress
+	NOP									B exitLighting							;					- End Bypass
+    ;----------------------------------------------------------------------------
+
+
+;//================================================================================================================
+;//=============================== Morphing & Process Normals with rgbas ==========================================
+;//================================================================================================================
+
+
+MPmorphnoLights:;----------------------------------------------------------------
+	NOP 								IADDIU VI06, VI10, 0					;					- Second Target positions buffer
+	NOP 								IADD VI07, VI06, VI09					;					- Second Target normals buffer
+MPmorphnoLightsLoop:;------------------------------------------------------------
+	MUL.xyzw VF20, VF20, VF24			LQ.xyzw VF03, (0-4*vertexSize)(VI03)	; Scale rgba-1		- Load position1-1
+	MUL.xyzw VF21, VF21, VF24			LQI.xyzw VF07, (VI06++)					; Scale rgba-2		- Load position1-2
+	MUL.xyzw VF22, VF22, VF24			LQ.xyzw VF04, (0-3*vertexSize)(VI03)	; Scale rgba-3		- Load position2-1
+	MUL.xyzw VF23, VF23, VF24			LQI.xyzw VF08, (VI06++)					; Scale rgba-4		- Load position2-2
+	MULAw.xyzw ACC, VF03, VF27			LQ.xyzw VF05, (0-2*vertexSize)(VI03)	; Process pos-1		- Load position3-1	
+	MADDx.xyzw VF03, VF07, VF27			LQI.xyzw VF09, (VI06++)					; Process pos-1		- Load position3-2	 
+	MULAw.xyzw ACC, VF04, VF27			LQ.xyzw VF06, (0-1*vertexSize)(VI03)	; Process pos-2		- Load position4-1
+	MADDx.xyzw VF04, VF08, VF27			LQI.xyzw VF10, (VI06++)					; Process pos-2		- Load position4-2	
+	MULAw.xyzw ACC, VF05, VF27			LQ.xyzw VF07, (3-4*vertexSize)(VI03)	; Process pos-3		- Load normal1-1	 
+	MADDx.xyzw VF05, VF09, VF27			LQI.xyzw VF11, (VI07++)					; Process pos-3		- Load normal1-2					 
+	MULAw.xyzw ACC, VF06, VF27			LQ.xyzw VF08, (3-3*vertexSize)(VI03)	; Process pos-4		- Load normal2-1	 				 
+	MADDx.xyzw VF06, VF10, VF27			LQI.xyzw VF12, (VI07++)					; Process pos-4		- Load normal2-2		
+	ITOF0.xyzw VF07, VF07				LQ.xyzw VF09, (3-2*vertexSize)(VI03)	; Float norm1-1  	- Load normal3-1	 					
+	ITOF0.xyzw VF11, VF11				LQI.xyzw VF13, (VI07++)					; Float norm1-2  	- Load normal3-2					
+	ITOF0.xyzw VF08, VF08				LQ.xyzw VF10, (3-1*vertexSize)(VI03)	; Float norm2-1  	- Load normal4-1	 					
+	ITOF0.xyzw VF12, VF12				LQI.xyzw VF14, (VI07++)					; Float norm2-2  	- Load normal4-2					
+	ITOF0.xyzw VF09, VF09				SQ.xyzw VF20, (2-4*vertexSize)(VI03)	; Float norm3-1  	- Store rgba-1				
+	ITOF0.xyzw VF13, VF13				SQ.xyzw VF21, (2-3*vertexSize)(VI03)	; Float norm3-2  	- Store rgba-2			
+	ITOF0.xyzw VF10, VF10				SQ.xyzw VF22, (2-2*vertexSize)(VI03)	; Float norm4-1  	- Store rgba-3				
+	ITOF0.xyzw VF14, VF14				SQ.xyzw VF23, (2-1*vertexSize)(VI03)	; Float norm4-2  	- Store rgba-4				
+	MULAw.xyzw ACC, VF07, VF26			LQ.xyzw	VF20, (2+0*vertexSize)(VI03)	; Process norm-1	- Load rgba-1
+	MADDx.xyzw VF07, VF11, VF26			LQ.xyzw VF21, (2+1*vertexSize)(VI03)	; Process norm-1	- Load rgba-2
+	MULAw.xyzw ACC, VF08, VF26			LQ.xyzw VF22, (2+2*vertexSize)(VI03)	; Process norm-2	- Load rgba-3
+	MADDx.xyzw VF08, VF12, VF26			LQ.xyzw VF23, (2+3*vertexSize)(VI03)	; Process norm-2	- Load rgba-4
+	MULAw.xyzw ACC, VF09, VF26			SQ.xyzw VF03, (0-4*vertexSize)(VI03)	; Process norm-3	- Save position-1	 
+	MADDx.xyzw VF09, VF13, VF26			SQ.xyzw VF04, (0-3*vertexSize)(VI03)	; Process norm-3	- Save position-2		 
+	MULAw.xyzw ACC, VF10, VF26			SQ.xyzw VF05, (0-2*vertexSize)(VI03)	; Process norm-4	- Save position-3				 
+	MADDx.xyzw VF10, VF14, VF26			SQ.xyzw VF06, (0-1*vertexSize)(VI03)	; Process norm-4	- Save position-4
+	ITOF0.xyzw VF20, VF20				SQ.xyzw VF07, (3-4*vertexSize)(VI03)	; Float rgba-1  	- Save normal-1	   	
+	ITOF0.xyzw VF21, VF21			 	SQ.xyzw VF08, (3-4*vertexSize)(VI03)	; Float rgba-1  	- Save normal-2				
+	ITOF0.xyzw VF22, VF22				SQ.xyzw VF09, (3-4*vertexSize)(VI03)	; Float rgba-1  	- Save normal-3	 
+	ITOF0.xyzw VF23, VF23				SQ.xyzw VF10, (3-4*vertexSize)(VI03)	; Float rgba-1  	- Save normal-4	
+	NOP									IBNE VI03, VI11, MPmorphnoLightsLoop	;    				- End Test   
+	NOP									IADDIU	VI03, VI03, (4*vertexSize)		; 				    - Increment adress
+    ;----------------------------------------------------------------------------
+
+
+;//================================================================================================================
+;//========================================= Exit Adress ==========================================================
+;//================================================================================================================
+
+
+;--------------------------------------------------------------------------------
+exitLighting:																	; Exit location
+;--------------------------------------------------------------------------------
+
+
+;//================================================================================================================
+;//=======================================					=======================================================
+;//===================						    THE END					    			  =========================
+;//========================================			        =======================================================
+;//============================================================================================= JCL Janvier 2001 =

@@ -1,0 +1,92 @@
+                    ;
+                    ; 
+                    ;  This file is a product of Criterion Software Ltd.
+                    ; 
+                    ;  This file is provided as is with no warranties of any kind and is
+                    ;  provided without any obligation on Criterion Software Ltd.
+                    ;  or Canon Inc. to assist in its use or modification.
+                    ; 
+                    ;  Criterion Software Ltd. and Canon Inc. will not, under any
+                    ;  circumstances, be liable for any lost revenue or other damages
+                    ;  arising from the use of this file.
+                    ; 
+                    ;  Copyright (c) 2001 Criterion Software Ltd.
+                    ;  All Rights Reserved.
+                    ; 
+                    ; 
+					;//==========================================================================
+					;//==========================================================================
+					;//==																	   ==						
+					;//==		 	 -PSX2- GENERIC TRIANGLES Custom FX CODE				   ==
+					;//==																	   ==					
+					;//==																	   ==					
+					;//==	Features : -  second  pass vector code.                 		   ==					
+					;//==			   - Reuse positions and rgbas from first pass.			   ==					
+					;//==			   - Perform deformations and perspective correction.      ==
+					;//==			                                                           ==
+   					;//==				 			                                    	   ==					
+					;//==															  		   ==					
+					;//==															  		   ==					
+					;//== 															-CHECKED-  ==	
+					;//==															  		   ==														
+					;//==========================================================================
+					;//==========================================================================
+
+; N.B :
+;   In Registers :
+;   VI06 : first pass draw list addr
+;   VI01 : Draw list addr
+;   VI14 : Output Buffer
+;
+;
+;   Variable :
+;   vuSymbMtxR0 : 2d texture rotation matrix
+;   vuSymbTransv : 2d texture translation and scale matrix
+;   OutverSize : size of an Output vertex structure
+;   vertexSize : size of an Input vertex structure
+
+
+
+	NOP 								LQ.xyzw VF26, vuSymbMtxR0(VI00)			;					- Loading Rotation Matrix
+	NOP                                 LQ.xyzw VF25, vuSymbTransv(VI00)        ;					- Loading Translation & Scale Vector
+	NOP                                 IADDIU VI04, VI01, 0					;					- Get Original data set addr
+	NOP                                 IADDIU VI05, VI14, 1					;					- Get Draw list addr                                      ;
+    ADDz.x VF27,VF00,VF26               ISW.x VI09, 0(VI14)						; Unpack row 1      - Store number of vertices
+    ADDw.y VF27,VF00,VF26               SQ.yzw VF01, 0(VI14)					; Unpack row 1      - Store Gif-Tag
+MPCustomFXLoop:;-----------------------------------------------------------------	
+	NOP									LQ.xyzw VF03, (0+0*OutverSize)(VI06)	;					- Load stq
+	NOP									IADDIU VI06, VI06, OutverSize			;
+	NOP									NOP										;
+	NOP									NOP										;
+	ADDz.xyz VF03, VF00, VF03			LQ.xyzw VF13, (1+0*vertexSize)(VI04)	; expand z->xyz		- Load uv
+	NOP									IADDIU VI04, VI04, (vertexSize)			; 	
+	NOP									NOP										;
+	NOP									NOP										;
+	MULx.xy VF12, VF26, VF13			NOP										; Apply Mtx Row 1 
+	MULy.xy VF11, VF27, VF13			NOP										; Apply Mtx row2
+	MULz.x VF03, VF03, VF25				NOP										; Apply U Scale 
+	MULw.y VF03, VF03, VF25				NOP										; Apply V Scale 
+	ADD.xy VF12, VF12, VF25				NOP										; Apply Translation
+	NOP									NOP										;
+	NOP									NOP										;
+	NOP									NOP										;
+	ADD.xy VF12, VF12, VF11				NOP										; Terminate Mtx 
+	NOP									NOP										;
+	NOP									NOP										;
+	NOP									NOP										;
+	MUL.xy	VF03, VF03, VF12			NOP										; Apply Scale & persp
+	NOP									NOP										;
+	NOP									NOP										;
+	NOP									NOP										;
+	NOP									SQ.xyzw VF03, (0+0*OutverSize)(VI05)	;                   - store transformed stq
+	NOP									IBNE VI04, VI07, MPCustomFXLoop			;
+	NOP									IADDIU VI05, VI05, OutverSize			;
+MPCustomFXEnd:;------------------------------------------------------------------
+	
+
+	
+;//================================================================================================================
+;//=======================================					=======================================================
+;//===================						    THE END					                  =========================
+;//========================================			        =======================================================
+;//============================================================================================= AJH Mars 2001 ====

@@ -1,0 +1,350 @@
+;
+; 
+;  This file is a product of Criterion Software Ltd.
+; 
+;  This file is provided as is with no warranties of any kind and is
+;  provided without any obligation on Criterion Software Ltd.
+;  or Canon Inc. to assist in its use or modification.
+; 
+;  Criterion Software Ltd. and Canon Inc. will not, under any
+;  circumstances, be liable for any lost revenue or other damages
+;  arising from the use of this file.
+; 
+;  Copyright (c) 2001 Criterion Software Ltd.
+;  All Rights Reserved.
+; 
+; 
+;==================================================================================================================
+;=========================================					=======================================================
+;=====================						    				    	        		  =========================
+;=================		 CRITERION SOFTWARE - ALPHA BLENDING TRIANGLE PARALLEL ENGINE  		   ====================
+;=====================						    					    		    	  =========================
+;=========================================			        =======================================================
+;=============================================================================================== AJH 2001 =========
+
+
+
+;===================/*   ===========      ===========    ====     ====     ===========    */=======================
+.global CustomFXPRL;/*    ===========    =============   =====   =====    =============   */=======================
+.balign 16,0 ;======/*    ===     ===   ====       ===      === ===       ===       ===   */=======================
+ CustomFXPRL:;======/*    ===     ===   =======              =====                 ====   */=======================
+ DMAret * ;=========/*    ===========     ===========         ===           =========     */=======================
+ MPG 0, * ;=========/*    ==========            ======       =====        ======          */=======================
+.vu	;===============/*    ===           ===       ====      === ===       ===       ===   */=======================
+;===================/*	  ===           ==============   =====   =====    =============	  */=======================
+;===================/*   ======          ============    ====     ====    =============   */=======================
+
+
+
+
+;//================================================================================================================
+;//======================================                           ===============================================
+;//=================================      	  MEMORY MANAGEMENT			   	 ======================================
+;//======================================                           ===============================================
+;//================================================================================================================
+
+
+
+
+;//---------------- HEADER FILES --------------------------------------------
+.include "stddata.i"                                             ; Main Header File
+;//---------------- BASIC DATA STRUCTURE ------------------------------------
+.equ CustomSize    	, (vuSymbStrideOfInputCluster)							; Custom size of vertices : Skeleton / Morphing
+.equ vertexSize	    , (4)													; Generic Size of input verticies
+.equ OutverSize     , (3)					 								; Generic Size of outpout vertices
+.equ Strider	    , (3*OutverSize+vertexSize)						  		; Memory expander stride : Clipping
+;//---------------- BUFFER STRUCTURE NO CLIPPING ----------------------------
+.equ ExpandBuffer1  , (2*vuSymbVIFOffset)									; Offset of the first cycling buffer
+.equ CyclicSpace    , ((vuSymbStaticDataStart-ExpandBuffer1-3)/3)			; Cycling buffers memory allocation
+.equ ExpandBuffer2  , (ExpandBuffer1+CyclicSpace+1)							; Offset of the second Cycling buffer
+.equ ExpandBuffer3  , (ExpandBuffer2+CyclicSpace+1)							; Offset of the third Cycling buffer
+;//---------------- BUFFER STRUCTURE FOR CLIPPING ---------------------------
+.equ XCyclicSpace   , ((vuSymbStaticDataStart-ExpandBuffer1-3)/Strider)     ; Cycling buffers memory allocation
+.equ XExpandBuffer2 , (ExpandBuffer1+XCyclicSpace*OutverSize+1)				; Offset of the second Cycling buffer
+.equ XExpandBuffer3 , (XExpandBuffer2+XCyclicSpace*OutverSize+1)			; Offset of the third Cycling buffer
+.equ ClippingBuffer , (XExpandBuffer3+XCyclicSpace*OutverSize+1)			; Offset of the clipping Buffer
+.equ TSClipRedLine	, (ClippingBuffer+(XCyclicSpace-9)*vertexSize)			; Strip Clipping Buffer Filling Red Line
+.equ TLClipRedLine	, (ClippingBuffer+(XCyclicSpace-15)*vertexSize)			; List Clipping Buffer Filling Red Line
+;//--------------------------------------------------------------------------
+
+
+
+
+;//================================================================================================================
+;//======================================                           ===============================================
+;//=================================       EXTERNAL PRE-PROCESSING		   	 ======================================
+;//======================================                           ===============================================
+;//================================================================================================================
+
+
+
+
+	;========================================================================
+	;========================================================================
+	;//==		TRANSFORMATION MATRIX & DYNAMIC BUFFER MANAGEMENT  	 	   ==
+	;========================================================================
+        .include "../VU1Lib/Triangle_Common/Lighting_Anim_Preprocess/MP_IsoMatrix.vu"                                                           ; External Matrix Generation
+	;========================================================================
+
+
+
+
+;//================================================================================================================
+;//======================================                           ===============================================
+;//=================================   BATCH PRE-PROCESSING & LIGHTING	   	 ======================================
+;//======================================                           ===============================================
+;//================================================================================================================
+
+
+
+
+	;========================================================================
+	;========================================================================
+	;//==		    		DOUBLE BUFFERING SYSTEM 	    			   ==
+	;========================================================================
+PRSrestart:;=================================================================
+	NOP									XTOP VI01							; Load Input buffer adress
+	NOP									XITOP VI09							; Load Number of verticies
+	NOP									IADD VI10, VI09, VI09				; retrieve buffer end !!! stride 4
+	NOP									IADD VI10, VI10, VI09				; retrieve buffer end !!! stride 4
+	NOP									IADD VI10, VI10, VI09				; retrieve buffer end !!! stride 4
+	NOP									IADDIU VI08, VI00, 0x7ff0			; Quad vertex alignment
+	NOP									IADDIU VI11, VI10, (3*vertexSize)	; Quad vertex alignment
+	NOP									ILW.y VI15, vuSDVUSwitch(VI00)		; Engine Manager Jump
+	NOP 								IAND VI11, VI11, VI08				; Quad vertex alignment
+	NOP									IADD VI10, VI01, VI10				; Buffer End
+	NOP									IADD VI11, VI01, VI11				; Quad alignement end
+    ;========================================================================
+
+
+
+
+	;========================================================================
+	;========================================================================
+	;//==			    		 LIGHTING SYSTEMS  	 				   	   ==
+LightingManager:;============================================================
+        .include "../VU1Lib/Triangle_Common/Lighting_Anim_Preprocess/FXN_Lightning.vu"
+	;========================================================================
+
+
+
+
+;//================================================================================================================
+;//======================================                           ===============================================
+;//=================================      	  RENDERING SYSTEMS			   	 ======================================
+;//======================================                           ===============================================
+;//================================================================================================================
+
+
+
+
+	;========================================================================
+	;========================================================================
+	;//==			   	  RENDERING ENGINES MANAGER			 	  	  	   ==
+	;========================================================================
+RenderManager:;==============================================================
+	NOP 								JR VI15								; Rendering Selector
+	NOP									XTOP VI11							; Chained memory adress : clipping / free VI01 : tests
+	;========================================================================
+
+
+
+
+	;========================================================================
+	;========================================================================
+	;//==			    GENERIC PARALLEL TRIANGLE RENDERING	  	  		   ==
+	;========================================================================
+GenericRender:;==============================================================
+	NOP									LQ.yzw VF01, vuSDgifTag(VI00)    	; Load GifTag
+	NOP 								IADDIU VI08, VI00, 0x4000			; Prepare GifTag vertex number
+	NOP 								IADD VI08, VI08, VI08          		; Build EOP
+	NOP 								IOR VI09, VI08, VI09           		; Ored with vertex number
+        .include "../VU1Lib/Triangle_Common/First_pass_generators/MP_Parallax.vu"                                                            ; Multipass Rendering System
+	NOP									XGKICK VI14                      	; Launch GSkick
+	NOP									IADDIU VI07, VI10, 0				; Fog compatibility in sub-engines memory description
+	NOP									IADD VI15, VI00, VI12				; Buffers Turn over
+	NOP									IADD VI12, VI00, VI13				; Buffers Turn over
+	NOP									IADD VI13, VI00, VI14				; Buffers Turn over
+	;------- SECOND PASS ----------------------------------------------------
+	NOP									BAL VI08, CFXprocessor				; CFX Rendering System
+	NOP									IADD VI14, VI00, VI15				; Buffers Turn over
+	;------------------------------------------------------------------------
+	NOP									B DoubleBufferStage					; End Bypass
+	NOP									IADD VI14, VI00, VI15				; Buffers Turn over
+	;========================================================================
+	;========================================================================
+
+
+
+
+	;========================================================================
+	;========================================================================
+	;//==		 	 CLIPPED PARALLEL TRIANGLE STRIP RENDERING	  	  	   ==
+	;========================================================================
+TSClipRender:;===============================================================
+        .include "../VU1Lib/Triangle_Strip/FXS_ClipParallax.vu"                                                       ; Triangle Strip Clipping processor
+	NOP									ISUBIU VI05, VI09, 3				; Test triangle existance
+	NOP									LQ.yzw VF01, vuSDgifTag(VI00)    	; Load GifTag
+	NOP									IBLTZ VI05, DoubleBufferStage		; End Bypass
+	NOP									IADDIU VI01, VI00, ClippingBuffer	; Select Clipping Buffer
+	NOP									BAL VI08, CTSprocessor				; Clipped/Culled Rendering System
+	NOP									IADD VI15, VI00, VI12				; Buffers Turn over
+	NOP									IADD VI12, VI00, VI13				; Buffers Turn over
+	NOP									IADD VI13, VI00, VI14				; Buffers Turn over
+	;------- SECOND PASS ----------------------------------------------------
+	NOP									BAL VI08, CFXprocessor				; CFX Rendering System
+	NOP									IADD VI14, VI00, VI15				; Buffers Turn over
+	;------------------------------------------------------------------------
+	NOP									IBEQ VI11, VI10, DoubleBufferStage	; End Bypass
+	NOP									IADD VI14, VI00, VI15				; Buffers Turn over
+	NOP									B TSClipRender	 					; Clipping Loop
+	NOP									ISUBIU VI11, VI11, 2*vertexSize		; Retreive last two vertices
+	;========================================================================
+
+
+
+
+	;========================================================================
+	;========================================================================
+	;//==			  CULLED PARALLEL TRIANGLE STRIP RENDERING	  	  	   ==
+	;========================================================================
+TSCullRender:;===============================================================
+        .include "../VU1Lib/Triangle_Strip/FXS_CullParallax.vu"                                                       ; Triangle Strip Fast Culling processor
+	NOP									ISUBIU VI05, VI09, 3				; Test triangle existance
+	NOP									LQ.yzw VF01, vuSDgifTag(VI00)    	; Load GifTag
+	NOP									IBLTZ VI05, DoubleBufferStage		; End Bypass
+	NOP									IADDIU VI01, VI00, ClippingBuffer	; Select Clipping Buffer
+	NOP									BAL VI08, CTSprocessor				; Clipped/Culled Rendering System
+	NOP									IADD VI15, VI00, VI12				; Buffers Turn over
+	NOP									IADD VI12, VI00, VI13				; Buffers Turn over
+	NOP									IADD VI13, VI00, VI14				; Buffers Turn over
+	;------- SECOND PASS ----------------------------------------------------
+	NOP									BAL VI08, CFXprocessor				; CFX Rendering System
+	NOP									IADD VI14, VI00, VI15				; Buffers Turn over
+	;------------------------------------------------------------------------
+	NOP									IBEQ VI11, VI10, DoubleBufferStage	; End Bypass
+	NOP									IADD VI14, VI00, VI15				; Buffers Turn over
+	NOP									B TSCullRender	 					; Clipping Loop
+	NOP									ISUBIU VI11, VI11, 2*vertexSize		; Retreive last two vertices
+	;========================================================================
+
+
+
+
+	;========================================================================
+	;========================================================================
+	;//==			  CLIPPED PARALLEL TRIANGLE LIST RENDERING	  	  	   ==
+	;========================================================================
+TLClipRender:;===============================================================
+        .include "../VU1Lib/Triangle_List/FXL_ClipParallax.vu"                                                       ; Triangle List Clipping processor
+	NOP									ISUBIU VI05, VI09, 3				; Test triangle existance
+	NOP									LQ.yzw VF01, vuSDgifTag(VI00)    	; Load GifTag
+	NOP									IBLTZ VI05, DoubleBufferStage		; End Bypass
+	NOP									IADDIU VI01, VI00, ClippingBuffer	; Select Clipping Buffer
+	NOP									BAL VI08, CTSprocessor				; Clipped/Culled Rendering System
+	NOP									IADD VI15, VI00, VI12				; Buffers Turn over
+	NOP									IADD VI12, VI00, VI13				; Buffers Turn over
+	NOP									IADD VI13, VI00, VI14				; Buffers Turn over
+	;------- SECOND PASS ----------------------------------------------------
+	NOP									BAL VI08, CFXprocessor				; CFX Rendering System
+	NOP									IADD VI14, VI00, VI15				; Buffers Turn over
+	;------------------------------------------------------------------------
+	NOP									IBNE VI11, VI10, TLClipRender		; Clipping Loop
+	NOP									IADD VI14, VI00, VI15				; Buffers Turn over
+	NOP									B DoubleBufferStage 				; End Bypass
+	;========================================================================
+
+
+
+
+	;========================================================================
+	;========================================================================
+	;//==			  CULLED PARALLEL TRIANGLE LIST RENDERING	  	  	   ==
+	;========================================================================
+TLCullRender:;===============================================================
+        .include "../VU1Lib/Triangle_List/FXL_CullParallax.vu"                                                       ; Triangle List Fast Culling processor
+	NOP									ISUBIU VI05, VI09, 3				; Test triangle existance
+	NOP									LQ.yzw VF01, vuSDgifTag(VI00)    	; Load GifTag
+	NOP									IBLTZ VI05, DoubleBufferStage		; End Bypass
+	NOP									IADDIU VI01, VI00, ClippingBuffer	; Select Clipping Buffer
+	NOP									BAL VI08, CTSprocessor				; Clipped/Culled Rendering System
+	NOP									IADD VI15, VI00, VI12				; Buffers Turn over
+	NOP									IADD VI12, VI00, VI13				; Buffers Turn over
+	NOP									IADD VI13, VI00, VI14				; Buffers Turn over
+	;------- SECOND PASS ----------------------------------------------------
+	NOP									BAL VI08, CFXprocessor				; CFX Rendering System
+	NOP									IADD VI14, VI00, VI15				; Buffers Turn over
+	;------------------------------------------------------------------------
+	NOP									IBNE VI11, VI10, TLCullRender		; Clipping Loop
+	NOP									IADD VI14, VI00, VI15				; Buffers Turn over
+	;========================================================================
+
+
+
+
+	;========================================================================
+	;========================================================================
+	;//==		    		DOUBLE BUFFERING SYSTEM 	    			   ==
+	;========================================================================
+DoubleBufferStage:;==========================================================
+	NOP[e]                        	 	IADDIU VI15, VI00, PRSrestart 		; Exit instruction / Begining adress
+ 	NOP									NOP									; Pause a cycle
+    NOP									JR VI15								; Double buffering jump
+ 	NOP									NOP									; Jump latency cycle
+	;------------------------------------------------------------------------
+
+
+
+
+;//================================================================================================================
+;//======================================                           ===============================================
+;//=================================      	   SUB-ENGINES AREA			   	 ======================================
+;//======================================                           ===============================================
+;//================================================================================================================
+
+
+
+
+	;========================================================================
+	;========================================================================
+	;//==		    CLIPPED/CULLED PARALLEL TRIANGLES PROCESSOR  	 	   ==
+	;========================================================================
+CTSprocessor:;===============================================================
+	NOP 								IADDIU VI02, VI00, 0x4000			; Prepare GifTag vertex number
+	NOP 								IADD VI02, VI02, VI02          		; Build EOP
+	NOP 								IOR VI09, VI09, VI02           		; Ored with vertex number
+        .include "../VU1Lib/Triangle_Common/First_pass_generators/MP_ClipParaGen.vu"                                                 ; Clipped Strip Rendering System
+	NOP									JR VI08								; Return to initial procedure
+	NOP									XGKICK VI14                      	; Launch GSkick
+	;========================================================================
+
+
+
+
+	;========================================================================
+	;========================================================================
+	;//==			   TRIANGLES CUSTOM FX PROCESSOR		  		   ==
+	;========================================================================
+CFXprocessor:;===============================================================
+	NOP									LQ.yzw VF01, vuSymbGifTagc2(VI00)  	; Second Context GifTag	: CFX
+	NOP									IADDIU VI06, VI13, 1				; Specify previous buffer position : second pass
+    .include "mp_cfx.vu"
+	NOP									XGKICK VI14                      	; GSkick CFX
+	NOP									IADD VI15, VI00, VI12				; Buffers Turn over
+	NOP									IADD VI12, VI00, VI13				; Buffers Turn over
+	NOP									JR VI08								; Return to initial procedure
+	NOP									IADD VI13, VI00, VI14				; Buffers Turn over
+	;========================================================================
+
+
+
+
+;===================/*   ===========      ===========    ====     ====     ===========    */=======================
+;===================/*   ============    =============   =====   =====    =============   */=======================
+;===================/*    ===     ===   ====       ===      === ===       ===       ===   */=======================
+;===================/*    ===     ===   =======              =====                 ====   */=======================
+.endmpg ;===========/*    ===========     ===========         ===           =========     */=======================
+.EndDmaData ;=======/*    ==========            ======       =====        ======          */=======================
+;===================/*    ===           ===       ====      === ===       ===       ===   */=======================
+;===================/*   ======	        ==============   =====   =====    =============	  */=======================
+;===================/*   ======          ============    ====     ====    =============   */=======================

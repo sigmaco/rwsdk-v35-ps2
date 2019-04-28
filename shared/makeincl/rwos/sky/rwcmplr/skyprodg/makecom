@@ -1,0 +1,345 @@
+###########################################################################
+#
+# File :     skyprodg/makecom
+#
+# Abstract : sky gcc 2.95.3/ProDG specific compile time options. 
+#
+#            See
+#            o SN systems ProDG
+#              http://www.snsys.com/
+#            o ee-gcc2953 binaries
+#              http://www.snsys.com/files/psx2/Temp/ps2-ee-2.95.3-v1.01.zip
+#            o GCC homepage
+#              http://www.gnu.org/software/gcc/gcc-2.95/gcc-2.95.3.html
+#
+###########################################################################
+#
+# This file is a product of Criterion Software Ltd.
+#
+# This file is provided as is with no warranties of any kind and is
+# provided without any obligation on Criterion Software Ltd. or Canon Inc. 
+# to assist in its use or modification.
+#
+# Criterion Software Ltd. will not, under any circumstances, be liable for 
+# any lost revenue or other damages arising from the use of this file.
+#
+# Copyright (c) 1999 Criterion Software Ltd.
+# All Rights Reserved.
+#
+# RenderWare is a trademark of Canon Inc.
+#
+###########################################################################
+
+# Indicate that compiler options have been included
+MAKECOM=1
+
+ifeq ($(SMALLCODE), 1)
+C_OPT = -Os
+else
+C_OPT = -O3
+endif
+
+C_OPT += \
+  -fcaller-saves \
+  -fcse-follow-jumps \
+  -fcse-skip-blocks \
+  -fdelayed-branch \
+  -fexpensive-optimizations \
+  -ffast-math \
+  -fgcse \
+  -fmove-all-movables \
+  -freduce-all-givs \
+  -fregmove \
+  -frerun-cse-after-loop \
+  -frerun-loop-opt \
+  -fschedule-insns2 \
+  -fstrength-reduce \
+  -fstrict-aliasing \
+  -fthread-jumps \
+  -funroll-loops 
+
+#  -fdata-sections \
+#  -ffunction-sections \
+
+#  -fdelete-null-pointer-checks \
+#  -foptimize-register-moves \
+#  -fsingle-precision-constant \
+#  -falign-functions=n \
+#  -falign-jumps=n \
+#  -falign-labels=n \
+#  -falign-loops=n \
+#  -fbranch-probabilities \
+#  -fdce \
+#  -ffloat-store \
+#  -fforce-addr \
+#  -fforce-mem \
+#  -finline-functions \
+#  -finline-limit=n \
+#  -fkeep-inline-functions \
+#  -fno-default-inline \
+#  -fno-defer-pop \
+#  -fno-function-cse \
+#  -fno-inline \
+#  -fno-math-errno \
+#  -fno-peephole \
+#  -fomit-frame-pointer \
+#  -foptimize-sibling-calls \
+#  -fschedule-insns \
+#  -fssa \
+#  -funroll-all-loops \
+
+
+ifeq ($(COPTIMIZE), 1)
+CFLAGS += $(C_OPT) -DNDEBUG  -Wuninitialized
+else
+CFLAGS += -O0
+#----------------
+# # gcc requires the generation of a dependency tree, and hence at least -O1,
+# # to detect any use of uninitialized variables
+# so build optimised then. Code generation options win.
+endif
+
+ifeq ($(CDEBUG), 1)
+CFLAGS += -g
+endif
+
+ifeq ($(PG), 1)
+CFLAGS += -pg -DPG
+endif
+
+CFLAGS += -DRW_USE_SPF
+
+ifeq ($(SCE_11),1)
+CFLAGS += -DSCE_11
+endif
+
+ifdef IOPPATH
+CFLAGS += -DIOPPATH=$(IOPPATH)
+endif
+
+ifdef PS2_DRIVE
+CFLAGS += -DPS2_DRIVE=$(PS2_DRIVE)
+endif
+
+# These seem to be platform specific, not compiler specific
+
+ifeq ($(NOASM), 1)
+CFLAGS += -DNOASM 
+endif
+
+ifeq ("$(COMPILER)", "")
+COMPILER=cc
+endif
+
+ifeq ("$(LINKER)", "")
+# It should be this, but we have a rather strange idea of LINKER
+LINKER=link.exe
+endif
+
+######
+# included burst from sony Makefiles
+######
+
+ifeq ("$(PS2_DRIVE)", "")
+SCE = /usr/local/sce/ee
+else
+SCE = $(PS2_DRIVE):/usr/local/sce/ee
+endif
+
+SCELIBDIR      = $(SCE)/lib
+SCEINCDIR      = $(SCE)/include
+
+ifeq ("$(SKYLCF)", "RWCMD")
+LCFILE      = $(RWGDIR)/shared/makecom/sky/rwapp.cmd
+else  #  ("$(RWLCF)", "")
+LCFILE      = $(SCELIBDIR)/app.cmd 
+endif #  ("$(RWLCF)", "")
+
+SYSLIBS     = $(SCELIBDIR)/libgraph.a \
+              $(SCELIBDIR)/libdma.a
+
+ifndef SCE_11
+SYSLIBS += $(SCELIBDIR)/libpad.a
+endif	
+
+ifeq ($(RWDEBUG), 1)
+ifeq ($(RWMEMDEBUG), 1)
+SYSLIBS += -L$(RWLIBDIR) -lrtdbmalloc
+endif # ($(RWMEMDEBUG), 1)
+endif # ($(RWDEBUG), 1)
+						
+CWARNINGS = \
+  -W \
+  -Wall \
+  -Wcast-qual \
+  -Wchar-subscripts \
+  -Wcomment \
+  -Werror-implicit-function-declaration \
+  -Wformat \
+  -Wimplicit \
+  -Wimplicit-function-declaration \
+  -Wimplicit-int \
+  -Wimport \
+  -Winline \
+  -Wlong-long \
+  -Wmain \
+  -Wmissing-noreturn \
+  -Wmultichar \
+  -Wnested-externs \
+  -Wno-import \
+  -Wparentheses \
+  -Wpointer-arith \
+  -Wreturn-type \
+  -Wsign-compare \
+  -Wswitch \
+  -Wtrigraphs \
+  -Wunknown-pragmas \
+  -Wunused \
+  -Wwrite-strings
+
+#  -Wbad-function-cast
+#  -Wredundant-decls
+#  -Wshadow
+#  -Wtraditional
+#  -Wundef
+#  -pedantic
+#  -Wmissing-declarations /* sce include files fire these warnings*/
+#  -Wmissing-prototypes   /* sce include files fire these warnings*/
+#  -Wstrict-prototypes    /* sce include files fire these warnings */
+#  -w
+#  -Wcast-align
+#  -Wconversion
+#  -Wfloat-equal
+#  -Wpacked
+#  -Wpadded
+#  -Wunreachable-code
+#  -Wunused-function
+#  -Wunused-label
+#  -Wunused-parameter
+#  -Wunused-value
+#  -Wunused-variable
+#  -Waggregate-return
+#  -Werror
+#  -Wid-clash-len
+#  -Wlarger-than-len
+#  -fsyntax-only
+#  -Wbad-function-cast
+#  -Wredundant-decls
+#  -Wshadow
+#  -Wtraditional
+#  -Wundef
+#  -pedantic
+#  -Wmissing-declarations /* sce include files fire these warnings*/
+#  -Wmissing-prototypes   /* sce include files fire these warnings*/
+#  -Wstrict-prototypes    /* sce include files fire these warnings */
+#  -w
+#  -Wcast-align
+#  -Wconversion
+#  -Wfloat-equal
+#  -Wpacked
+#  -Wpadded
+#  -Wunreachable-code
+#  -Wunused-function
+#  -Wunused-label
+#  -Wunused-parameter
+#  -Wunused-value
+#  -Wunused-variable
+#  -Waggregate-return
+#  -Werror
+#  -Wid-clash-len
+#  -Wlarger-than-len
+#  -fsyntax-only
+
+CC        = ps2cc 
+CPP       = $(CC)
+COUT      = -o 
+LOUT      = -e 
+SOUT      = -S -o $@ 
+CPPOPT    = -E -Wp,-P 
+CFLAGS   += $(CWARNINGS) -fno-common -c 
+CFLAGS   += -Wa,-I$(DEVDIR)/$(RWTARGET) 
+CFLAGS   += -Wa,-al=$*.lst 
+CFLAGS   += -DSKY 
+
+LD        = ps2ld
+LFLAGS   = -collect2 -g -Map $(TARGET).map				\
+           -L$(SCELIBDIR) -L$(SCE)/gcc/lib/gcc-lib/ee/2.95.3		\
+           -L$(SCE)/gcc/ee/lib						\
+           -lm								\
+           -strip-unused-data						\
+           -T $(LCFILE) 
+LOUT = -o 
+
+# We use ps2cc here as we need to be able to invoke a cpp prepass.
+AS        = ps2cc
+AOUT      = -o 
+ASFLAGS   = -c -xassembler-with-cpp 
+ASFLAGS  += -Wa,-al=$*.lsa 
+
+DVPASM        = ps2dvpas
+DVPASFLAGS    = -I$(SRCDIR) -I$(DEVDIR)/$(RWTARGET) 
+DVPAOUT       = -o 
+
+RUN = pc-ps2d -d miko 
+
+ifeq ($(CDEBUG), 1)
+#ASFLAGS     += --gstabs 
+DVPASMFLAGS += --gstabs 
+endif
+
+# We do want assembler
+
+# Cope with broken compiler instalations
+ifeq ("$(PS2_DRIVE)", "")
+ifeq ("$(PS2_CPATH)", "")
+CFLAGS += -I/usr/local/sce/ee/include -I/usr/local/sce/common/include \
+          -I/usr/local/sce/ee/gcc/ee/include                          \
+          -I/usr/local/sce/ee/gcc/lib/gcc-lib/ee/2.95.3/include
+else
+CFLAGS += -I/usr/local/sce/ee/include -I/usr/local/sce/common/include
+endif
+else
+ifeq ("$(PS2_CPATH)", "")
+CFLAGS += -I$(PS2_DRIVE):/usr/local/sce/ee/include          \
+          -I$(PS2_DRIVE):/usr/local/sce/common/include      \
+          -I$(PS2_DRIVE):/usr/local/sce/ee/gcc/ee/include   \
+          -I$(PS2_DRIVE):/usr/local/sce/ee/gcc/lib/gcc-lib/ee/2.95.3/include
+else
+CFLAGS += -I$(PS2_DRIVE):/usr/local/sce/ee/include          \
+          -I$(PS2_DRIVE):/usr/local/sce/common/include
+endif
+endif
+CFLAGS += -fno-rtti -fno-exceptions
+
+# Add crtO.o to list of object files
+
+OBJ += crt0.o
+
+VPATH += $(SCELIBDIR)
+
+# Define some compiler/platform specific parameters for the naming of object
+# and library files
+
+O = o
+L = a
+LP = lib
+EXE = .elf
+
+# Directory creation
+ifndef MD
+MD = mkdir -p
+endif
+
+# The following rule is required, as it is not a default
+
+#.SUFFIXES: .c .$(O) .asm .dsm
+
+$(OBJDIR)/%.$(O) : %.dsm
+	$(DVPASM) $(DVPASFLAGS) -alhs $(DVPAOUT)$@ $^ > $(OBJDIR)/$*.lsd
+CPPFLAGS += $(CFLAGS)
+
+
+# Support for multipass linking with LIB groups
+
+RWLIBGROUPSTART = -start-group
+RWLIBGROUPEND = -end-group

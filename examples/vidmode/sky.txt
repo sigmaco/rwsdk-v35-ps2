@@ -1,0 +1,85 @@
+--------------------------------------------------------------------------
+          RenderWare Graphics Example (PlayStation 2): Video-modes
+--------------------------------------------------------------------------
+
+PURPOSE
+
+The VIDMODE example shows all the available video modes and allows the
+user to switch between them. This is a PS2 platform example ONLY. The 
+example starts-up in the default video mode.
+
+Everytime the application is run a file called "vmodes.txt" is created in
+the directory where the application was run from. Contained within this
+file is a list of all the available video modes and their properties.
+
+--------------------------------------------------------------------------
+GENERAL CONTROLS
+
+TRIANGLE            - Browse the next video mode.
+
+CROSS               - Browse the previous video mode.
+
+CIRCLE              - Switch to the indicated video mode.
+
+SQUARE              - Switch to the default video mode.
+
+SELECT button       - Toggle menu/help/plain mode.
+
+START + SELECT      - Quit the application.
+
+--------------------------------------------------------------------------
+MENU OPTIONS
+
+VIDEO MODE          - Allows the user to browse through the available
+                      video modes by index, their properties will be 
+                      displayed in the bottom right corner.
+                           
+SWITCH MODE         - Makes the currently selected video mode (above)
+                      the current video mode.
+
+DEFAULT MODE        - Allows the user to set the default video mode.
+
+FPS                 - Allows the user to read the number of frames 
+                      per second being rendered (updated every
+                      second).
+
+--------------------------------------------------------------------------
+MENU CONTROLS
+
+DPAD UP and DOWN    - Select menu item.
+
+DPAD LEFT and RIGHT - Modify menu item value or execute associated 
+                      command.
+
+LEFT ANALOG stick   - Modify floating point value (if applicable) 
+                      otherwise do what you would do in general 
+                          controls.
+
+--------------------------------------------------------------------------
+HELP CONTROLS
+
+DPAD UP and DOWN         - Scroll a line at a time (autorepeat available).
+
+LEFT SHOULDER #1 and #2  - Scroll a page at a time.
+
+--------------------------------------------------------------------------
+VIDEO MODE SELECTION
+
+Initial video mode selection via the command-line option '-vms' is not 
+available for this example.
+
+--------------------------------------------------------------------------
+This demonstration program is copyright Criterion Software Limited 2003. 
+Criterion Software grants you a license to use it only in the form as 
+supplied. You may not disassemble, decompile or reverse engineer this 
+demonstration program.
+
+This demonstration program is provided as is with no warranties of any
+kind. Criterion Software will not, under any circumstances, be liable for
+any lost revenue or other damages arising from the use of this
+demonstration program.
+
+RenderWare is a registered trademark of Canon Inc.
+Other trademarks acknowledged.
+--------------------------------------------------------------------------
+Tue Apr 22 12:04:26 2003 -- build sky ( 64649 0x35000 )

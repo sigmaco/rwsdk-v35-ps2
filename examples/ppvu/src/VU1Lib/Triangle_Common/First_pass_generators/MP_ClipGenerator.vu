@@ -1,0 +1,85 @@
+					;//==================================================================
+					;//==================================================================
+					;//==															   ==						
+					;//==  	   -PSX2-  MULTIPASS - CLIPPED - PERSPECTIVE - TRIANGLES   ==
+					;//==															   ==
+					;//== Feature :  - Finalize vertices with perspective correction.  ==						
+					;//==			 - Generate stqs and integer rgba.				   ==						
+					;//==			 - Performs fog calculation for free.			   ==	
+					;//==			 - Support 24 bits and 16 bits Zbuffers.		   ==													
+					;//==															   ==
+					;//== 			 										-CHECKED-  ==					
+					;//==															   ==										
+					;//==================================================================
+					;//==================================================================
+
+
+	;----------------------------------------------------------------------------
+	NOP									LQ.zw VF23, vuSDxMaxyMax(VI00)			; 					- Load fog scale / plan 					 
+	NOP									LQ.xyzw VF03, (0+0*vertexSize)(VI01)	;					- Load position-1	
+	NOP									LQ.xyw  VF07, (1+0*vertexSize)(VI01)	;					- Load uv-1
+	ADDAx.xyzw ACC, VF02, VF00			LQ.xyzw VF11, (2+0*vertexSize)(VI01)	; Offset in Acc		- Load rgba-1	 
+	MSUBAz.w ACC, VF23, VF23			LQ.xyzw VF04, (0+1*vertexSize)(VI01)	; Prepare fog		- Load position-2
+	MADDz.w VF15, VF03, VF23			DIV Q, VF00w, VF03w						; Calc fog-1		- Inverse zpos-1 
+	ADDw.z VF07, VF00, VF00				LQ.xyw  VF08, (1+1*vertexSize)(VI01)	; Build stq-1		- Load uv-2		
+	NOP									LQ.xyzw VF12, (2+1*vertexSize)(VI01)	;  					- Load rgba-2
+	NOP									LOI 255.0								;  					- Build fog clamping value	
+	MINIi.w VF03, VF15, I				ISW.x VI09, 0(VI14)						; Clamp fog-1		- Store number of vertices   
+	MADDz.w VF16, VF04, VF23			IADDIU VI05, VI14, 1					; Calc fog-2		- Output buffer adress	  	
+	NOP									IADDIU VI04, VI12, 1					; 					- Multipass Output Buffer 
+	MADDq.xyz VF03, VF03, Q				IADDIU VI06, VI01, 0					; Project pos-1		- Clone Input Buffer Adress		
+	MAX.w VF03, VF03, VF02				SQ.yzw VF01, 0(VI14)					; Clamp fog-1		- Store Gif Tag 	
+MPClipGenloop:;------------------------------------------------------------------
+	MULq.xyz VF07, VF07, Q				DIV Q, VF00w, VF04w						; Build stq-1		- Inverse zpos-2	
+	FTOI0.xyzw VF11, VF11				LQ.xyzw VF05, (0+2*vertexSize)(VI06)	; Int rgba-1		- Load position-3	 
+	MINIi.w VF04, VF16, I				LQ.xyw VF09, (1+2*vertexSize)(VI06)		; Clamp fog-2		- Load uv-3	
+	FTOI4.xyzw VF03, VF03				LQ.xyzw VF13, (2+2*vertexSize)(VI06)	; Convert pos-1		- Load rgba-3	 
+	NOP									IADDIU VI06, VI06, vertexSize			;					- Increment input buffer adress
+	ADDw.z VF08, VF00, VF00				SQI.xyzw VF07, (VI05++)					; Build stq-2		- Save stq-1
+	MADDz.w VF17, VF05, VF23			SQI.xyzw VF11, (VI05++)					; Calc fog-3		- Save rgba-1 
+	NOP									SQ.xyzw VF11, (1+0*OutverSize)(VI04)	;  					- Store multipass rgba-1
+	NOP									SQ.xyzw VF03, (2+0*OutverSize)(VI04)	; 					- Store multipass position-1	
+	MAX.w VF04, VF04, VF02				IBEQ VI06, VI07, MPClipGenEnd			; Clamp fog-2		- End Test				
+	MADDq.xyz VF04, VF04, Q				SQI.xyzw VF03, (VI05++)					; Project pos-2		- Save position-1	 
+	MULq.xyz VF08, VF08, Q				DIV Q, VF00w, VF05w						; Build stq-2		- Inverse zpos-3	
+	FTOI0.xyzw VF12, VF12				LQ.xyzw VF06, (0+2*vertexSize)(VI06)	; Int rgba-2		- Load position-4
+	MINIi.w VF05, VF17, I				LQ.xyw VF10, (1+2*vertexSize)(VI06)		; Clamp fog-3		- Load uv-4		
+	FTOI4.xyzw VF04, VF04				LQ.xyzw VF14, (2+2*vertexSize)(VI06)	; Convert pos-2		- Load rgba-4		 
+	NOP									IADDIU VI06, VI06, vertexSize			;					- Increment input buffer adress
+	ADDw.z VF09, VF00, VF00				SQI.xyzw VF08, (VI05++)					; Build stq-3		- Save stq-2
+	MADDz.w VF18, VF06, VF23			SQI.xyzw VF12, (VI05++)					; Calc fog-4		- Save rgba-2 	 
+	NOP									SQ.xyzw VF12, (1+1*OutverSize)(VI04)	;  					- Store multipass rgba-2
+	NOP									SQ.xyzw VF04, (2+1*OutverSize)(VI04)	; 					- Store multipass position-2
+	MAX.w VF05, VF05, VF02				IBEQ VI06, VI07, MPClipGenEnd			; Clamp fog-3		- End Test			
+	MADDq.xyz VF05, VF05, Q				SQI.xyzw VF04, (VI05++)					; Project pos-3		- Save position-2		 
+	MULq.xyz VF09, VF09, Q				DIV Q, VF00w, VF06w						; Build stq-3		- Inverse zpos-4	
+	FTOI0.xyzw VF13, VF13				LQ.xyzw VF03, (0+2*vertexSize)(VI06)	; Int rgba-3		- Load position-1
+	MINIi.w VF06, VF18, I				LQ.xyw VF07, (1+2*vertexSize)(VI06)		; Clamp fog-4		- Load uv-1		
+	FTOI4.xyzw VF05, VF05				LQ.xyzw VF11, (2+2*vertexSize)(VI06)	; Convert pos-3		- Load rgba-1	 
+	NOP									IADDIU VI06, VI06, vertexSize			;					- Increment input buffer adress
+	ADDw.z VF10, VF00, VF00				SQI.xyzw VF09, (VI05++)					; Build stq-4		- Save stq-3
+	MADDz.w VF15, VF03, VF23			SQI.xyzw VF13, (VI05++)					; Calc fog-1		- Save rgba-3 		 
+	NOP									SQ.xyzw VF13, (1+2*OutverSize)(VI04)	;  					- Store multipass rgba-3	
+	NOP									SQ.xyzw VF05, (2+2*OutverSize)(VI04)	; 					- Store multipass position-3
+	MAX.w VF06, VF06, VF02				IBEQ VI06, VI07, MPClipGenEnd			; Clamp fog-4		- End Test		
+	MADDq.xyz VF06, VF06, Q				SQI.xyzw VF05, (VI05++)					; Project pos-4		- Save position-3	 
+	MULq.xyz VF10, VF10, Q				DIV Q, VF00w, VF03w						; Build stq-4		- Inverse zpos-1	
+	FTOI0.xyzw VF14, VF14				LQ.xyzw VF04, (0+2*vertexSize)(VI06)	; Int rgba-4		- Load position-2	
+	MINIi.w VF03, VF15, I				LQ.xyw VF08, (1+2*vertexSize)(VI06)		; Clamp fog-1		- Load uv-2		
+	FTOI4.xyzw VF06, VF06				LQ.xyzw VF12, (2+2*vertexSize)(VI06)	; Convert pos-4		- Load rgba-2	 
+	NOP									IADDIU VI06, VI06, vertexSize			;					- Increment input buffer adress
+	ADDw.z VF07, VF00, VF00				SQI.xyzw VF10, (VI05++)					; Build stq-1		- Save stq-4 
+	MADDz.w VF16, VF04, VF23			SQI.xyzw VF14, (VI05++)					; Calc fog-2		- Save rgba-4 		 
+	NOP									SQ.xyzw VF14, (1+3*OutverSize)(VI04)	;  					- Store multipass rgba-4
+	NOP									SQ.xyzw VF06, (2+3*OutverSize)(VI04)	; 					- Store multipass position-4
+	NOP									IADDIU VI04, VI04, (4*OutverSize)		;					- Increment multipass buffer adress		
+	MAX.w VF03, VF03, VF02				IBNE VI06, VI07, MPClipGenloop			; Clamp fog-1		- End Test			
+	MADDq.xyz VF03, VF03, Q				SQI.xyzw VF06, (VI05++)					; Project pos-1		- Save position-4		 
+MPClipGenEnd:;-------------------------------------------------------------------	
+	 
+										 
+;//================================================================================================================
+;//========================================					=======================================================
+;//====================						    THE END					    			  =========================
+;//========================================			        =======================================================
+;//============================================================================================= JCL Janvier 2001 =

@@ -1,0 +1,1 @@
+extern void FullScreenCopyChannel(RwRaster *dest, RwRaster *src, RwRaster *palette, RwUInt32 channel);

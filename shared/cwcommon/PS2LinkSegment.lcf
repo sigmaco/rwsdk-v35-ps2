@@ -1,0 +1,108 @@
+MEMORY {
+	
+	# The LENGTH parameter is the maximum size allocated for 
+	# that segment of memory.  If the LENGTH is 0, the 
+	# linker will use as much of memory as needed even if it
+	# overflows on the next segment.
+	
+	.indata		(RX)  : ORIGIN = 0x00100000, LENGTH = 0x00100000
+	.textdata	(RWX) : ORIGIN = 0x00200000
+	.mw_init	(RW)  :	ORIGIN = AFTER(.textdata)
+	.spad		(RW)  :	ORIGIN = 0x70000000, LENGTH = 0x4000
+}
+
+SECTIONS {
+	#	define
+	_stack		= -1;
+	_stack_size	= 0x00100000;
+	_heap_size	= -1;
+	
+	..indata :
+	{
+		*	(.indata)
+	} > .indata
+
+	..textdata :
+	{
+		crt0.o	(.text)
+		*		(.text)
+
+		. = ALIGN(128);
+		*		(.vutext)
+		
+#		. = ALIGN(128);
+		*		(.reginfo)
+
+		. = ALIGN(128);
+		*		(.data)
+
+		. = ALIGN(128);
+		*		(.vudata)
+
+		. = ALIGN(128);
+		*		(.rodata)
+		
+		. = ALIGN(128);
+		*		(.rdata)
+		
+				
+		# C++ related sections
+		
+		*	(.vtables)		# Only needed for C++
+		*	(.exception)	# Only needed for C++
+		
+		# Include the exception table index.  
+		. = ALIGN(4);
+
+		__exception_table_start__ = .;
+		EXCEPTION			# Only needed in C++
+		*	(.gcc_except_table)
+		__exception_table_end__ = .;
+	
+	
+		. = ALIGN(128);
+		_gp = . + 0x00008000;
+
+		LITERAL
+		
+		. = ALIGN(128);
+		*		(.sdata)
+		
+		. = ALIGN(128);
+		_fbss = .;
+		*		(.sbss)
+		*		(.scommon)
+		*		(SCOMMON)
+
+		. = ALIGN(128);
+		*		(.bss)
+		*		(.common)
+		*		(COMMON)
+		. = ALIGN(128);
+		*		(.vubss)
+				
+		_end = .;		
+	} > .textdata
+
+
+	# Include linker defined symbols (static initializer table)
+	# This area of memory is only needed at startup and can be 
+	# reclaimed when the main program is activated.
+	
+	..tmp :
+	{
+		# Static initializers table. 
+		
+		__static_init = .;
+#		STATICINIT
+		
+		. = ALIGN(8);	
+	} > .mw_init		
+
+
+	..spad :
+	{
+		crt0.o	(.spad)
+		*		(.spad)
+	} > .spad
+}

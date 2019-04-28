@@ -1,0 +1,89 @@
+					;//==================================================================
+					;//==================================================================
+					;//==															   ==						
+					;//==  	  -PSX2-      MULTIPASS - PARALLEL - TRIANGLES 	 		   ==
+					;//==															   ==					
+					;//==															   ==					
+					;//== Features : Transform vertices into screen space. Rgbas are   ==					
+					;//==			 converted from float to integer.     	  		   ==					
+					;//==			 Generate stq. Free fog calculation. 			   ==					
+					;//==			 Support 24 bits and 16 bits Zbuffers.			   ==			
+					;//==															   ==					
+					;//== 													-CHECKED-  ==
+					;//==															   ==															
+					;//==================================================================
+					;//==================================================================
+					
+
+	;----------------------------------------------------------------------------
+	ADDx.xyzw VF24, VF28, VF00			LQ.zw VF22, vuSDxMaxyMax(VI00)			; Clone trans matrix	- Load fog scale/plan				
+	ADDx.xyzw VF25, VF29, VF00			LQ.xyz VF03, (0+0*vertexSize)(VI01)		; Clone trans matrix	- Load position-1 			
+	ADDx.xyzw VF26, VF30, VF00			LQ.xy VF07, (1+0*vertexSize)(VI01)		; Clone trans matrix	- Load uv-1	 							
+	ADD.xyz VF27, VF31, VF02			LQ.xyzw VF11, (2+0*vertexSize)(VI01)	; Clone trans matrix	- Load rgba-1		
+	MULAz.w ACC, VF31, VF22				MR32.z VF07, VF00						; Insert trans-fog		- Uv-1 to Stq-1 
+	MSUBz.w VF27, VF22, VF22			MR32.z VF08, VF00						; Insert trans-fog		- Uv-2 to Stq-2 
+	MULz.w VF24, VF24, VF22				NOP										; Scale fog w field		  
+	MULz.w VF25, VF25, VF22				NOP										; Scale fog w field		
+	MULz.w VF26, VF26, VF22				NOP										; Scale fog w field				
+	MULAw.xyzw ACC, VF27, VF00			LQ.xyz VF04, (0+1*vertexSize)(VI01)		; Transform pos-1		- Load position-2    
+	MADDAx.xyzw ACC, VF24, VF03			LQ.xy VF08, (1+1*vertexSize)(VI01)		; Transform pos-1		- Load uv-2
+	MADDAy.xyzw ACC, VF25, VF03			LQ.xyzw VF12, (2+1*vertexSize)(VI01)	; Transform pos-1		- Load rgba-2 
+	MADDz.xyzw VF03, VF26, VF03			NOP										; Transform pos-1		 
+	ADDw.z VF09 ,VF00, VF00				NOP										; Uv-3 to Stq-3 		 
+	ADDw.z VF10 ,VF00, VF00				NOP										; Uv-4 to Stq-4 		 
+	MULAw.xyzw ACC, VF27, VF00			LOI 255.0								; Transform pos-2		- Fog maximum clamping value
+	MINIi.w VF03, VF03, I				ISW.x VI09, 0(VI14)						; Clamp fog-1    		- Store Tag number of vertices
+	MADDAx.xyzw ACC, VF24, VF04			IADDIU VI04, VI12, 1					; Transform pos-2		- Output buffer multi pass	 
+	MADDAy.xyzw ACC, VF25, VF04			IADDIU VI05, VI14, 1					; Transform pos-2		- Clone output buffer adress 
+	MADDz.xyzw VF04, VF26, VF04			IADDIU VI06, VI01, 0					; Transform pos-2		- Clone input buffer adress  
+	MAX.w VF03, VF03, VF02				SQ.yzw VF01, 0(VI14)					; Clamp fog-1    		- Store Gif-tag 	
+MPparallaxLoop:;-----------------------------------------------------------------	
+	FTOI0.xyzw VF11, VF11				LQ.xyz VF05, (0+2*vertexSize)(VI06)		; Float to Int rgba-1 	- Load position-3  
+	MULAw.xyzw ACC, VF27, VF00			LQ.xy VF09, (1+2*vertexSize)(VI06)		; Transform pos-3		- Load uv-3
+	MINIi.w VF04, VF04, I				LQ.xyzw VF13, (2+2*vertexSize)(VI06)	; Clamp fog-2    		- Load rgba-3
+	FTOI4.xyzw VF03, VF03				IADDIU VI06, VI06, vertexSize			; Convert pos-1			- Increment input buffer adress
+	MADDAx.xyzw ACC, VF24, VF05			SQI.xyzw VF07, (VI05++)					; Transform pos-3		- Store stq-1
+	MADDAy.xyzw ACC, VF25, VF05			SQI.xyzw VF11, (VI05++)					; Transform pos-3		- Store rgba-1 
+	NOP									SQ.xyzw VF11, (1+0*OutverSize)(VI04)	; 						- Store second-pass rgba-1
+	NOP									SQ.xyzw VF03, (2+0*OutverSize)(VI04)	; 						- Store second-pass position-1
+	MADDz.xyzw VF05, VF26, VF05			IBEQ VI06, VI10, MPparallaxEnd			; Transform pos-3		- End test 
+	MAX.w VF04, VF04, VF02				SQI.xyzw VF03, (VI05++)					; Clamp fog-2    		- Store position-1
+	FTOI0.xyzw VF12, VF12				LQ.xyz VF06, (0+2*vertexSize)(VI06)		; Float to Int rgba-2 	- Load position-4  
+	MULAw.xyzw ACC, VF27, VF00			LQ.xy VF10, (1+2*vertexSize)(VI06)		; Transform pos-4		- Load uv-4
+	MINIi.w VF05, VF05, I				LQ.xyzw VF14, (2+2*vertexSize)(VI06)	; Clamp fog-3    		- Load rgba-4
+	FTOI4.xyzw VF04, VF04				IADDIU VI06, VI06, vertexSize			; Convert pos-2			- Increment input buffer adress
+	MADDAx.xyzw ACC, VF24, VF06			SQI.xyzw VF08, (VI05++)					; Transform pos-4		- Store stq-2
+	MADDAy.xyzw ACC, VF25, VF06			SQI.xyzw VF12, (VI05++)					; Transform pos-4		- Store rgba-2 
+	NOP									SQ.xyzw VF12, (1+1*OutverSize)(VI04)	; 						- Store second-pass rgba-2
+	NOP									SQ.xyzw VF04, (2+1*OutverSize)(VI04)	; 						- Store second-pass position-2	
+	MADDz.xyzw VF06, VF26, VF06			IBEQ VI06, VI10, MPparallaxEnd			; Transform pos-4		- End test 
+	MAX.w VF05, VF05, VF02				SQI.xyzw VF04, (VI05++)					; Clamp fog-3    		- Store position-2
+	FTOI0.xyzw VF13, VF13				LQ.xyz VF03, (0+2*vertexSize)(VI06)		; Float to Int rgba-3 	- Load position-1  
+	MULAw.xyzw ACC, VF27, VF00			LQ.xy VF07, (1+2*vertexSize)(VI06)		; Transform pos-1		- Load uv-1
+	MINIi.w VF06, VF06, I				LQ.xyzw VF11, (2+2*vertexSize)(VI06)	; Clamp fog-4    		- Load rgba-1
+	FTOI4.xyzw VF05, VF05				IADDIU VI06, VI06, vertexSize			; Convert pos-3			- Increment input buffer adress
+	MADDAx.xyzw ACC, VF24, VF03			SQI.xyzw VF09, (VI05++)					; Transform pos-1		- Store stq-3
+	MADDAy.xyzw ACC, VF25, VF03			SQI.xyzw VF13, (VI05++)					; Transform pos-1		- Store rgba-3 
+	NOP									SQ.xyzw VF13, (1+2*OutverSize)(VI04)	; 						- Store second-pass rgba-3
+	NOP									SQ.xyzw VF05, (2+2*OutverSize)(VI04)	; 						- Store second-pass position-3	
+	MADDz.xyzw VF03, VF26, VF03			IBEQ VI06, VI10, MPparallaxEnd			; Transform pos-1		- End test 
+	MAX.w VF06, VF06, VF02				SQI.xyzw VF05, (VI05++)					; Clamp fog-4    		- Store position-3
+	FTOI0.xyzw VF14, VF14				LQ.xyz VF04, (0+2*vertexSize)(VI06)		; Float to Int rgba-4 	- Load position-2  
+	MULAw.xyzw ACC, VF27, VF00			LQ.xy VF08, (1+2*vertexSize)(VI06)		; Transform pos-2		- Load uv-2
+	MINIi.w VF03, VF03, I				LQ.xyzw VF12, (2+2*vertexSize)(VI06)	; Clamp fog-1    		- Load rgba-2
+	FTOI4.xyzw VF06, VF06				IADDIU VI06, VI06, vertexSize			; Convert pos-4			- Increment input buffer adress
+	MADDAx.xyzw ACC, VF24, VF04			SQI.xyzw VF10, (VI05++)					; Transform pos-2		- Store stq-4
+	MADDAy.xyzw ACC, VF25, VF04			SQI.xyzw VF14, (VI05++)					; Transform pos-2		- Store rgba-4 
+	NOP									SQ.xyzw VF14, (1+3*OutverSize)(VI04)	; 						- Store second-pass rgba-4
+	NOP									SQ.xyzw VF06, (2+3*OutverSize)(VI04)	; 						- Store second-pass position-4	
+	NOP									IADDIU VI04, VI04, (4*OutverSize)		;						- Increment second pass output buffer
+	MADDz.xyzw VF04, VF26, VF04			IBNE VI06, VI10, MPparallaxLoop			; Transform pos-2		- End test 
+	MAX.w VF03, VF03, VF02				SQI.xyzw VF06, (VI05++)					; Clamp fog-1    		- Store position-4
+MPparallaxEnd:;------------------------------------------------------------------
+
+	
+;//================================================================================================================
+;//=======================================					=======================================================
+;//===================						    THE END					    			  =========================
+;//=======================================			        =======================================================
+;//============================================================================================= JCL Janvier 2001 =
