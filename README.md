@@ -1,4 +1,4 @@
-# RenderWare (Graphics) 3.5 — Evaluation Edition for PlayStation 2
+# RenderWare (Graphics) 3.5, PlayStation 2 — Evaluation Edition
 Auto-descritivo. Se não foi captado por você, então isto não é pra você.
 
 Em caso de dúvida, use nosso suporte no Discord.
