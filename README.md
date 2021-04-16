@@ -1,8 +1,9 @@
-# RenderWare (Graphics) 3.5, PlayStation 2 — Evaluation Edition
-Auto-descritivo. Se não foi captado por você, então isto não é pra você.
+# RenderWare "Graphics" 3 (3.5), PlayStation 2 — Evaluation Edition
+Evaluation Edition of the [RenderWare](https://sigmaco.org/t/renderware) Graphics 3.5 for [PlayStation 2](https://sigmaco.org/t/playstation-2).
 
-Em caso de dúvida, use nosso suporte no Discord.
-https://republicasigma.com.br/discord/join/
+For any questions, use our support at [Discord](https://sigmaco.org/discord/):
 
-Este conteúdo é © 1993-2004 Criterion Software Limited. Todos os direitos reservados.
-Violação de copyright não-intencional. Isto está aqui para propósitos educativos e preservação digital.
+[![](https://discordapp.com/api/guilds/349379672351571969/embed.png?style=banner4)](https://sigmaco.org/discord/)
+
+[RenderWare](https://sigmaco.org/t/renderware) is © [1993](https://sigmaco.org/t/1993)-[2006](https://sigmaco.org/t/2006) [Criterion Software Ltd.](https://sigmaco.org/t/criterion-software), [Canon Inc.](https://sigmaco.org/t/canon), & [Electronic Arts Inc](https://sigmaco.org/t/ea-games). All rights reserved.
+This repository is intended merely to preserve the history and legacy of [RenderWare](https://sigmaco.org/t/renderware). No copyright infringement targets any harm to its legal holders. For any objections, contact the [SIGMA Technology Group](https://sigmaco.org/g/technology) at [technology@sigmaco.org](mailto:technology@sigmaco.org).
